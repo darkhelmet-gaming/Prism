@@ -28,7 +28,7 @@ version = '1.0.0-SNAPSHOT'
 ext.projectName = 'Prism'
 ext.inceptionYear = '2014'
 ext.packaging = 'jar'
-ext.url = 'http://discover-prism.com'
+ext.url = 'http://helion3.com/'
 ext.description = 'Prism'
 ext.organization = 'Helion3'
 
@@ -60,7 +60,7 @@ processResources {
 
 // License header formatting
 license {
-    ext.name = project.name
+    ext.name = project.projectName
     ext.organization = project.organization
     ext.url = project.url
     ext.year = project.inceptionYear

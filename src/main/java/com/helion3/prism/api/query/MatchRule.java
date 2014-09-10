@@ -21,10 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api;
+package com.helion3.prism.api.query;
 
-public interface Query {
-
-
-
+/**
+ * Instructs the query engine on how to match given conditions
+ */
+public enum MatchRule {
+    INCLUDE,EXCLUDE,PARTIAL
 }

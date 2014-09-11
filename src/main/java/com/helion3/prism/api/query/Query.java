@@ -34,11 +34,4 @@ public interface Query {
      */
     void addPlayer(Player player);
 
-    /**
-     * Set the match rule for all given {@link org.spongepowered.api.entity.Player}s, if any.
-     *
-     * @param rule
-     */
-    void setPlayerMatchRule(MatchRule rule);
-
 }

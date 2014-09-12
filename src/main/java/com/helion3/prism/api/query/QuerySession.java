@@ -23,15 +23,27 @@
  */
 package com.helion3.prism.api.query;
 
-import org.spongepowered.api.entity.Player;
+public interface QuerySession {
 
-public interface Query {
+    // @todo waiting on sponge
+//    public CommandSender getSender()
 
-//    /**
-//     * Query records involving a specific {@link org.spongepowered.api.entity.Player}
-//     *
-//     * @param player
-//     */
-//    void addPlayer(Player player);
+    /**
+     * Get the query defined for this session
+     *
+     * @return {@link Query}
+     */
+    Query getQuery();
+
+    /**
+     * Is this session for a preview
+     *
+     * @return Boolean, if a preview
+     */
+    boolean isPreview();
+
+    // @todo waiting on sponge
+//    public void addResultRecipient( CommandSender sender )
+//    public List<CommandSender> getResultRecipients()
 
 }

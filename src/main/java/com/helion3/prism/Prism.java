@@ -21,17 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.query;
+package com.helion3.prism;
 
-import org.spongepowered.api.entity.Player;
+import org.spongepowered.api.event.SpongeEventHandler;
+import org.spongepowered.api.event.state.ServerStartedEvent;
+import org.spongepowered.api.plugin.Plugin;
 
-public interface Query {
+@Plugin(id = "Prism", name = "Prism")
+public class Prism {
 
-//    /**
-//     * Query records involving a specific {@link org.spongepowered.api.entity.Player}
-//     *
-//     * @param player
-//     */
-//    void addPlayer(Player player);
+    /**
+     * Performs bootstrapping of Prism resources/objects
+     *
+     * @param event Server started
+     */
+    @SpongeEventHandler
+    public void onEnable(ServerStartedEvent event){
 
+
+    }
 }

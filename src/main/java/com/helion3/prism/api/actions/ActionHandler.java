@@ -21,17 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.query;
+package com.helion3.prism.api.actions;
 
-import org.spongepowered.api.entity.Player;
+import java.util.Date;
 
-public interface Query {
+public interface ActionHandler {
 
-//    /**
-//     * Query records involving a specific {@link org.spongepowered.api.entity.Player}
-//     *
-//     * @param player
-//     */
-//    void addPlayer(Player player);
+//    void setDate( Date date );
 
+    Date getDate();
+
+
+    public void setData( String data );
+
+    public String getData();
+
+
+//    public ActionType getType();
+//     void setType(ActionType type);
+
+//    public void setAggregateCount(int aggregateCount);
+
+
+    int getAggregateCount();
+
+
+//    ChangeResult applyRollback( QuerySession session );
+//
+//    ChangeResult applyRestore( QuerySession session );
+//
+//    ChangeResult applyUndo( QuerySession session );
+//
+//    ChangeResult applyDeferred( QuerySession session );
 }

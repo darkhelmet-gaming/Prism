@@ -23,7 +23,7 @@
  */
 package com.helion3.prism.api.query;
 
-import org.spongepowered.api.entity.Player;
+import org.spongepowered.api.entity.player.Player;
 
 public interface Query {
 

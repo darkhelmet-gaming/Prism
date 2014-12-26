@@ -23,9 +23,10 @@
  */
 package com.helion3.prism;
 
-import org.spongepowered.api.event.SpongeEventHandler;
 import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.util.event.Subscribe;
+
 
 @Plugin(id = "Prism", name = "Prism")
 public class Prism {
@@ -35,7 +36,7 @@ public class Prism {
      *
      * @param event Server started
      */
-    @SpongeEventHandler
+    @Subscribe
     public void onEnable(ServerStartedEvent event){
 
 

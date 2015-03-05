@@ -25,6 +25,7 @@ package com.helion3.prism.api.actions;
 
 import java.util.Date;
 
+// @todo rename this
 public interface ActionHandler {
 
 //    void setDate( Date date );

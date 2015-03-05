@@ -27,18 +27,16 @@ import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.util.event.Subscribe;
 
-
-@Plugin(id = "Prism", name = "Prism")
+@Plugin(id = "Prism", name = "Prism", version = "3.0")
 public class Prism {
 
     /**
-     * Performs bootstrapping of Prism resources/objects
+     * Performs bootstrapping of Prism resources/objects.
      *
      * @param event Server started
      */
     @Subscribe
-    public void onEnable(ServerStartedEvent event){
-
-
+    public void onServerStart(ServerStartedEvent event) {
+        
     }
 }

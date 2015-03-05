@@ -23,15 +23,5 @@
  */
 package com.helion3.prism.api.query;
 
-import org.spongepowered.api.entity.player.Player;
-
 public interface Query {
-
-//    /**
-//     * Query records involving a specific {@link org.spongepowered.api.entity.Player}
-//     *
-//     * @param player
-//     */
-//    void addPlayer(Player player);
-
 }

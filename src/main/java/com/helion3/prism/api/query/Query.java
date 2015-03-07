@@ -1,7 +1,7 @@
 /**
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2014 Helion3 http://helion3.com/
+ * Copyright (c) 2015 Helion3 http://helion3.com/
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal

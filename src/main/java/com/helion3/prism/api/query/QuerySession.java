@@ -1,7 +1,7 @@
 /**
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2014 Helion3 http://helion3.com/
+ * Copyright (c) 2015 Helion3 http://helion3.com/
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ package com.helion3.prism.api.query;
 public interface QuerySession {
 
     // @todo waiting on sponge
-//    public CommandSender getSender()
+    // public CommandSender getSender()
 
     /**
      * Get the query defined for this session
@@ -43,7 +43,7 @@ public interface QuerySession {
     boolean isPreview();
 
     // @todo waiting on sponge
-//    public void addResultRecipient( CommandSender sender )
-//    public List<CommandSender> getResultRecipients()
+    // public void addResultRecipient( CommandSender sender )
+    // public List<CommandSender> getResultRecipients()
 
 }

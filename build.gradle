@@ -23,7 +23,7 @@ defaultTasks 'licenseFormat', 'check', 'build'
 ext.projectName = 'Prism'
 ext.inceptionYear = '2015'
 ext.packaging = 'jar'
-ext.url = 'http://discover-prism.com/'
+ext.url = 'http://helion3.com/'
 ext.description = 'Prism'
 ext.organization = 'Helion3'
 

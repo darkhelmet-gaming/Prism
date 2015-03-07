@@ -1,7 +1,7 @@
 /**
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2014 Helion3 http://helion3.com/
+ * Copyright (c) 2015 Helion3 http://helion3.com/
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,15 +32,14 @@ import java.util.List;
 public interface StorageAdapter {
 
     /**
-     * Establishes an active connection to the storage
-     * engine. Any DB setup/initialization code will run
-     * here.
+     * Establishes an active connection to the storage engine. Any DB
+     * setup/initialization code will run here.
      *
      * @return Whether or not we connected properly
      * @throws Exception Abstract DB exceptions
      */
     boolean connect() throws Exception;
-    
+
     /**
      * Writes a collection of events to storage
      * 
@@ -48,7 +47,7 @@ public interface StorageAdapter {
      * @return {@link StorageWriteResult}
      * @throws Exception
      */
-    StorageWriteResult write( List<Event> events ) throws Exception;
+    StorageWriteResult write(List<Event> events) throws Exception;
 
     /**
      * Execute a query session for a list of resulting actions
@@ -57,7 +56,7 @@ public interface StorageAdapter {
      * @return List of {@link ActionHandler}
      * @throws Exception Abstract DB or query/handler exceptions
      */
-    List<Event> query( QuerySession session ) throws Exception;
+    List<Event> query(QuerySession session) throws Exception;
 
     /**
      * Given a {@link Query} this will remove all matching records.
@@ -74,8 +73,8 @@ public interface StorageAdapter {
     void close();
 
     /**
-     * Test the connection, returns true if valid and ready, false
-     * if error/null.
+     * Test the connection, returns true if valid and ready, false if
+     * error/null.
      *
      * @return
      * @throws Exception If connection fails

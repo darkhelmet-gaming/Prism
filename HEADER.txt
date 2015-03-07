@@ -1,4 +1,4 @@
-This file is part of ${name}, licensed under the MIT License (MIT).
+This file is part of Prism, licensed under the MIT License (MIT).
 
 Copyright (c) ${year} ${organization} ${url}
 

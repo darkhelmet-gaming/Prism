@@ -1,7 +1,7 @@
 /**
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2014 Helion3 http://helion3.com/
+ * Copyright (c) 2015 Helion3 http://helion3.com/
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,8 +36,8 @@ import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
 public class Prism {
-	
-	private static StorageAdapter storageAdapter;
+
+    private static StorageAdapter storageAdapter;
 
     /**
      * Performs bootstrapping of Prism resources/objects.
@@ -47,42 +47,42 @@ public class Prism {
     @Subscribe
     public void onServerStart(ServerStartedEvent event) {
 
-    	// Game reference
-    	Game game = event.getGame();
-    	
-    	// Listen to events
-    	registerSpongeEventListeners( game.getEventManager() );
-    	
-    	// Initialize storage engine
-    	// @todo needs config
-    	storageAdapter = new MongoStorageAdapter();
-    	try {
-			storageAdapter.connect();
-		} catch (Exception e) {
-			// @todo handle this
-			e.printStackTrace();
-		}
-    	
-    	// Initialize the recording queue manager
-    	new RecordingQueueManager().start();
-    	
+        // Game reference
+        Game game = event.getGame();
+
+        // Listen to events
+        registerSpongeEventListeners(game.getEventManager());
+
+        // Initialize storage engine
+        // @todo needs config
+        storageAdapter = new MongoStorageAdapter();
+        try {
+            storageAdapter.connect();
+        } catch (Exception e) {
+            // @todo handle this
+            e.printStackTrace();
+        }
+
+        // Initialize the recording queue manager
+        new RecordingQueueManager().start();
+
     }
-    
+
     /**
      * 
      * @return
      */
-    public static StorageAdapter getStorageAdapter(){
-    	return storageAdapter;
+    public static StorageAdapter getStorageAdapter() {
+        return storageAdapter;
     }
-    
+
     /**
      * Register all event listeners.
      */
-    private void registerSpongeEventListeners( EventManager eventManager ){
+    private void registerSpongeEventListeners(EventManager eventManager) {
 
-    	// Block events
-    	eventManager.register(this, new BlockBreakListener());
-    	
+        // Block events
+        eventManager.register(this, new BlockBreakListener());
+
     }
 }

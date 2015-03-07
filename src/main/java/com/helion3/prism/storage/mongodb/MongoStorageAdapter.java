@@ -1,7 +1,7 @@
 /**
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
- * Copyright (c) 2014 Helion3 http://helion3.com/
+ * Copyright (c) 2015 Helion3 http://helion3.com/
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,14 +43,14 @@ import java.util.List;
 import org.bson.Document;
 
 public class MongoStorageAdapter implements StorageAdapter {
-	
-	private static MongoClient mongoClient = null;
-	private static MongoDatabase database;
-	private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
-	
-	// @todo move these to config
-	private final String databaseName = "prism";
-	private final String collectionDataName = "prismData";
+
+    private static MongoClient mongoClient = null;
+    private static MongoDatabase database;
+    private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
+
+    // @todo move these to config
+    private final String databaseName = "prism";
+    private final String collectionDataName = "prismData";
 
     /**
      * Establish connections to the database
@@ -59,19 +59,22 @@ public class MongoStorageAdapter implements StorageAdapter {
      */
     @Override
     public boolean connect() throws Exception {
-    	
-        mongoClient = new MongoClient("127.0.0.1",27017); // @todo move to config
- 
-        // @todo support auth: boolean auth = db.authenticate(myUserName, myPassword);
-        
+
+        mongoClient = new MongoClient("127.0.0.1", 27017); // @todo move to
+                                                           // config
+
+        // @todo support auth: boolean auth = db.authenticate(myUserName,
+        // myPassword);
+
         // Connect to the database
         database = mongoClient.getDatabase(databaseName);
 
         // Create indexes
         try {
-            getCollection(collectionDataName).createIndex( new BasicDBObject("x",1).append("z",1) .append("y",1).append("created",-1) );
-            getCollection(collectionDataName).createIndex( new BasicDBObject("created",-1).append("action",1) );
-        } catch( Exception e ){
+            getCollection(collectionDataName).createIndex(
+                    new BasicDBObject("x", 1).append("z", 1).append("y", 1).append("created", -1));
+            getCollection(collectionDataName).createIndex(new BasicDBObject("created", -1).append("action", 1));
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -79,40 +82,40 @@ public class MongoStorageAdapter implements StorageAdapter {
         return false;
 
     }
-    
+
     /**
      * 
      */
     @Override
-    public StorageWriteResult write( List<Event> events ) throws Exception {
-    	
-    	MongoCollection<Document> collection = getCollection(collectionDataName);
- 	
-    	// Build an array of documents
-    	List<WriteModel<Document>> documents = new ArrayList<WriteModel<Document>>();
-    	for( Event event : events ){
-    		Document document = new Document("action", event.getName());
-    		documents.add( new InsertOneModel<Document>(document) );
-    	}
-    	
-    	// Write
-    	collection.bulkWrite( documents, bulkWriteOptions );
-    	
-    	// @todo implement real results, BulkWriteResult
-    	
-    	return new StorageWriteResult();
+    public StorageWriteResult write(List<Event> events) throws Exception {
+
+        MongoCollection<Document> collection = getCollection(collectionDataName);
+
+        // Build an array of documents
+        List<WriteModel<Document>> documents = new ArrayList<WriteModel<Document>>();
+        for (Event event : events) {
+            Document document = new Document("action", event.getName());
+            documents.add(new InsertOneModel<Document>(document));
+        }
+
+        // Write
+        collection.bulkWrite(documents, bulkWriteOptions);
+
+        // @todo implement real results, BulkWriteResult
+
+        return new StorageWriteResult();
 
     }
-    
+
     /**
      * 
      * @param collectionName
      * @return
      */
-    protected static MongoCollection<Document> getCollection( String collectionName ){
+    protected static MongoCollection<Document> getCollection(String collectionName) {
         try {
             return database.getCollection(collectionName);
-        } catch( Exception e ){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -126,7 +129,7 @@ public class MongoStorageAdapter implements StorageAdapter {
      */
     // @todo implement
     @Override
-    public List<Event> query( QuerySession session ) throws Exception {
+    public List<Event> query(QuerySession session) throws Exception {
         List<Event> handlers = new ArrayList<Event>();
         return handlers;
     }
@@ -139,7 +142,7 @@ public class MongoStorageAdapter implements StorageAdapter {
      */
     // @todo implement
     @Override
-    public StorageDeleteResult delete(Query query){
+    public StorageDeleteResult delete(Query query) {
         return new StorageDeleteResult();
     }
 
@@ -148,13 +151,13 @@ public class MongoStorageAdapter implements StorageAdapter {
      */
     // @todo implement
     @Override
-    public void close(){
+    public void close() {
 
     }
 
     /**
-     * Test the connection, returns true if valid and ready, false
-     * if error/null.
+     * Test the connection, returns true if valid and ready, false if
+     * error/null.
      *
      * @return
      * @throws Exception If connection fails

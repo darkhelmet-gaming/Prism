@@ -21,37 +21,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.actions;
+package com.helion3.prism.api.storage;
 
-import java.util.Date;
+import java.util.UUID;
 
-// @todo rename this
-public interface ActionHandler {
+public interface StorageAdapterSettings {
 
-//    void setDate( Date date );
+    /**
+     * Remove a meta setting by its key
+     *
+     * @param key
+     */
+    void deleteSetting(String key);
 
-    Date getDate();
+    /**
+     * Retrieve a meta setting by its key
+     *
+     * @param key
+     * @return String setting value
+     */
+    String getSetting(String key);
 
+    /**
+     * Save a new key/value
+     *
+     * @param key
+     * @param value
+     */
+    void saveSetting(String key, String value);
 
-    public void setData( String data );
+    /**
+     * Remove an owner's meta setting by its key
+     *
+     * @param key
+     * @param owner
+     */
+    void deleteSetting(String key, UUID owner);
 
-    public String getData();
+    /**
+     * Retrieve an owner's meta setting by its key
+     *
+     * @param key
+     * @param value
+     * @param owner
+     */
+    void saveSetting(String key, String value, UUID owner);
 
+    /**
+     * Save a new key/value for an owner
+     *
+     * @param key
+     * @param owner
+     * @return String setting value
+     */
+    String getSetting(String key, UUID owner);
 
-//    public ActionType getType();
-//     void setType(ActionType type);
-
-//    public void setAggregateCount(int aggregateCount);
-
-
-    int getAggregateCount();
-
-
-//    ChangeResult applyRollback( QuerySession session );
-//
-//    ChangeResult applyRestore( QuerySession session );
-//
-//    ChangeResult applyUndo( QuerySession session );
-//
-//    ChangeResult applyDeferred( QuerySession session );
 }

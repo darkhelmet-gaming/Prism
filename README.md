@@ -6,6 +6,8 @@ Sponge is currently in development and this plugin in not ready for use at this 
 
 Our goal is to reproduce Prism as it was for bukkit, with coding, design, and performance improvements.
 
+This version of Prism is still an infant but we're eager for feedback and input.
+
 ### IRC
 
 Please follow prism development on `irc.esper.net` in `#prism`

@@ -23,12 +23,21 @@
  */
 package com.helion3.prism;
 
+import org.spongepowered.api.Game;
 import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.service.event.EventManager;
 import org.spongepowered.api.util.event.Subscribe;
+
+import com.helion3.prism.api.storage.StorageAdapter;
+import com.helion3.prism.events.listeners.BlockBreakListener;
+import com.helion3.prism.queues.RecordingQueueManager;
+import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
 public class Prism {
+	
+	private static StorageAdapter storageAdapter;
 
     /**
      * Performs bootstrapping of Prism resources/objects.
@@ -37,6 +46,43 @@ public class Prism {
      */
     @Subscribe
     public void onServerStart(ServerStartedEvent event) {
-        
+
+    	// Game reference
+    	Game game = event.getGame();
+    	
+    	// Listen to events
+    	registerSpongeEventListeners( game.getEventManager() );
+    	
+    	// Initialize storage engine
+    	// @todo needs config
+    	storageAdapter = new MongoStorageAdapter();
+    	try {
+			storageAdapter.connect();
+		} catch (Exception e) {
+			// @todo handle this
+			e.printStackTrace();
+		}
+    	
+    	// Initialize the recording queue manager
+    	new RecordingQueueManager().start();
+    	
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public static StorageAdapter getStorageAdapter(){
+    	return storageAdapter;
+    }
+    
+    /**
+     * Register all event listeners.
+     */
+    private void registerSpongeEventListeners( EventManager eventManager ){
+
+    	// Block events
+    	eventManager.register(this, new BlockBreakListener());
+    	
     }
 }

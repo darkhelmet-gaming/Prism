@@ -23,27 +23,99 @@
  */
 package com.helion3.prism.storage.mongodb;
 
-import com.helion3.prism.api.actions.ActionHandler;
+import com.helion3.prism.api.events.Event;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.storage.StorageAdapter;
+import com.helion3.prism.api.storage.StorageAdapter;
+import com.helion3.prism.api.storage.StorageDeleteResult;
+import com.helion3.prism.api.storage.StorageWriteResult;
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.BulkWriteOptions;
+import com.mongodb.client.model.InsertOneModel;
+import com.mongodb.client.model.WriteModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.Document;
+
 public class MongoStorageAdapter implements StorageAdapter {
+	
+	private static MongoClient mongoClient = null;
+	private static MongoDatabase database;
+	private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
+	
+	// @todo move these to config
+	private final String databaseName = "prism";
+	private final String collectionDataName = "prismData";
 
     /**
      * Establish connections to the database
      *
      * @return Whether we could connect properly
      */
-    // @todo implement
     @Override
     public boolean connect() throws Exception {
+    	
+        mongoClient = new MongoClient("127.0.0.1",27017); // @todo move to config
+ 
+        // @todo support auth: boolean auth = db.authenticate(myUserName, myPassword);
+        
+        // Connect to the database
+        database = mongoClient.getDatabase(databaseName);
+
+        // Create indexes
+        try {
+            getCollection(collectionDataName).createIndex( new BasicDBObject("x",1).append("z",1) .append("y",1).append("created",-1) );
+            getCollection(collectionDataName).createIndex( new BasicDBObject("created",-1).append("action",1) );
+        } catch( Exception e ){
+            e.printStackTrace();
+            return false;
+        }
 
         return false;
 
+    }
+    
+    /**
+     * 
+     */
+    @Override
+    public StorageWriteResult write( List<Event> events ) throws Exception {
+    	
+    	MongoCollection<Document> collection = getCollection(collectionDataName);
+ 	
+    	// Build an array of documents
+    	List<WriteModel<Document>> documents = new ArrayList<WriteModel<Document>>();
+    	for( Event event : events ){
+    		Document document = new Document("action", event.getName());
+    		documents.add( new InsertOneModel<Document>(document) );
+    	}
+    	
+    	// Write
+    	collection.bulkWrite( documents, bulkWriteOptions );
+    	
+    	// @todo implement real results, BulkWriteResult
+    	
+    	return new StorageWriteResult();
+
+    }
+    
+    /**
+     * 
+     * @param collectionName
+     * @return
+     */
+    protected static MongoCollection<Document> getCollection( String collectionName ){
+        try {
+            return database.getCollection(collectionName);
+        } catch( Exception e ){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -54,28 +126,9 @@ public class MongoStorageAdapter implements StorageAdapter {
      */
     // @todo implement
     @Override
-    public List<ActionHandler> query( QuerySession session ) throws Exception {
-        List<ActionHandler> handlers = new ArrayList<ActionHandler>();
+    public List<Event> query( QuerySession session ) throws Exception {
+        List<Event> handlers = new ArrayList<Event>();
         return handlers;
-    }
-
-    /**
-     * Prism purges records in chunks. How we find those chunks is determined
-     * by the storage engine. For MySQL it's by primary key, etc.
-     *
-     * It must be numerical (something we can increment), largest allowed is a long.
-     *
-     * @return
-     */
-    // @todo implement
-    @Override
-    public long getMinimumChunkingKey(){
-        return 0;
-    }
-    // @todo implement
-    @Override
-    public long getMaximumChunkingKey(){
-        return 0;
     }
 
     /**
@@ -86,8 +139,8 @@ public class MongoStorageAdapter implements StorageAdapter {
      */
     // @todo implement
     @Override
-    public int delete(Query query){
-        return 0;
+    public StorageDeleteResult delete(Query query){
+        return new StorageDeleteResult();
     }
 
     /**

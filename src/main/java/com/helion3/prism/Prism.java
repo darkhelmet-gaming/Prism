@@ -34,6 +34,13 @@ import com.helion3.prism.events.listeners.BlockBreakListener;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 
+/**
+ * Prism is an event logging + rollback/restore engine for Minecraft
+ * servers. 
+ * 
+ * @author viveleroi
+ *
+ */
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
 public class Prism {
 

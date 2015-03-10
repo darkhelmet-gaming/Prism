@@ -25,18 +25,18 @@ package com.helion3.prism.queues;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.helion3.prism.api.events.Event;
+import com.helion3.prism.api.records.EventRecord;
 
 public class RecordingQueue {
 
-    private static final LinkedBlockingQueue<Event> queue = new LinkedBlockingQueue<Event>();
+    private static final LinkedBlockingQueue<EventRecord> queue = new LinkedBlockingQueue<EventRecord>();
 
     /**
      * Adds a new Event to the recording queue.
      * 
      * @param event Event to be queued for database write
      */
-    public static void add(final Event event) {
+    public static void add(final EventRecord event) {
 
         if (event == null) {
             throw new IllegalArgumentException("Null event given to Prism recording queue.");
@@ -49,9 +49,9 @@ public class RecordingQueue {
     /**
      * Returns all unsaved events in the queue.
      * 
-     * @return Current unsaved {@link Event} queue
+     * @return Current unsaved {@link EventRecord} queue
      */
-    public static LinkedBlockingQueue<Event> getQueue() {
+    public static LinkedBlockingQueue<EventRecord> getQueue() {
         return queue;
     }
     

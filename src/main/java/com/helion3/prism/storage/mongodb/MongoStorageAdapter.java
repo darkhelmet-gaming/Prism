@@ -23,12 +23,13 @@
  */
 package com.helion3.prism.storage.mongodb;
 
-import com.helion3.prism.api.events.Event;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
+import com.helion3.prism.api.records.EventRecord;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
+import com.helion3.prism.records.BlockEventRecord;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -41,6 +42,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.Extent;
 
 public class MongoStorageAdapter implements StorageAdapter {
 
@@ -87,15 +90,46 @@ public class MongoStorageAdapter implements StorageAdapter {
      * 
      */
     @Override
-    public StorageWriteResult write(List<Event> events) throws Exception {
+    public StorageWriteResult write(List<EventRecord> events) throws Exception {
 
         MongoCollection<Document> collection = getCollection(collectionDataName);
 
         // Build an array of documents
         List<WriteModel<Document>> documents = new ArrayList<WriteModel<Document>>();
-        for (Event event : events) {
-            Document document = new Document("action", event.getName());
+        for (EventRecord event : events) {
+            
+            Document document = new Document();
+            
+            document.put("action", event.getName());
+            document.put("date", event.getDate());
+            
+            // Coordinates
+            document.put("x", event.getLocation().getPosition().getX());
+            document.put("y", event.getLocation().getPosition().getY());
+            document.put("z", event.getLocation().getPosition().getZ());
+            
+            // World
+            Extent extent = event.getLocation().getExtent();
+            if (extent instanceof World) {
+                document.put("world", ((World) extent).getUniqueId());
+            }
+            
+            // Block data
+            if ( event instanceof BlockEventRecord ){
+                BlockEventRecord blockRecord = (BlockEventRecord) event;
+                
+                if (blockRecord.getExistingBlockId().isPresent()) {
+                    document.put("existingBlockId", blockRecord.getExistingBlockId().get());
+                }
+                if (blockRecord.getReplacementBlockId().isPresent()) {
+                    document.put("replacementBlockId", blockRecord.getReplacementBlockId().get());
+                }
+            }
+            
+            // @todo player
+            
             documents.add(new InsertOneModel<Document>(document));
+            
         }
 
         // Write
@@ -129,8 +163,8 @@ public class MongoStorageAdapter implements StorageAdapter {
      */
     // @todo implement
     @Override
-    public List<Event> query(QuerySession session) throws Exception {
-        List<Event> handlers = new ArrayList<Event>();
+    public List<EventRecord> query(QuerySession session) throws Exception {
+        List<EventRecord> handlers = new ArrayList<EventRecord>();
         return handlers;
     }
 

@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.helion3.prism.Prism;
-import com.helion3.prism.api.events.Event;
+import com.helion3.prism.api.records.EventRecord;
 
 public class RecordingQueueManager extends Thread {
 
@@ -36,15 +36,13 @@ public class RecordingQueueManager extends Thread {
 
         while (true) {
 
-            System.out.println("Recording manager checking queue...");
-
-            List<Event> eventsSaveBatch = new ArrayList<Event>();
+            List<EventRecord> eventsSaveBatch = new ArrayList<EventRecord>();
 
             // Assume we're iterating everything in the queue
             while (!RecordingQueue.getQueue().isEmpty()) {
 
                 // Poll the next event, append to list
-                Event event = RecordingQueue.getQueue().poll();
+                EventRecord event = RecordingQueue.getQueue().poll();
                 if (event != null) {
                     eventsSaveBatch.add(event);
                 }

@@ -21,18 +21,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.events;
+package com.helion3.prism.api.records;
 
-public interface Actionable {
+import java.util.Date;
+
+import org.spongepowered.api.world.Location;
+
+/**
+ * Represents a single record of an event. Contains 
+ * necessary information about the event including the 
+ * location, subject, time, causation, etc.
+ * 
+ * @author viveleroi
+ */
+public interface EventRecord {
 
     /**
-     * Reverse the end result of this event.
+     * Returns the parameter name for this {@link EventRecord}.
+     * 
+     * @return String name of the event
      */
-    public void undo();
+    public String getName();
 
     /**
-     * Re-apply the effect(s) of this event.
+     * Returns the location for this {@link EventRecord}.
+     * 
+     * @return Location of the event
      */
-    public void redo();
+    public Location getLocation();
+    
+    /**
+     * Returns the date/time of this event.
+     * 
+     * @return Date The date the event occurred
+     */
+    public Date getDate();
 
 }

@@ -21,24 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.events;
+package com.helion3.prism.api.records;
 
-import org.spongepowered.api.world.Location;
-
-public interface Event {
+public interface Actionable {
 
     /**
-     * Returns the parameter name for this {@link Event}.
+     * Reverses the result of this event on a subject
+     * unless the state of the subject has changed since
+     * this event, in way that would conflict.
      * 
-     * @return String name of the event
+     * For example, if the subject was a block, and
+     * the action removed the block, this will restore
+     * the block at the same location.
+     * 
      */
-    public String getName();
+    public void undo();
 
     /**
-     * Returns the location for this {@link Event}.
+     * Re-applies the result of this event to a subject,
+     * unless the subject does not exist in a state that
+     * would allow this change.
      * 
-     * @return Location of the event
      */
-    public Location getLocation();
+    public void redo();
 
 }

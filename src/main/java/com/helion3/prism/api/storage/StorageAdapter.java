@@ -23,9 +23,9 @@
  */
 package com.helion3.prism.api.storage;
 
-import com.helion3.prism.api.events.Event;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
+import com.helion3.prism.api.records.EventRecord;
 
 import java.util.List;
 
@@ -43,11 +43,11 @@ public interface StorageAdapter {
     /**
      * Writes a collection of events to storage
      * 
-     * @param event {@link Event}s to persist
+     * @param event {@link EventRecord}s to persist
      * @return {@link StorageWriteResult}
      * @throws Exception
      */
-    StorageWriteResult write(List<Event> events) throws Exception;
+    StorageWriteResult write(List<EventRecord> events) throws Exception;
 
     /**
      * Execute a query session for a list of resulting actions
@@ -56,7 +56,7 @@ public interface StorageAdapter {
      * @return List of {@link ActionHandler}
      * @throws Exception Abstract DB or query/handler exceptions
      */
-    List<Event> query(QuerySession session) throws Exception;
+    List<EventRecord> query(QuerySession session) throws Exception;
 
     /**
      * Given a {@link Query} this will remove all matching records.

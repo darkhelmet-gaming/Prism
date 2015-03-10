@@ -25,25 +25,11 @@ package com.helion3.prism.api.query;
 
 public interface QuerySession {
 
-    // @todo waiting on sponge
-    // public CommandSender getSender()
-
     /**
-     * Get the query defined for this session
+     * Get the query defined for this session.
      *
      * @return {@link Query}
      */
     Query getQuery();
-
-    /**
-     * Is this session for a preview
-     *
-     * @return Boolean, if a preview
-     */
-    boolean isPreview();
-
-    // @todo waiting on sponge
-    // public void addResultRecipient( CommandSender sender )
-    // public List<CommandSender> getResultRecipients()
 
 }

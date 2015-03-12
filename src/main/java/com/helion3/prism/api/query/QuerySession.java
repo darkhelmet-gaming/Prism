@@ -23,13 +23,29 @@
  */
 package com.helion3.prism.api.query;
 
-public interface QuerySession {
+/**
+ * Represents a record query session, which includes the actual
+ * {@link Query} as well as the source, and result set meta data.
+ * 
+ */
+public class QuerySession {
+    
+    protected final Query query;
+    
+    /**
+     * Creates a new session with the given {@link Query}
+     * @param query
+     */
+    public QuerySession(Query query){
+        this.query = query;
+    }
 
     /**
      * Get the query defined for this session.
      *
      * @return {@link Query}
      */
-    Query getQuery();
-
+    Query getQuery(){
+        return query;
+    }
 }

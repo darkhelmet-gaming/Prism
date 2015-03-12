@@ -25,36 +25,75 @@ package com.helion3.prism.api.records;
 
 import java.util.Date;
 
+import javax.annotation.Nullable;
+
 import org.spongepowered.api.world.Location;
+
+import com.google.common.base.Optional;
 
 /**
  * Represents a single record of an event. Contains 
  * necessary information about the event including the 
  * location, subject, time, causation, etc.
  * 
- * @author viveleroi
  */
-public interface EventRecord {
+public abstract class EventRecord {
+    
+    // Required values
+    protected final String eventName;
+    protected final Date date;
+    protected final EventSource source;
+    
+    // Optional
+    protected final Optional<Location> location;
+    
+    /**
+     * 
+     * @param eventName Parameter name of the event
+     * @param source Source/cause of the event
+     * @param location Location the event occurred
+     * @param date Time at which the event occurred
+     */
+    public EventRecord(String eventName, EventSource source, Date date, @Nullable Location location ){
+        this.eventName = eventName;
+        this.source = source;
+        this.date = date;
+        this.location = Optional.fromNullable(location);
+    }
 
     /**
      * Returns the parameter name for this {@link EventRecord}.
      * 
      * @return String name of the event
      */
-    public String getName();
+    public String getName(){
+        return eventName;
+    }
 
     /**
      * Returns the location for this {@link EventRecord}.
      * 
      * @return Location of the event
      */
-    public Location getLocation();
+    public Optional<Location> getLocation(){
+        return location;
+    }
     
     /**
      * Returns the date/time of this event.
      * 
      * @return Date The date the event occurred
      */
-    public Date getDate();
-
+    public Date getDate(){
+        return date;
+    }
+    
+    /**
+     * Returns the source of this specific event.
+     * 
+     * @return EventSource Source of this event
+     */
+    public EventSource getsSource(){
+        return source;
+    }
 }

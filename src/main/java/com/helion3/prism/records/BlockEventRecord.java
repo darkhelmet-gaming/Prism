@@ -31,25 +31,24 @@ import org.spongepowered.api.world.Location;
 
 import com.google.common.base.Optional;
 import com.helion3.prism.api.records.EventRecord;
+import com.helion3.prism.api.records.EventSource;
 
-public class BlockEventRecord implements EventRecord {
-
-    private final String eventName;
-    private final Location location;
+public class BlockEventRecord extends EventRecord {
+    
     private final Optional<String> existingBlockId;
     private final Optional<String> replacementBlockId;
-    private final Date date;
 
     /**
      * Represents an event which occurred to a block, for which there was
      * an empty/air replacement block at this location.
      * 
      * @param eventName Prism parameter name for this event.
+     * @param source {@link EventSource} Source/cause of this event
      * @param location Location of the block affected.
      * @param existingBlockId Minecraft ID for the existing block.
      */
-    public BlockEventRecord(String eventName, Location location, @Nullable String existingBlockId) {
-        this(eventName, location, existingBlockId, null);
+    public BlockEventRecord(String eventName, EventSource source, Location location, @Nullable String existingBlockId) {
+        this(eventName, source, location, existingBlockId, null);
     }
 
     /**
@@ -57,12 +56,13 @@ public class BlockEventRecord implements EventRecord {
      * replacement block for the same location.
      * 
      * @param eventName Prism parameter name for this event.
+     * @param source {@link EventSource} Source/cause of this event
      * @param location Location of the block affected.
      * @param existingBlockId Minecraft ID for the existing block.
      * @param replacementBlockId Minecraft ID for the replacement block.
      */
-    public BlockEventRecord(String eventName, Location location, @Nullable String existingBlockId, @Nullable String replacementBlockId) {
-        this(eventName, new Date(), location, existingBlockId, replacementBlockId);
+    public BlockEventRecord(String eventName, EventSource source, Location location, @Nullable String existingBlockId, @Nullable String replacementBlockId) {
+        this(eventName, source, new Date(), location, existingBlockId, replacementBlockId);
     }
     
     /**
@@ -73,36 +73,15 @@ public class BlockEventRecord implements EventRecord {
      * @private
      * 
      * @param eventName Prism parameter name for this event.
+     * @param source {@link EventSource} Source/cause of this event
      * @param location Location of the block affected.
      * @param existingBlockId Minecraft ID for the existing block.
      * @param replacementBlockId Minecraft ID for the replacement block.
      */
-    public BlockEventRecord(String eventName, Date date, Location location, @Nullable String existingBlockId, @Nullable String replacementBlockId) {
-        this.eventName = eventName;
-        this.location = location;
+    public BlockEventRecord(String eventName, EventSource source, Date date, Location location, @Nullable String existingBlockId, @Nullable String replacementBlockId) {
+        super(eventName,source,date,location);
         this.existingBlockId = Optional.fromNullable(existingBlockId);
         this.replacementBlockId = Optional.fromNullable(replacementBlockId);
-        this.date = date;
-    }
-
-    /**
-     * Returns the parameter name for this {@link EventRecord}.
-     * 
-     * @return String Name of the event
-     */
-    @Override
-    public String getName() {
-        return eventName;
-    }
-
-    /**
-     * Returns the location for this {@link EventRecord}.
-     * 
-     * @return Location of the event
-     */
-    @Override
-    public Location getLocation() {
-        return location;
     }
 
     /**
@@ -121,14 +100,5 @@ public class BlockEventRecord implements EventRecord {
      */
     public Optional<String> getReplacementBlockId() {
         return replacementBlockId;
-    }
-    
-    /**
-     * Returns the date/time of this event.
-     * 
-     * @return Date The date the event occurred
-     */
-    public Date getDate(){
-        return date;
     }
 }

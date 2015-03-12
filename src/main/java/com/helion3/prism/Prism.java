@@ -26,10 +26,12 @@ package com.helion3.prism;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.service.event.EventManager;
 import org.spongepowered.api.util.event.Subscribe;
 
 import com.helion3.prism.api.storage.StorageAdapter;
+import com.helion3.prism.commands.PrismCommand;
 import com.helion3.prism.events.listeners.BlockBreakListener;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
@@ -72,6 +74,10 @@ public class Prism {
 
         // Initialize the recording queue manager
         new RecordingQueueManager().start();
+        
+        // Listen for commands
+        CommandService cmdService = game.getCommandDispatcher();
+        cmdService.register(this, new PrismCommand(), "prism", "pr");
 
     }
 

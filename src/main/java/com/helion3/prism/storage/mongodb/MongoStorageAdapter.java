@@ -32,7 +32,9 @@ import com.helion3.prism.api.storage.StorageWriteResult;
 import com.helion3.prism.records.BlockEventRecord;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.InsertOneModel;
@@ -42,8 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.Extent;
+import org.spongepowered.api.world.Location;
 
 public class MongoStorageAdapter implements StorageAdapter {
 
@@ -53,7 +54,7 @@ public class MongoStorageAdapter implements StorageAdapter {
 
     // @todo move these to config
     private final String databaseName = "prism";
-    private final String collectionDataName = "prismData";
+    private final String collectionEventRecordsName = "prismEventRecord";
 
     /**
      * Establish connections to the database
@@ -74,9 +75,9 @@ public class MongoStorageAdapter implements StorageAdapter {
 
         // Create indexes
         try {
-            getCollection(collectionDataName).createIndex(
+            getCollection(collectionEventRecordsName).createIndex(
                     new BasicDBObject("x", 1).append("z", 1).append("y", 1).append("created", -1));
-            getCollection(collectionDataName).createIndex(new BasicDBObject("created", -1).append("action", 1));
+            getCollection(collectionEventRecordsName).createIndex(new BasicDBObject("created", -1).append("action", 1));
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -92,7 +93,7 @@ public class MongoStorageAdapter implements StorageAdapter {
     @Override
     public StorageWriteResult write(List<EventRecord> events) throws Exception {
 
-        MongoCollection<Document> collection = getCollection(collectionDataName);
+        MongoCollection<Document> collection = getCollection(collectionEventRecordsName);
 
         // Build an array of documents
         List<WriteModel<Document>> documents = new ArrayList<WriteModel<Document>>();
@@ -101,21 +102,29 @@ public class MongoStorageAdapter implements StorageAdapter {
             Document document = new Document();
             
             document.put("action", event.getName());
-            document.put("date", event.getDate());
+            document.put("created", event.getDate());
             
-            // Coordinates
-            document.put("x", event.getLocation().getPosition().getX());
-            document.put("y", event.getLocation().getPosition().getY());
-            document.put("z", event.getLocation().getPosition().getZ());
-            
-            // World
-            Extent extent = event.getLocation().getExtent();
-            if (extent instanceof World) {
-                document.put("world", ((World) extent).getUniqueId());
+            // Location
+            if (event.getLocation().isPresent()) {
+                
+                // Coordinates
+                Location location = event.getLocation().get();
+                document.put("x", location.getPosition().getX());
+                document.put("y", location.getPosition().getY());
+                document.put("z", location.getPosition().getZ());
+                
+                // World
+                // @todo Doesn't yet work in Sponge.
+                // UnsupportedOperationException http://bit.ly/1FbHr0Q
+//                Extent extent = location.getExtent();
+//                if (extent instanceof World) {
+//                    document.put("world", ((World) extent).getUniqueId());
+//                }
             }
             
             // Block data
             if ( event instanceof BlockEventRecord ){
+                
                 BlockEventRecord blockRecord = (BlockEventRecord) event;
                 
                 if (blockRecord.getExistingBlockId().isPresent()) {
@@ -126,8 +135,14 @@ public class MongoStorageAdapter implements StorageAdapter {
                 }
             }
             
-            // @todo player
+            // Source
+            if (event.getsSource().isPlayer()) {
+                document.put("player", event.getsSource().getSourceIdentifier());
+            } else {
+                document.put("source", event.getsSource().getSourceIdentifier());
+            }
             
+            // Insert
             documents.add(new InsertOneModel<Document>(document));
             
         }
@@ -164,8 +179,87 @@ public class MongoStorageAdapter implements StorageAdapter {
     // @todo implement
     @Override
     public List<EventRecord> query(QuerySession session) throws Exception {
-        List<EventRecord> handlers = new ArrayList<EventRecord>();
-        return handlers;
+        
+        // Prepare results
+        List<EventRecord> results = new ArrayList<EventRecord>();
+        
+        // Get collection
+        MongoCollection<Document> collection = getCollection(collectionEventRecordsName);
+        
+        // Query conditions
+        // @todo needs implementation
+        Document query = new Document();
+        Document matcher = new Document("$match", query);
+
+        // Session configs
+        int sortDir = 1; // @todo needs implementation
+        int rowLimit = 5; // @todo needs implementation
+        boolean shouldGroup = true; // @todo needs implementation
+        
+        // Sorting
+        Document sortFields = new Document();
+        sortFields.put("created",sortDir);
+        sortFields.put( "x", 1 );
+        sortFields.put( "z", 1 );
+        sortFields.put( "y", 1 );
+        Document sorter = new Document("$sort", sortFields);
+        
+        // Offset/Limit
+        Document limit = new Document("$limit", rowLimit);
+        
+        // Build aggregators
+        AggregateIterable<Document> aggregated = null;
+        if( shouldGroup ){
+            
+            // Grouping fields
+            Document groupFields = new Document();
+            groupFields.put("eventName", "$eventName");
+            groupFields.put("player", "$player");
+            groupFields.put("existingBlockId", "$existingBlockId");
+            groupFields.put("dayOfMonth", new Document("$dayOfMonth", "$created"));
+            groupFields.put("month", new Document("$month", "$created"));
+            groupFields.put("year", new Document("$year", "$created"));
+            
+            Document groupHolder = new Document("_id", groupFields);
+            groupHolder.put("count", new Document("$sum", 1));
+            
+            Document group = new Document("$group", groupHolder);
+            
+            // Aggregation pipeline
+            List<Document> pipeline = new ArrayList<Document>();
+            pipeline.add(matcher);
+            pipeline.add(group);
+            pipeline.add(sorter);
+            pipeline.add(limit);
+            
+            aggregated = collection.aggregate(pipeline);
+            
+        } else {
+            
+            // Aggregation pipeline
+            List<Document> pipeline = new ArrayList<Document>();
+            pipeline.add(matcher);
+            pipeline.add(sorter);
+            pipeline.add(limit);
+            
+            aggregated = collection.aggregate(pipeline);
+ 
+        }
+        
+        // Iterate results and build our event record list
+        MongoCursor<Document> cursor = aggregated.iterator();
+        try {
+            while (cursor.hasNext()) {
+                // @todo fix this.
+                // @todo we need an "aggregate" vs "normal" system here
+                System.out.println(cursor.next());
+            }
+        } finally {
+            cursor.close();
+        }
+        
+        return results;
+        
     }
 
     /**

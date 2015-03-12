@@ -23,5 +23,5 @@
  */
 package com.helion3.prism.api.query;
 
-public interface Query {
+final public class Query {
 }

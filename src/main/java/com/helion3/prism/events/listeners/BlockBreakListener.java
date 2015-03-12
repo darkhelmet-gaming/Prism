@@ -29,11 +29,10 @@ import org.spongepowered.api.event.block.BlockBreakEvent;
 import org.spongepowered.api.event.entity.living.player.PlayerBreakBlockEvent;
 import org.spongepowered.api.util.event.Subscribe;
 
-import com.helion3.prism.queues.RecordingQueue;
-import com.helion3.prism.records.BlockEventRecord;
+import com.helion3.prism.api.records.PrismRecord;
 
 public class BlockBreakListener {
-
+    
     /**
      * Listens for block break events.
      * 
@@ -41,21 +40,18 @@ public class BlockBreakListener {
      */
     @Subscribe
     public void onBlockBreak(BlockBreakEvent event) {
-
-        // Block data
+        
+        // Block
         BlockLoc blockLoc = event.getBlock();
-        String existingBlockId = blockLoc.getType().getId();
         
         // Player-caused
         if (event instanceof PlayerBreakBlockEvent) {
-            PlayerBreakBlockEvent playerEvent = (PlayerBreakBlockEvent) event;
-            Player player = playerEvent.getPlayer();
-            System.out.print(player.getName() + " " + player.getUniqueId());
+            
+            Player player = ((PlayerBreakBlockEvent) event).getPlayer();
+            
+            // Save the record
+            new PrismRecord().player(player).brokeBlock(blockLoc).save();
+            
         }
-
-        // Build and record the event
-        BlockEventRecord breakEventRecord = new BlockEventRecord("block-break", blockLoc.getLocation(), existingBlockId);
-        RecordingQueue.add(breakEventRecord);
-
     }
 }

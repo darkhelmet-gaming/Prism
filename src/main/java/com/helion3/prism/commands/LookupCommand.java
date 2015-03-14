@@ -34,7 +34,8 @@ import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.records.EventRecord;
+import com.helion3.prism.api.records.ResultRecord;
+import com.helion3.prism.api.records.ResultRecordAggregate;
 
 public class LookupCommand implements CommandCallable {
 
@@ -49,12 +50,45 @@ public class LookupCommand implements CommandCallable {
         
         // @todo temporary pending cleaner command registration system
         
+        // @todo run query async
+        
         // @todo this will come from parameter parsing...
         Query query = new Query();
         QuerySession session = new QuerySession( query );
         
         try {
-            List<EventRecord> records = Prism.getStorageAdapter().query(session);
+            
+            // Iterate query results
+            List<ResultRecord> results = Prism.getStorageAdapter().query(session);
+            for (ResultRecord result : results) {
+                // Aggregate data
+                if (result instanceof ResultRecordAggregate) {
+                    
+                    ResultRecordAggregate aggregate = (ResultRecordAggregate) result;
+                    
+                    // @todo make this a template
+                    String resultMessage = "";
+                    
+                    resultMessage += aggregate.player;
+                    // @todo get player last known username
+                    resultMessage += " ";
+                    resultMessage += aggregate.eventName;
+                    // @todo lookup the proper verb
+                    resultMessage += " ";
+                    resultMessage += aggregate.subjectName;
+                    
+                    source.sendMessage(resultMessage);
+                    
+                }
+                
+                // Complete data
+                else {
+                    
+                    // @todo display the full record
+                    
+                }
+            }
+            
         } catch (Exception e) {
             // @todo handle
             e.printStackTrace();

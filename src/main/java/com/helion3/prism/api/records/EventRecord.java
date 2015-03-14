@@ -37,7 +37,7 @@ import com.google.common.base.Optional;
  * location, subject, time, causation, etc.
  * 
  */
-public abstract class EventRecord {
+abstract public class EventRecord {
     
     // Required values
     protected final String eventName;
@@ -66,7 +66,7 @@ public abstract class EventRecord {
      * 
      * @return String name of the event
      */
-    public String getName(){
+    public String getEventName(){
         return eventName;
     }
 
@@ -95,5 +95,16 @@ public abstract class EventRecord {
      */
     public EventSource getsSource(){
         return source;
+    }
+    
+    /**
+     * Return a human-readable display name/summary
+     * of the event subject, i.e. "dirt", "creeper"
+     * or "diamond pickaxe", etc.
+     * 
+     * @return Human-readable summary
+     */
+    public String getSubjectDisplayName(){
+        return "";
     }
 }

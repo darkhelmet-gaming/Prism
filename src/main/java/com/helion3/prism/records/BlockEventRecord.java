@@ -101,4 +101,29 @@ public class BlockEventRecord extends EventRecord {
     public Optional<String> getReplacementBlockId() {
         return replacementBlockId;
     }
+    
+    /**
+     * Return a human-readable display name/summary
+     * of the event subject, i.e. "dirt", "creeper"
+     * or "diamond pickaxe", etc.
+     * 
+     * @return Human-readable summary
+     */
+    @Override
+    public String getSubjectDisplayName(){
+        
+        String displayName = "unknown block";
+        
+        if (existingBlockId.isPresent()) {
+            displayName = existingBlockId.get();
+        }
+        else if (replacementBlockId.isPresent()) {
+            displayName = replacementBlockId.get();
+        }
+        
+        displayName = displayName.replace("minecraft:", "");
+        
+        return displayName;
+        
+    }
 }

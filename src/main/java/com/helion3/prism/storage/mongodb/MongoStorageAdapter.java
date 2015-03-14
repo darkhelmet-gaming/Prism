@@ -26,6 +26,8 @@ package com.helion3.prism.storage.mongodb;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.records.EventRecord;
+import com.helion3.prism.api.records.ResultRecord;
+import com.helion3.prism.api.records.ResultRecordAggregate;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
@@ -101,8 +103,9 @@ public class MongoStorageAdapter implements StorageAdapter {
             
             Document document = new Document();
             
-            document.put("action", event.getName());
+            document.put("eventName", event.getEventName());
             document.put("created", event.getDate());
+            document.put("subjectName", event.getSubjectDisplayName());
             
             // Location
             if (event.getLocation().isPresent()) {
@@ -178,10 +181,10 @@ public class MongoStorageAdapter implements StorageAdapter {
      */
     // @todo implement
     @Override
-    public List<EventRecord> query(QuerySession session) throws Exception {
+    public List<ResultRecord> query(QuerySession session) throws Exception {
         
         // Prepare results
-        List<EventRecord> results = new ArrayList<EventRecord>();
+        List<ResultRecord> results = new ArrayList<ResultRecord>();
         
         // Get collection
         MongoCollection<Document> collection = getCollection(collectionEventRecordsName);
@@ -215,7 +218,7 @@ public class MongoStorageAdapter implements StorageAdapter {
             Document groupFields = new Document();
             groupFields.put("eventName", "$eventName");
             groupFields.put("player", "$player");
-            groupFields.put("existingBlockId", "$existingBlockId");
+            groupFields.put("subjectName", "$subjectName");
             groupFields.put("dayOfMonth", new Document("$dayOfMonth", "$created"));
             groupFields.put("month", new Document("$month", "$created"));
             groupFields.put("year", new Document("$year", "$created"));
@@ -250,9 +253,31 @@ public class MongoStorageAdapter implements StorageAdapter {
         MongoCursor<Document> cursor = aggregated.iterator();
         try {
             while (cursor.hasNext()) {
-                // @todo fix this.
-                // @todo we need an "aggregate" vs "normal" system here
-                System.out.println(cursor.next());
+                
+                // Mongo document
+                Document wrapper = cursor.next();
+                Document document = (Document) wrapper.get("_id");
+                
+                // Build our result object
+                ResultRecord result = null;
+                if (shouldGroup) {
+                    
+                    result = new ResultRecordAggregate();
+                    ((ResultRecordAggregate)result).count = (int) wrapper.get("count");
+
+                } else {
+                    
+//                    ResultRecordComplete result = new ResultRecordComplete();
+//                    results.add(result);
+                }
+                
+                // Common fields
+                result.eventName = (String) document.get("eventName");
+                result.player = (String) document.get("player");
+                result.subjectName = (String) document.get("subjectName");
+                
+                results.add(result);
+                
             }
         } finally {
             cursor.close();

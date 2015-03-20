@@ -263,7 +263,7 @@ public class MongoStorageAdapter implements StorageAdapter {
                 if (shouldGroup) {
                     
                     result = new ResultRecordAggregate();
-                    ((ResultRecordAggregate)result).count = (int) wrapper.get("count");
+                    ((ResultRecordAggregate)result).count = (Integer) wrapper.get("count");
 
                 } else {
                     

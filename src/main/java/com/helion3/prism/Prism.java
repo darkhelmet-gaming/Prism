@@ -32,6 +32,7 @@ import org.spongepowered.api.service.event.EventManager;
 
 import com.google.inject.Inject;
 import com.helion3.prism.api.storage.StorageAdapter;
+import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.events.listeners.BlockBreakListener;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
@@ -46,9 +47,7 @@ import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
 public class Prism {
 
-    @Inject
-    protected Logger logger;
-
+    private static Logger logger;
     private static StorageAdapter storageAdapter;
 
     /**
@@ -78,15 +77,35 @@ public class Prism {
         // Initialize the recording queue manager
         new RecordingQueueManager().start();
 
+        // Commands
+        game.getCommandDispatcher().register(this, PrismCommands.getCommand(game), "prism", "pr");
+
         logger.info("Prism started successfully. Bad guys beware.");
     }
 
     /**
-     *
-     * @return
+     * Returns the Logger instance for this plugin.
+     * @return Logger instance
+     */
+    public static Logger getLogger() {
+        return logger;
+    }
+
+    /**
+     * Returns our storage/database adapter.
+     * @return Storage adapter.
      */
     public static StorageAdapter getStorageAdapter() {
         return storageAdapter;
+    }
+
+    /**
+     * Injects the Logger instance for this plugin
+     * @param log Logger
+     */
+    @Inject
+    private void setLogger(Logger log) {
+        logger = log;
     }
 
     /**

@@ -17,3 +17,8 @@ Please follow prism development on `irc.esper.net` in `#prism`
 Use the provided Gradle runtime to compile.
 
     ./gradlew build
+
+### Development
+
+- `git clone git@github.com:prism/Prism.git`
+- `cp scripts/pre-commit .git/hooks`

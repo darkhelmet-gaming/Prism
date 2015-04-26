@@ -29,6 +29,7 @@ import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.records.EventRecord;
 import com.helion3.prism.api.records.ResultRecord;
 import com.helion3.prism.api.records.ResultRecordAggregate;
+import com.helion3.prism.api.records.ResultRecordComplete;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
@@ -48,6 +49,8 @@ import java.util.List;
 
 import org.bson.Document;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.Extent;
 
 public class MongoStorageAdapter implements StorageAdapter {
 
@@ -131,12 +134,10 @@ public class MongoStorageAdapter implements StorageAdapter {
                 document.put("z", location.getPosition().getZ());
 
                 // World
-                // @todo Doesn't yet work in Sponge.
-                // UnsupportedOperationException http://bit.ly/1FbHr0Q
-//                Extent extent = location.getExtent();
-//                if (extent instanceof World) {
-//                    document.put("world", ((World) extent).getUniqueId());
-//                }
+                Extent extent = location.getExtent();
+                if (extent instanceof World) {
+                    document.put("world", ((World) extent).getUniqueId());
+                }
             }
 
             // Block data
@@ -153,11 +154,8 @@ public class MongoStorageAdapter implements StorageAdapter {
             }
 
             // Source
-            if (event.getSource().isPlayer()) {
-                document.put("player", event.getSource().getSourceIdentifier());
-            } else {
-                document.put("source", event.getSource().getSourceIdentifier());
-            }
+            String sourceKey = event.getSource().isPlayer() ? "player" : "source";
+            document.put(sourceKey, event.getSource().getSourceIdentifier());
 
             // Insert
             documents.add(new InsertOneModel<Document>(document));
@@ -193,7 +191,6 @@ public class MongoStorageAdapter implements StorageAdapter {
      * @param session
      * @return List of {@link com.helion3.prism.api.actions.ActionHandler}
      */
-    // @todo implement
     @Override
     public List<ResultRecord> query(QuerySession session) throws Exception {
 
@@ -211,7 +208,7 @@ public class MongoStorageAdapter implements StorageAdapter {
         // Session configs
         int sortDir = 1; // @todo needs implementation
         int rowLimit = 5; // @todo needs implementation
-        boolean shouldGroup = true; // @todo needs implementation
+        boolean shouldGroup = false; // @todo needs implementation
 
         // Sorting
         Document sortFields = new Document();
@@ -270,7 +267,7 @@ public class MongoStorageAdapter implements StorageAdapter {
 
                 // Mongo document
                 Document wrapper = cursor.next();
-                Document document = (Document) wrapper.get("_id");
+                Document document = shouldGroup ? (Document) wrapper.get("_id") : wrapper;
 
                 // Build our result object
                 ResultRecord result = null;
@@ -281,8 +278,8 @@ public class MongoStorageAdapter implements StorageAdapter {
 
                 } else {
 
-//                    ResultRecordComplete result = new ResultRecordComplete();
-//                    results.add(result);
+                    result = new ResultRecordComplete();
+
                 }
 
                 // Common fields

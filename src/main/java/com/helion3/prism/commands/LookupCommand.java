@@ -25,7 +25,6 @@ package com.helion3.prism.commands;
 
 //import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,14 +50,16 @@ public class LookupCommand  {
     private LookupCommand(){}
 
     public static CommandSpec getCommand(Game game) {
+
+        // @todo move to config
+        final String templateComplete = "{player} {event} {subject}";
+        final String templateAggregate = "{player} {event} {subject} x{count}";
+
         return CommandSpec.builder()
             .setDescription(Texts.of("View/query Prism records"))
             .setExecutor(new CommandExecutor() {
                 @Override
                 public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-
-                    Collection<Object> players = args.getAll("player");
-                    Prism.getLogger().debug("arg size: " + players.size());
 
                     // @todo this will come from parameter parsing...
                     Query query = new Query();
@@ -69,31 +70,36 @@ public class LookupCommand  {
                         // Iterate query results
                         List<ResultRecord> results = Prism.getStorageAdapter().query(session);
                         for (ResultRecord result : results) {
+
+                            String template;
+
+                            Map<String,String> tokens = new HashMap<String, String>();
+                            tokens.put("player", result.player);
+                            tokens.put("event", result.eventName);
+                            tokens.put("subject", result.subjectName);
+
                             // Aggregate data
                             if (result instanceof ResultRecordAggregate) {
 
-                                ResultRecordAggregate aggregate = (ResultRecordAggregate) result;
+                                template = templateAggregate;
 
-                                // @todo move to config
-                                String template = "{player} {event} {subject}";
-
-                                Map<String,String> tokens = new HashMap<String, String>();
-                                tokens.put("player", aggregate.player);
-                                tokens.put("event", aggregate.eventName);
-                                tokens.put("subject", aggregate.subjectName);
-
-                                src.sendMessage(Texts.of(Template.parseTemplate(template, tokens)));
+                                ResultRecordAggregate recordAggregate = (ResultRecordAggregate) result;
+                                tokens.put("count", ""+recordAggregate.count);
 
                             }
 
                             // Complete data
                             else {
 
-                                // @todo display the full record
+                                template = templateComplete;
+
+                                //ResultRecordComplete recordComplete = (ResultRecordComplete) result;
 
                             }
-                        }
 
+                            src.sendMessage(Texts.of(Template.parseTemplate(template, tokens)));
+
+                        }
                     } catch (Exception e) {
                         // @todo handle
                         e.printStackTrace();

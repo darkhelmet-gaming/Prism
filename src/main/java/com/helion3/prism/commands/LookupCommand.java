@@ -52,8 +52,8 @@ public class LookupCommand  {
     public static CommandSpec getCommand(Game game) {
 
         // @todo move to config
-        final String templateComplete = "{player} {event} {subject}";
-        final String templateAggregate = "{player} {event} {subject} x{count}";
+        final String templateComplete = "{source} {event} {subject}";
+        final String templateAggregate = "{source} {event} {subject} x{count}";
 
         return CommandSpec.builder()
             .setDescription(Texts.of("View/query Prism records"))
@@ -67,14 +67,16 @@ public class LookupCommand  {
 
                     try {
 
+                        // @todo must be async
+
                         // Iterate query results
-                        List<ResultRecord> results = Prism.getStorageAdapter().query(session);
+                        List<ResultRecord> results = Prism.getStorageAdapter().records().query(session);
                         for (ResultRecord result : results) {
 
                             String template;
 
                             Map<String,String> tokens = new HashMap<String, String>();
-                            tokens.put("player", result.player);
+                            tokens.put("source", result.source);
                             tokens.put("event", result.eventName);
                             tokens.put("subject", result.subjectName);
 

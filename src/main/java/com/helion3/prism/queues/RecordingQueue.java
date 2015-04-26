@@ -31,9 +31,11 @@ public class RecordingQueue {
 
     private static final LinkedBlockingQueue<EventRecord> queue = new LinkedBlockingQueue<EventRecord>();
 
+    private RecordingQueue(){}
+
     /**
      * Adds a new Event to the recording queue.
-     * 
+     *
      * @param event Event to be queued for database write
      */
     public static void add(final EventRecord event) {
@@ -48,17 +50,10 @@ public class RecordingQueue {
 
     /**
      * Returns all unsaved events in the queue.
-     * 
+     *
      * @return Current unsaved {@link EventRecord} queue
      */
     public static LinkedBlockingQueue<EventRecord> getQueue() {
         return queue;
-    }
-    
-    /**
-     * Private constructor to prevent instances
-     */
-    private RecordingQueue(){
-        
     }
 }

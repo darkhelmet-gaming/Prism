@@ -40,6 +40,7 @@ import com.google.inject.Inject;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.events.listeners.BlockBreakListener;
+import com.helion3.prism.events.listeners.PlayerJoinListener;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 
@@ -83,7 +84,6 @@ public class Prism {
         registerSpongeEventListeners(game.getEventManager());
 
         // Initialize storage engine
-        // @todo needs config
         storageAdapter = new MongoStorageAdapter();
         try {
             storageAdapter.connect();
@@ -141,6 +141,9 @@ public class Prism {
 
         // Block events
         eventManager.register(this, new BlockBreakListener());
+
+        // Player events
+        eventManager.register(this, new PlayerJoinListener());
 
     }
 }

@@ -21,23 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.records;
+package com.helion3.prism.api.storage;
 
-abstract public class ResultRecord {
+import java.util.List;
 
-    /**
-     * Name of the event this record is for
-     */
-    public String eventName;
+import com.helion3.prism.api.query.Query;
+import com.helion3.prism.api.query.QuerySession;
+import com.helion3.prism.api.records.EventRecord;
+import com.helion3.prism.api.records.ResultRecord;
 
-    /**
-     * Name of the source
-     */
-    public String source;
+public interface StorageAdapterRecords {
 
     /**
-     * Subject display name
+     * Writes a collection of events to storage
+     *
+     * @param event {@link EventRecord}s to persist
+     * @return {@link StorageWriteResult}
+     * @throws Exception
      */
-    public String subjectName;
+    StorageWriteResult write(List<EventRecord> events) throws Exception;
 
+    /**
+     * Execute a query session for a list of resulting actions
+     *
+     * @param session
+     * @return List of {@link ResultRecord}
+     * @throws Exception Abstract DB or query/handler exceptions
+     */
+    List<ResultRecord> query(QuerySession session) throws Exception;
+
+    /**
+     * Given a {@link Query} this will remove all matching records.
+     *
+     * @param query Query conditions indicating what we're purging
+     * @return {@link StorageDeleteResult}
+     * @throws Exception Abstract DB or query/handler exceptions
+     */
+    StorageDeleteResult delete(Query query) throws Exception;
 }

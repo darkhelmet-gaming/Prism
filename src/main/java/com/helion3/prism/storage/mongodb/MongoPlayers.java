@@ -21,23 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.records;
+package com.helion3.prism.storage.mongodb;
 
-abstract public class ResultRecord {
+import org.bson.Document;
+import org.spongepowered.api.entity.player.Player;
 
-    /**
-     * Name of the event this record is for
-     */
-    public String eventName;
+import com.helion3.prism.api.storage.StorageAdapterPlayers;
+import com.helion3.prism.api.storage.StorageWriteResult;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.UpdateOptions;
 
-    /**
-     * Name of the source
-     */
-    public String source;
+public class MongoPlayers implements StorageAdapterPlayers {
 
-    /**
-     * Subject display name
-     */
-    public String subjectName;
+    @Override
+    public StorageWriteResult save(Player player) throws Exception {
 
+        MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionPlayersName);
+
+        // Upsert
+        collection.updateOne(
+            new Document("_id", player.getUniqueId().toString()),
+            new Document("$set", new Document("name", player.getName())),
+            new UpdateOptions().upsert(true)
+        );
+
+        // @todo return a real result
+        return new StorageWriteResult();
+    }
 }

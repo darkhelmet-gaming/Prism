@@ -21,23 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.records;
+package com.helion3.prism.events.listeners;
 
-abstract public class ResultRecord {
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 
-    /**
-     * Name of the event this record is for
-     */
-    public String eventName;
+import com.helion3.prism.Prism;
 
-    /**
-     * Name of the source
-     */
-    public String source;
+public class PlayerJoinListener {
 
     /**
-     * Subject display name
+     * Listens for player join events so that we can identify
+     * players properly.
+     *
+     * @param event
      */
-    public String subjectName;
+    @Subscribe
+    public void onPlayerJoin(final PlayerJoinEvent event) {
 
+        // Run our database query async
+        new Thread(new Runnable() {
+            @Override
+            public void run(){
+                try {
+                    Prism.getStorageAdapter().players().save(event.getPlayer());
+                } catch (Exception e) {
+                    // @todo handle
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
 }

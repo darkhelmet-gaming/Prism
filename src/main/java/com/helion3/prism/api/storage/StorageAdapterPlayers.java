@@ -21,23 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.records;
+package com.helion3.prism.api.storage;
 
-abstract public class ResultRecord {
+import org.spongepowered.api.entity.player.Player;
 
-    /**
-     * Name of the event this record is for
-     */
-    public String eventName;
+public interface StorageAdapterPlayers {
 
     /**
-     * Name of the source
+     * Creates or updates a player identification record.
+     *
+     * @param player Player
+     * @return StorageWriteResult
+     * @throws Exception
      */
-    public String source;
-
-    /**
-     * Subject display name
-     */
-    public String subjectName;
+    public StorageWriteResult save(Player player) throws Exception;
 
 }

@@ -50,7 +50,7 @@ public class RecordingQueueManager extends Thread {
 
             if (eventsSaveBatch.size() > 0) {
                 try {
-                    Prism.getStorageAdapter().write(eventsSaveBatch);
+                    Prism.getStorageAdapter().records().write(eventsSaveBatch);
                 } catch (Exception e) {
                     // @todo handle failures
                     e.printStackTrace();

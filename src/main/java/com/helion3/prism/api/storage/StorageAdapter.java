@@ -23,15 +23,7 @@
  */
 package com.helion3.prism.api.storage;
 
-import com.helion3.prism.api.query.Query;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.records.EventRecord;
-import com.helion3.prism.api.records.ResultRecord;
-
-import java.util.List;
-
 public interface StorageAdapter {
-
     /**
      * Establishes an active connection to the storage engine. Any DB
      * setup/initialization code will run here.
@@ -42,31 +34,25 @@ public interface StorageAdapter {
     boolean connect() throws Exception;
 
     /**
-     * Writes a collection of events to storage
-     * 
-     * @param event {@link EventRecord}s to persist
-     * @return {@link StorageWriteResult}
-     * @throws Exception
+     * Holder for the storage adapter handling
+     * event records.
+     * @return StorageAdapterRecords Storage adapter for records
      */
-    StorageWriteResult write(List<EventRecord> events) throws Exception;
+    StorageAdapterRecords records();
 
     /**
-     * Execute a query session for a list of resulting actions
-     *
-     * @param session
-     * @return List of {@link ResultRecord}
-     * @throws Exception Abstract DB or query/handler exceptions
+     * Holder for the storage adapter handling
+     * player ID records.
+     * @return StorageAdapterPlayers Storage adapter for player records
      */
-    List<ResultRecord> query(QuerySession session) throws Exception;
+    StorageAdapterPlayers players();
 
     /**
-     * Given a {@link Query} this will remove all matching records.
-     *
-     * @param query Query conditions indicating what we're purging
-     * @return {@link StorageDeleteResult}
-     * @throws Exception Abstract DB or query/handler exceptions
+     * Holder for the storage adapter handling
+     * per-player settings.
+     * @return StorageAdapterSettings Storage adapter for settings
      */
-    StorageDeleteResult delete(Query query) throws Exception;
+    StorageAdapterSettings settings();
 
     /**
      * Close connections.
@@ -81,5 +67,4 @@ public interface StorageAdapter {
      * @throws Exception If connection fails
      */
     boolean testConnection() throws Exception;
-
 }

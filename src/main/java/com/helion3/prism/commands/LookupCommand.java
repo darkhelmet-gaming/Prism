@@ -26,7 +26,9 @@ package com.helion3.prism.commands;
 //import static org.spongepowered.api.util.command.args.GenericArguments.*;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.spongepowered.api.Game;
 import org.spongepowered.api.text.Texts;
@@ -42,6 +44,7 @@ import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.records.ResultRecord;
 import com.helion3.prism.api.records.ResultRecordAggregate;
+import com.helion3.prism.utils.Template;
 
 public class LookupCommand  {
 
@@ -71,18 +74,15 @@ public class LookupCommand  {
 
                                 ResultRecordAggregate aggregate = (ResultRecordAggregate) result;
 
-                                // @todo make this a template
-                                String resultMessage = "";
+                                // @todo move to config
+                                String template = "{player} {event} {subject}";
 
-                                resultMessage += aggregate.player;
-                                // @todo get player last known username
-                                resultMessage += " ";
-                                resultMessage += aggregate.eventName;
-                                // @todo lookup the proper verb
-                                resultMessage += " ";
-                                resultMessage += aggregate.subjectName;
+                                Map<String,String> tokens = new HashMap<String, String>();
+                                tokens.put("player", aggregate.player);
+                                tokens.put("event", aggregate.eventName);
+                                tokens.put("subject", aggregate.subjectName);
 
-                                src.sendMessage(Texts.of(resultMessage));
+                                src.sendMessage(Texts.of(Template.parseTemplate(template, tokens)));
 
                             }
 

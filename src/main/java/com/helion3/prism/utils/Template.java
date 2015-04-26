@@ -21,28 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.commands;
+package com.helion3.prism.utils;
 
-import static org.spongepowered.api.util.command.args.GenericArguments.*;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.spongepowered.api.Game;
-import org.spongepowered.api.util.command.args.ChildCommandElementExecutor;
-import org.spongepowered.api.util.command.spec.CommandSpec;
+public class Template {
 
-public class PrismCommands {
-
-    private PrismCommands(){}
+    private Template() {}
 
     /**
-     * Build a complete command hierarchy
-     * @return
+     * Replaces named tokens in a string with their final value.
+     *
+     * @param text String template with placeholder tokens
+     * @param replacements Map of named tokens and their values
+     * @return String Final result
      */
-    public static CommandSpec getCommand(Game game) {
-        final ChildCommandElementExecutor children = new ChildCommandElementExecutor(null);
-        children.register(LookupCommand.getCommand(game), "lookup", "l");
-        return CommandSpec.builder()
-            .setExecutor(children)
-            .setArguments(optional(firstParsing(children)))
-            .build();
+    public static String parseTemplate( String text, Map<String,String> replacements ) {
+        Pattern pattern = Pattern.compile("\\{(.+?)\\}");
+        Matcher matcher = pattern.matcher(text);
+        StringBuilder builder = new StringBuilder();
+        int i = 0;
+        while (matcher.find()) {
+            String replacement = replacements.get(matcher.group(1));
+            builder.append(text.substring(i, matcher.start()));
+            if (replacement == null)
+                builder.append(matcher.group(0));
+            else
+                builder.append(replacement);
+            i = matcher.end();
+        }
+        builder.append(text.substring(i, text.length()));
+        return builder.toString();
     }
 }

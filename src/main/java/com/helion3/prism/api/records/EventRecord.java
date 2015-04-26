@@ -93,7 +93,7 @@ abstract public class EventRecord {
      * 
      * @return EventSource Source of this event
      */
-    public EventSource getsSource(){
+    public EventSource getSource(){
         return source;
     }
     

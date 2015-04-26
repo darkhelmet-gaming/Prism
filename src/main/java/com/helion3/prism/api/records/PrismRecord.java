@@ -23,7 +23,7 @@
  */
 package com.helion3.prism.api.records;
 
-import org.spongepowered.api.block.BlockLoc;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.entity.player.Player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -47,8 +47,8 @@ public class PrismRecord {
     
     private String eventName;
     private EventSource source;
-    private Optional<BlockLoc> optionalExistingBlock = Optional.absent();
-    private Optional<BlockLoc> optionalReplacementBlock = Optional.absent();
+    private Optional<Location> optionalExistingBlock = Optional.absent();
+    private Optional<Location> optionalReplacementBlock = Optional.absent();
     
     /**
      * Describe the Player responsible for the event this
@@ -69,7 +69,7 @@ public class PrismRecord {
      * @param block Block broken.
      * @return RecordBuilder
      */
-    public PrismRecord brokeBlock(BlockLoc block){
+    public PrismRecord brokeBlock(Location block){
         checkNotNull(block);
         this.eventName = "block-break";
         this.optionalExistingBlock = Optional.of(block);
@@ -85,8 +85,8 @@ public class PrismRecord {
 
         // Block Break (only existing block present)
         if (optionalExistingBlock.isPresent() && !optionalReplacementBlock.isPresent()) {
-            BlockLoc existingBlock = optionalExistingBlock.get();
-            record = new BlockEventRecord(eventName, source, existingBlock.getLocation(), existingBlock.getType().getId());
+            Location existingBlock = optionalExistingBlock.get();
+            record = new BlockEventRecord(eventName, source, existingBlock, existingBlock.getType().getId());
         }
         
         // Queue the finished record for saving

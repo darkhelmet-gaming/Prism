@@ -23,28 +23,31 @@
  */
 package com.helion3.prism;
 
+import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.service.event.EventManager;
-import org.spongepowered.api.util.event.Subscribe;
 
+import com.google.inject.Inject;
 import com.helion3.prism.api.storage.StorageAdapter;
-import com.helion3.prism.commands.PrismCommand;
 import com.helion3.prism.events.listeners.BlockBreakListener;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 
 /**
  * Prism is an event logging + rollback/restore engine for Minecraft
- * servers. 
- * 
+ * servers.
+ *
  * @author viveleroi
  *
  */
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
 public class Prism {
+
+    @Inject
+    protected Logger logger;
 
     private static StorageAdapter storageAdapter;
 
@@ -74,15 +77,12 @@ public class Prism {
 
         // Initialize the recording queue manager
         new RecordingQueueManager().start();
-        
-        // Listen for commands
-        CommandService cmdService = game.getCommandDispatcher();
-        cmdService.register(this, new PrismCommand(), "prism", "pr");
 
+        logger.info("Prism started successfully. Bad guys beware.");
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static StorageAdapter getStorageAdapter() {

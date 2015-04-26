@@ -139,10 +139,10 @@ public class MongoStorageAdapter implements StorageAdapter {
             }
             
             // Source
-            if (event.getsSource().isPlayer()) {
-                document.put("player", event.getsSource().getSourceIdentifier());
+            if (event.getSource().isPlayer()) {
+                document.put("player", event.getSource().getSourceIdentifier());
             } else {
-                document.put("source", event.getsSource().getSourceIdentifier());
+                document.put("source", event.getSource().getSourceIdentifier());
             }
             
             // Insert

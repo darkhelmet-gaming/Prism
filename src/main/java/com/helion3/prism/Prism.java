@@ -23,11 +23,17 @@
  */
 package com.helion3.prism;
 
+import java.io.File;
+
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.state.ServerStartedEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.service.config.DefaultConfig;
 import org.spongepowered.api.service.event.EventManager;
 
 import com.google.inject.Inject;
@@ -47,8 +53,17 @@ import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
 public class Prism {
 
+    private static Configuration config;
     private static Logger logger;
     private static StorageAdapter storageAdapter;
+
+    @Inject
+    @DefaultConfig(sharedRoot = false)
+    private File defaultConfig;
+
+    @Inject
+    @DefaultConfig(sharedRoot = false)
+    private ConfigurationLoader<CommentedConfigurationNode> configManager;
 
     /**
      * Performs bootstrapping of Prism resources/objects.
@@ -60,6 +75,9 @@ public class Prism {
 
         // Game reference
         Game game = event.getGame();
+
+        // Load configuration file
+        config = new Configuration(defaultConfig, configManager);
 
         // Listen to events
         registerSpongeEventListeners(game.getEventManager());
@@ -81,6 +99,14 @@ public class Prism {
         game.getCommandDispatcher().register(this, PrismCommands.getCommand(game), "prism", "pr");
 
         logger.info("Prism started successfully. Bad guys beware.");
+    }
+
+    /**
+     * Returns the plugin configuration
+     * @return Configuration
+     */
+    public static Configuration getConfig() {
+        return config;
     }
 
     /**

@@ -23,6 +23,7 @@
  */
 package com.helion3.prism.storage.mongodb;
 
+import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.records.EventRecord;
@@ -53,10 +54,21 @@ public class MongoStorageAdapter implements StorageAdapter {
     private static MongoClient mongoClient = null;
     private static MongoDatabase database;
     private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
+    private final String databaseName;
+    private final String collectionEventRecordsName;
 
-    // @todo move these to config
-    private final String databaseName = "prism";
-    private final String collectionEventRecordsName = "prismEventRecord";
+    /**
+     *
+     */
+    public MongoStorageAdapter() {
+
+        databaseName = Prism.getConfig().getNode("db", "name").getString();
+
+        // Collections
+        String tablePrefix = Prism.getConfig().getNode("db", "tablePrefix").getString();
+        collectionEventRecordsName = tablePrefix + "EventRecord";
+
+    }
 
     /**
      * Establish connections to the database
@@ -66,8 +78,10 @@ public class MongoStorageAdapter implements StorageAdapter {
     @Override
     public boolean connect() throws Exception {
 
-        mongoClient = new MongoClient("127.0.0.1", 27017); // @todo move to
-                                                           // config
+        String host = Prism.getConfig().getNode("db", "mongo", "host").getString();
+        int port = Prism.getConfig().getNode("db", "mongo", "port").getInt();
+
+        mongoClient = new MongoClient(host, port);
 
         // @todo support auth: boolean auth = db.authenticate(myUserName,
         // myPassword);
@@ -90,7 +104,7 @@ public class MongoStorageAdapter implements StorageAdapter {
     }
 
     /**
-     * 
+     *
      */
     @Override
     public StorageWriteResult write(List<EventRecord> events) throws Exception {
@@ -100,22 +114,22 @@ public class MongoStorageAdapter implements StorageAdapter {
         // Build an array of documents
         List<WriteModel<Document>> documents = new ArrayList<WriteModel<Document>>();
         for (EventRecord event : events) {
-            
+
             Document document = new Document();
-            
+
             document.put("eventName", event.getEventName());
             document.put("created", event.getDate());
             document.put("subjectName", event.getSubjectDisplayName());
-            
+
             // Location
             if (event.getLocation().isPresent()) {
-                
+
                 // Coordinates
                 Location location = event.getLocation().get();
                 document.put("x", location.getPosition().getX());
                 document.put("y", location.getPosition().getY());
                 document.put("z", location.getPosition().getZ());
-                
+
                 // World
                 // @todo Doesn't yet work in Sponge.
                 // UnsupportedOperationException http://bit.ly/1FbHr0Q
@@ -124,12 +138,12 @@ public class MongoStorageAdapter implements StorageAdapter {
 //                    document.put("world", ((World) extent).getUniqueId());
 //                }
             }
-            
+
             // Block data
             if ( event instanceof BlockEventRecord ){
-                
+
                 BlockEventRecord blockRecord = (BlockEventRecord) event;
-                
+
                 if (blockRecord.getExistingBlockId().isPresent()) {
                     document.put("existingBlockId", blockRecord.getExistingBlockId().get());
                 }
@@ -137,17 +151,17 @@ public class MongoStorageAdapter implements StorageAdapter {
                     document.put("replacementBlockId", blockRecord.getReplacementBlockId().get());
                 }
             }
-            
+
             // Source
             if (event.getSource().isPlayer()) {
                 document.put("player", event.getSource().getSourceIdentifier());
             } else {
                 document.put("source", event.getSource().getSourceIdentifier());
             }
-            
+
             // Insert
             documents.add(new InsertOneModel<Document>(document));
-            
+
         }
 
         // Write
@@ -160,7 +174,7 @@ public class MongoStorageAdapter implements StorageAdapter {
     }
 
     /**
-     * 
+     *
      * @param collectionName
      * @return
      */
@@ -182,13 +196,13 @@ public class MongoStorageAdapter implements StorageAdapter {
     // @todo implement
     @Override
     public List<ResultRecord> query(QuerySession session) throws Exception {
-        
+
         // Prepare results
         List<ResultRecord> results = new ArrayList<ResultRecord>();
-        
+
         // Get collection
         MongoCollection<Document> collection = getCollection(collectionEventRecordsName);
-        
+
         // Query conditions
         // @todo needs implementation
         Document query = new Document();
@@ -198,7 +212,7 @@ public class MongoStorageAdapter implements StorageAdapter {
         int sortDir = 1; // @todo needs implementation
         int rowLimit = 5; // @todo needs implementation
         boolean shouldGroup = true; // @todo needs implementation
-        
+
         // Sorting
         Document sortFields = new Document();
         sortFields.put("created",sortDir);
@@ -206,14 +220,14 @@ public class MongoStorageAdapter implements StorageAdapter {
         sortFields.put( "z", 1 );
         sortFields.put( "y", 1 );
         Document sorter = new Document("$sort", sortFields);
-        
+
         // Offset/Limit
         Document limit = new Document("$limit", rowLimit);
-        
+
         // Build aggregators
         AggregateIterable<Document> aggregated = null;
         if( shouldGroup ){
-            
+
             // Grouping fields
             Document groupFields = new Document();
             groupFields.put("eventName", "$eventName");
@@ -222,69 +236,69 @@ public class MongoStorageAdapter implements StorageAdapter {
             groupFields.put("dayOfMonth", new Document("$dayOfMonth", "$created"));
             groupFields.put("month", new Document("$month", "$created"));
             groupFields.put("year", new Document("$year", "$created"));
-            
+
             Document groupHolder = new Document("_id", groupFields);
             groupHolder.put("count", new Document("$sum", 1));
-            
+
             Document group = new Document("$group", groupHolder);
-            
+
             // Aggregation pipeline
             List<Document> pipeline = new ArrayList<Document>();
             pipeline.add(matcher);
             pipeline.add(group);
             pipeline.add(sorter);
             pipeline.add(limit);
-            
+
             aggregated = collection.aggregate(pipeline);
-            
+
         } else {
-            
+
             // Aggregation pipeline
             List<Document> pipeline = new ArrayList<Document>();
             pipeline.add(matcher);
             pipeline.add(sorter);
             pipeline.add(limit);
-            
+
             aggregated = collection.aggregate(pipeline);
- 
+
         }
-        
+
         // Iterate results and build our event record list
         MongoCursor<Document> cursor = aggregated.iterator();
         try {
             while (cursor.hasNext()) {
-                
+
                 // Mongo document
                 Document wrapper = cursor.next();
                 Document document = (Document) wrapper.get("_id");
-                
+
                 // Build our result object
                 ResultRecord result = null;
                 if (shouldGroup) {
-                    
+
                     result = new ResultRecordAggregate();
                     ((ResultRecordAggregate)result).count = (Integer) wrapper.get("count");
 
                 } else {
-                    
+
 //                    ResultRecordComplete result = new ResultRecordComplete();
 //                    results.add(result);
                 }
-                
+
                 // Common fields
                 result.eventName = (String) document.get("eventName");
                 result.player = (String) document.get("player");
                 result.subjectName = (String) document.get("subjectName");
-                
+
                 results.add(result);
-                
+
             }
         } finally {
             cursor.close();
         }
-        
+
         return results;
-        
+
     }
 
     /**

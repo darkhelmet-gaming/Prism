@@ -54,6 +54,7 @@ import com.mongodb.client.model.WriteModel;
 public class MongoRecords implements StorageAdapterRecords {
 
     private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
+
    /**
     *
     */
@@ -89,7 +90,7 @@ public class MongoRecords implements StorageAdapterRecords {
            }
 
            // Block data
-           if ( event instanceof BlockEventRecord ){
+           if (event instanceof BlockEventRecord){
 
                BlockEventRecord blockRecord = (BlockEventRecord) event;
 
@@ -119,7 +120,6 @@ public class MongoRecords implements StorageAdapterRecords {
        // @todo implement real results, BulkWriteResult
 
        return new StorageWriteResult();
-
    }
 
    /**

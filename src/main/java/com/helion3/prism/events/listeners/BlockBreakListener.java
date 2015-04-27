@@ -43,7 +43,6 @@ public class BlockBreakListener {
 
         Location location = event.getBlock();
 
-
         // Player-caused
         if (event instanceof PlayerBreakBlockEvent) {
 

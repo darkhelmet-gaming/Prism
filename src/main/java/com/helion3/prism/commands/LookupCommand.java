@@ -45,7 +45,7 @@ import com.helion3.prism.api.records.ResultRecord;
 import com.helion3.prism.api.records.ResultRecordAggregate;
 import com.helion3.prism.utils.Template;
 
-public class LookupCommand  {
+public class LookupCommand {
 
     private LookupCommand(){}
 

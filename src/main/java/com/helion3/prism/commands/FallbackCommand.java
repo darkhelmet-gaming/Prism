@@ -23,26 +23,27 @@
  */
 package com.helion3.prism.commands;
 
-import static org.spongepowered.api.util.command.args.GenericArguments.*;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.command.CommandException;
+import org.spongepowered.api.util.command.CommandResult;
+import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.util.command.args.CommandContext;
+import org.spongepowered.api.util.command.spec.CommandExecutor;
 
-import org.spongepowered.api.Game;
-import org.spongepowered.api.util.command.args.ChildCommandElementExecutor;
-import org.spongepowered.api.util.command.spec.CommandSpec;
+import com.helion3.prism.utils.Format;
 
-public class PrismCommands {
+public class FallbackCommand implements CommandExecutor  {
 
-    private PrismCommands(){}
-
-    /**
-     * Build a complete command hierarchy
-     * @return
-     */
-    public static CommandSpec getCommand(Game game) {
-        final ChildCommandElementExecutor children = new ChildCommandElementExecutor(new FallbackCommand());
-        children.register(LookupCommand.getCommand(game), "lookup", "l");
-        return CommandSpec.builder()
-            .setExecutor(children)
-            .setArguments(optional(firstParsing(children)))
-            .build();
+    @Override
+    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+        src.sendMessage(Texts.of(
+            Format.heading(TextColors.GRAY, "By ", TextColors.GOLD, "viveleroi.\n"),
+            TextColors.DARK_AQUA, "Tracking so good the NSA stole our name.\n",
+            TextColors.GRAY, "Help: ", TextColors.WHITE, "/pr ?\n",
+            TextColors.GRAY, "IRC: ", TextColors.WHITE, "irc.esper.net #prism\n",
+            TextColors.GRAY, "Site: ", TextColors.WHITE, "http://discover-prism.com"
+        ));
+        return CommandResult.builder().successCount(1).build();
     }
 }

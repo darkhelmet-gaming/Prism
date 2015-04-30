@@ -32,23 +32,32 @@ import org.spongepowered.api.world.Location;
 import com.google.common.base.Optional;
 
 /**
- * Represents a single record of an event. Contains 
- * necessary information about the event including the 
+ * Represents a single record of an event. Contains
+ * necessary information about the event including the
  * location, subject, time, causation, etc.
- * 
+ *
  */
 abstract public class EventRecord {
-    
+
     // Required values
     protected final String eventName;
     protected final Date date;
     protected final EventSource source;
-    
+
     // Optional
     protected final Optional<Location> location;
-    
+
     /**
-     * 
+     *
+     * @param eventName Parameter name of the event
+     * @param source Source/cause of the event
+     */
+    public EventRecord(String eventName, EventSource source ){
+        this(eventName, source, new Date(), null);
+    }
+
+    /**
+     *
      * @param eventName Parameter name of the event
      * @param source Source/cause of the event
      * @param location Location the event occurred
@@ -63,7 +72,7 @@ abstract public class EventRecord {
 
     /**
      * Returns the parameter name for this {@link EventRecord}.
-     * 
+     *
      * @return String name of the event
      */
     public String getEventName(){
@@ -72,36 +81,36 @@ abstract public class EventRecord {
 
     /**
      * Returns the location for this {@link EventRecord}.
-     * 
+     *
      * @return Location of the event
      */
     public Optional<Location> getLocation(){
         return location;
     }
-    
+
     /**
      * Returns the date/time of this event.
-     * 
+     *
      * @return Date The date the event occurred
      */
     public Date getDate(){
         return date;
     }
-    
+
     /**
      * Returns the source of this specific event.
-     * 
+     *
      * @return EventSource Source of this event
      */
     public EventSource getSource(){
         return source;
     }
-    
+
     /**
      * Return a human-readable display name/summary
      * of the event subject, i.e. "dirt", "creeper"
      * or "diamond pickaxe", etc.
-     * 
+     *
      * @return Human-readable summary
      */
     public String getSubjectDisplayName(){

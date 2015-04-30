@@ -47,10 +47,12 @@ public class Configuration {
                 defaultConfig.getParentFile().mkdirs();
                 defaultConfig.createNewFile();
                 rootNode = configManager.createEmptyNode(ConfigurationOptions.defaults());
+                Prism.getLogger().info("Creating new config at mods/Prism/Prism.conf");
             } else {
                 rootNode = configManager.load();
             }
 
+            // Database
             ConfigurationNode dbName = rootNode.getNode("db", "name");
             if (dbName.isVirtual()) {
                 dbName.setValue("prism");
@@ -71,10 +73,20 @@ public class Configuration {
                 dbMongoPort.setValue(27017);
             }
 
+            // Events
+            ConfigurationNode eventBlockBreak = rootNode.getNode("events", "block", "break");
+            if (eventBlockBreak.isVirtual()) {
+                eventBlockBreak.setValue(true);
+            }
+
+            ConfigurationNode eventPlayerJoin = rootNode.getNode("events", "player", "join");
+            if (eventPlayerJoin.isVirtual()) {
+                eventPlayerJoin.setValue(false);
+            }
+
             // Save
             try {
                 configManager.save(rootNode);
-                Prism.getLogger().info("Created new config at mods/Prism/Prism.conf");
             } catch(IOException e) {
                 // @todo handle properly
                 e.printStackTrace();

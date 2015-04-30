@@ -60,36 +60,46 @@ final public class Query {
     public static Query fromParameters(String[] parameters) {
         Query query = new Query();
 
-        for (String parameter : parameters) {
-            // @todo check for colon
+        if (parameters.length > 0) {
+            for (String parameter : parameters) {
+                // Determine the true alias and value
+                String alias;
+                String value;
+                if (parameter.contains(":")) {
+                    // Split the parameter: values
+                    String[] split = parameter.split( ":", 2 );
+                    alias = split[0];
+                    value = split[1];
+                } else {
+                    // Any value with a defined parameter is assumed to be a
+                    // player username.
+                    alias = "p";
+                    value = parameter;
+                }
 
-            // Split the parameter: values
-            final String[] split = parameter.split( ":", 2 );
-            final String alias = split[0];
-            final String value = split[1];
+                // Simple validation
+                if (alias.length() <= 0 || value.length() <= 0) {
+                    // @todo throw invalid syntax error
+                    break;
+                }
 
-            // Simple validation
-            if (alias.length() <= 0 || value.length() <= 0) {
-                // @todo throw invalid syntax error
-                break;
+                // Find a handler
+                Optional<ParameterHandler> optionalHandler = Prism.getHandlerForParameter(alias);
+                if (!optionalHandler.isPresent()) {
+                    // @todo throw invalid alias error
+                    break;
+                }
+
+                ParameterHandler handler = optionalHandler.get();
+
+                // Validate value
+                if (!handler.acceptsValue(value)) {
+                    // @todo throw syntax error
+                    break;
+                }
+
+                handler.process(value, query);
             }
-
-            // Find a handler
-            Optional<ParameterHandler> optionalHandler = Prism.getHandlerForParameter(alias);
-            if (!optionalHandler.isPresent()) {
-                // @todo throw invalid alias error
-                break;
-            }
-
-            ParameterHandler handler = optionalHandler.get();
-
-            // Validate value
-            if (!handler.acceptsValue(value)) {
-                // @todo throw syntax error
-                break;
-            }
-
-            handler.process(value, query);
         }
 
         return query;

@@ -21,22 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.events.listeners;
+package com.helion3.prism.records;
 
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
+import com.helion3.prism.api.records.EventRecord;
+import com.helion3.prism.api.records.EventSource;
 
-import com.helion3.prism.api.records.PrismRecord;
+public class SimpleEventRecord extends EventRecord {
 
-public class PlayerJoinListener {
-
-    /**
-     * Saves event records when a player joins.
-     *
-     * @param event
-     */
-    @Subscribe
-    public void onPlayerJoin(final PlayerJoinEvent event) {
-        new PrismRecord().player(event.getPlayer()).joined().save();
+    public SimpleEventRecord(String eventName, EventSource source) {
+        super(eventName, source);
     }
 }

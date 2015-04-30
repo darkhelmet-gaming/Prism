@@ -26,17 +26,33 @@ package com.helion3.prism.events.listeners;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 
-import com.helion3.prism.api.records.PrismRecord;
+import com.helion3.prism.Prism;
 
-public class PlayerJoinListener {
+public class RequiredPlayerJoinListener {
 
     /**
-     * Saves event records when a player joins.
+     * Listens for player join events so that we can properly identify
+     * players.
+     *
+     * Note: This listener is required and is *not* involved with tracking
+     * join events.
      *
      * @param event
      */
     @Subscribe
     public void onPlayerJoin(final PlayerJoinEvent event) {
-        new PrismRecord().player(event.getPlayer()).joined().save();
+
+        // Run our database query async
+        new Thread(new Runnable() {
+            @Override
+            public void run(){
+                try {
+                    Prism.getStorageAdapter().players().save(event.getPlayer());
+                } catch (Exception e) {
+                    // @todo handle
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }

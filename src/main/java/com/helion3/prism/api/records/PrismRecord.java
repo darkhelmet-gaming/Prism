@@ -31,29 +31,30 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Optional;
 import com.helion3.prism.queues.RecordingQueue;
 import com.helion3.prism.records.BlockEventRecord;
+import com.helion3.prism.records.SimpleEventRecord;
 
 /**
  * An easy-to-understand factory class for Prism {@link EventRecord}s.
- * 
+ *
  * By chaining methods together, you can build a record with
  * natural-language style syntax.
- * 
+ *
  * For example:
- * 
+ *
  * new PrismRecord().player(player).brokeBlock(blockLoc).save()
- * 
+ *
  */
 public class PrismRecord {
-    
+
     private String eventName;
     private EventSource source;
     private Optional<Location> optionalExistingBlock = Optional.absent();
     private Optional<Location> optionalReplacementBlock = Optional.absent();
-    
+
     /**
      * Describe the Player responsible for the event this
      * record describes.
-     * 
+     *
      * @param player Player responsible for this event
      * @return RecordBuilder
      */
@@ -63,9 +64,8 @@ public class PrismRecord {
     }
 
     /**
-     * Describes a single block break. The location is automatically
-     * obtained from the BlockLoc.
-     * 
+     * Describes a single block break at a given Location.
+     *
      * @param block Block broken.
      * @return RecordBuilder
      */
@@ -75,12 +75,28 @@ public class PrismRecord {
         this.optionalExistingBlock = Optional.of(block);
         return this;
     }
-    
+
+    /**
+     * Describes a player join.
+     * @return
+     */
+    public PrismRecord joined() {
+        this.eventName = "player-join";
+        return this;
+    }
+
     /**
      * Build the final event record and send it to the queue.
      */
     public void save(){
-        
+
+        if (source == null) {
+            throw new IllegalArgumentException("Event record can not be created - invalid source.");
+        }
+        else if (eventName == null) {
+            throw new IllegalArgumentException("Event record can not be created - invalid event name.");
+        }
+
         EventRecord record = null;
 
         // Block Break (only existing block present)
@@ -88,10 +104,14 @@ public class PrismRecord {
             Location existingBlock = optionalExistingBlock.get();
             record = new BlockEventRecord(eventName, source, existingBlock, existingBlock.getType().getId());
         }
-        
-        // Queue the finished record for saving
-        if (record != null) {
-            RecordingQueue.add(record);
+
+        // Generic
+        if (record == null) {
+            record = new SimpleEventRecord(eventName, source);
         }
+
+        // Queue the finished record for saving
+        RecordingQueue.add(record);
+
     }
 }

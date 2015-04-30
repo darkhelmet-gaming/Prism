@@ -79,6 +79,11 @@ public class Configuration {
                 eventBlockBreak.setValue(true);
             }
 
+            ConfigurationNode eventBlockPlace = rootNode.getNode("events", "block", "place");
+            if (eventBlockPlace.isVirtual()) {
+                eventBlockPlace.setValue(true);
+            }
+
             ConfigurationNode eventPlayerJoin = rootNode.getNode("events", "player", "join");
             if (eventPlayerJoin.isVirtual()) {
                 eventPlayerJoin.setValue(false);

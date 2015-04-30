@@ -24,6 +24,7 @@
 package com.helion3.prism.api.records;
 
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.player.Player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -49,14 +50,14 @@ public class PrismRecord {
     private String eventName;
     private EventSource source;
     private Optional<Location> optionalExistingBlock = Optional.absent();
-    private Optional<Location> optionalReplacementBlock = Optional.absent();
+    private Optional<BlockSnapshot> optionalReplacementBlock = Optional.absent();
 
     /**
      * Describe the Player responsible for the event this
      * record describes.
      *
      * @param player Player responsible for this event
-     * @return RecordBuilder
+     * @return PrismRecord
      */
     public PrismRecord player(Player player){
         this.source = new EventSource(player);
@@ -67,12 +68,35 @@ public class PrismRecord {
      * Describes a single block break at a given Location.
      *
      * @param block Block broken.
-     * @return RecordBuilder
+     * @return PrismRecord
      */
     public PrismRecord brokeBlock(Location block){
         checkNotNull(block);
         this.eventName = "block-break";
         this.optionalExistingBlock = Optional.of(block);
+        return this;
+    }
+
+    /**
+     * Describes a single block place at a given Location.
+     *
+     * @param block Block placed.
+     * @return PrismRecord
+     */
+    public PrismRecord placedBlock(Location block){
+        checkNotNull(block);
+        this.eventName = "block-place";
+        this.optionalExistingBlock = Optional.of(block);
+        return this;
+    }
+
+    /**
+     * Describes which block was replaced by a block action.
+     * @param snapshot BlockSnapshot Snapshot of the former block
+     * @return PrismRecord
+     */
+    public PrismRecord replacing(BlockSnapshot snapshot) {
+        this.optionalReplacementBlock = Optional.of(snapshot);
         return this;
     }
 
@@ -108,10 +132,17 @@ public class PrismRecord {
 
         EventRecord record = null;
 
-        // Block Break (only existing block present)
-        if (optionalExistingBlock.isPresent() && !optionalReplacementBlock.isPresent()) {
-            Location existingBlock = optionalExistingBlock.get();
-            record = new BlockEventRecord(eventName, source, existingBlock, existingBlock.getType().getId());
+        // Block Events
+        if (optionalExistingBlock.isPresent()) {
+            Location location = optionalExistingBlock.get();
+            String existingBlockId = optionalExistingBlock.get().getType().getId();
+
+            String replacementBlockId = null;
+            if (optionalReplacementBlock.isPresent()) {
+                replacementBlockId = optionalReplacementBlock.get().getState().getType().getId();
+            }
+
+            record = new BlockEventRecord(eventName, source, location, existingBlockId, replacementBlockId);
         }
 
         // Generic

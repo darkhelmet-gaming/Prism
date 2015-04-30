@@ -47,6 +47,7 @@ import com.helion3.prism.api.parameters.ParameterHandler;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.events.listeners.BlockBreakListener;
+import com.helion3.prism.events.listeners.BlockPlaceListener;
 import com.helion3.prism.events.listeners.PlayerJoinListener;
 import com.helion3.prism.events.listeners.PlayerQuitListener;
 import com.helion3.prism.events.listeners.RequiredPlayerJoinListener;
@@ -188,6 +189,10 @@ final public class Prism {
         // Block events
         if (config.getNode("events", "block", "break").getBoolean()) {
             eventManager.register(this, new BlockBreakListener());
+        }
+
+        if (config.getNode("events", "block", "place").getBoolean()) {
+            eventManager.register(this, new BlockPlaceListener());
         }
 
         // Player events

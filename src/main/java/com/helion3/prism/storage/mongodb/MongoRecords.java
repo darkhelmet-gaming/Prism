@@ -33,6 +33,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
 
+import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.records.EventRecord;
@@ -131,6 +132,8 @@ public class MongoRecords implements StorageAdapterRecords {
    @Override
    public List<ResultRecord> query(QuerySession session) throws Exception {
 
+       Query query = session.getQuery();
+
        // Prepare results
        List<ResultRecord> results = new ArrayList<ResultRecord>();
 
@@ -138,14 +141,21 @@ public class MongoRecords implements StorageAdapterRecords {
        MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
 
        // Query conditions
-       // @todo needs implementation
-       Document query = new Document();
-       Document matcher = new Document("$match", query);
+       Document conditions = new Document();
+
+       // Actions
+       if (query.getEventNames().size() > 0) {
+           String matchRule = query.getEventNameMatchRule().equals(MatchRule.INCLUDE) ? "$in" : "$nin";
+           conditions.append("eventName", new Document(matchRule, query.getEventNames()));
+       }
+
+       // Append all conditions
+       Document matcher = new Document("$match", conditions);
 
        // Session configs
        int sortDir = 1; // @todo needs implementation
        int rowLimit = 5; // @todo needs implementation
-       boolean shouldGroup = session.getQuery().isAggregate();
+       boolean shouldGroup = query.isAggregate();
 
        // Sorting
        Document sortFields = new Document();

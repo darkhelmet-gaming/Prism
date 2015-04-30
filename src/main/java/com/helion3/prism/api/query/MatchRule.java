@@ -21,44 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.parameters;
+package com.helion3.prism.api.query;
 
-import java.util.regex.Pattern;
-
-import com.google.common.collect.ImmutableList;
-import com.helion3.prism.api.query.MatchRule;
-import com.helion3.prism.api.query.Query;
-
-public class ParameterAction extends SimpleParameterHandler {
-
-    private final Pattern pattern = Pattern.compile( "[~|!]?[\\w,-]+" );
-
-    /**
-     * Constructor
-     */
-    public ParameterAction() {
-        super( ImmutableList.of("a", "action") );
-    }
-
-    @Override
-    public boolean acceptsValue(String parameter) {
-        return pattern.matcher(parameter).matches();
-    }
-
-    @Override
-    public void process(String value, Query query) {
-        final String[] actions = value.split( "," );
-
-        if (actions[0].startsWith("!")) {
-            actions[0] = actions[0].replace("!", "");
-            query.setEventNameMatchRule(MatchRule.EXCLUDE);
-        }
-
-        for (String action : actions) {
-
-            // @todo pull all matching "real" action names
-
-            query.addEventName(action);
-        }
-    }
+public enum MatchRule {
+    EXCLUDE,
+    INCLUDE,
+    PARTIAL
 }

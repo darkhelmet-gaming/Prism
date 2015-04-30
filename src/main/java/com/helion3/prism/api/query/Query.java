@@ -25,6 +25,9 @@ package com.helion3.prism.api.query;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.parameters.ParameterHandler;
@@ -32,6 +35,8 @@ import com.helion3.prism.api.parameters.ParameterHandler;
 final public class Query {
 
     private boolean isAggregate = true;
+    private List<String> eventNames = new ArrayList<String>();
+    private MatchRule eventMatchRule = MatchRule.INCLUDE;
 
     /**
      * Builds a {@link Query} by parsing a string of parameters
@@ -105,5 +110,39 @@ final public class Query {
      */
     public void setAggregate(boolean isAggregate) {
         this.isAggregate = isAggregate;
+    }
+
+    /**
+     * Returns the {@link MatchRule} the event condition will use.
+     * @return MatchRule
+     */
+    public MatchRule getEventNameMatchRule() {
+        return eventMatchRule;
+    }
+
+    /**
+     * Sets the {@link MatchRule} the event condition will use.
+     * @param rule {@link MatchRule}
+     */
+    public void setEventNameMatchRule(MatchRule rule) {
+        eventMatchRule = rule;
+    }
+
+    /**
+     * Add a named event to the query condition. This will be
+     * a white or black list depending on the event {@link MatchRule}
+     * @param action String action name
+     */
+    public void addEventName(String action) {
+        checkNotNull(action);
+        eventNames.add(action);
+    }
+
+    /**
+     * Returns a list of named actions.
+     * @return List of named actions.
+     */
+    public List<String> getEventNames() {
+        return eventNames;
     }
 }

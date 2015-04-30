@@ -21,29 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.commands;
+package com.helion3.prism.api.parameters;
 
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
+import com.google.common.collect.ImmutableList;
 
-import com.helion3.prism.utils.Format;
+public abstract class SimpleParameterHandler implements ParameterHandler {
 
-public class FallbackCommand implements CommandExecutor  {
+    private final ImmutableList<String> aliases;
 
+    /**
+     * Super constructor for most parameter handlers.
+     * @param aliases ImmutableList<String> Command aliases which match this handler
+     */
+    public SimpleParameterHandler(ImmutableList<String> aliases) {
+        this.aliases = aliases;
+    }
+
+    /**
+     * Returns whether this handler applies to the given
+     * parameter string.
+     */
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        src.sendMessage(Texts.of(
-            Format.heading(TextColors.GRAY, "By ", TextColors.GOLD, "viveleroi.\n"),
-            TextColors.DARK_AQUA, "Tracking so good the NSA stole our name.\n",
-            TextColors.GRAY, "Help: ", TextColors.WHITE, "/pr ?\n",
-            TextColors.GRAY, "IRC: ", TextColors.WHITE, "irc.esper.net #prism\n",
-            TextColors.GRAY, "Site: ", TextColors.WHITE, "http://discover-prism.com"
-        ));
-        return CommandResult.builder().successCount(1).build();
+    public boolean handles(String alias) {
+        return aliases.contains(alias);
     }
 }

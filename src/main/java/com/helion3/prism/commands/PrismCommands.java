@@ -23,11 +23,22 @@
  */
 package com.helion3.prism.commands;
 
-import static org.spongepowered.api.util.command.args.GenericArguments.*;
+import java.util.List;
 
 import org.spongepowered.api.Game;
-import org.spongepowered.api.util.command.args.ChildCommandElementExecutor;
+import org.spongepowered.api.util.command.CommandCallable;
+import org.spongepowered.api.util.command.CommandResult;
+import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.command.CommandException;
+import org.spongepowered.api.util.command.args.CommandContext;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.helion3.prism.utils.Format;
 
 public class PrismCommands {
 
@@ -38,11 +49,22 @@ public class PrismCommands {
      * @return
      */
     public static CommandSpec getCommand(Game game) {
-        final ChildCommandElementExecutor children = new ChildCommandElementExecutor(new FallbackCommand());
-        children.register(LookupCommand.getCommand(game), "lookup", "l");
         return CommandSpec.builder()
-            .setExecutor(children)
-            .setArguments(optional(firstParsing(children)))
-            .build();
+                .setExecutor(new CommandExecutor() {
+                    @Override
+                    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
+                        src.sendMessage(Texts.of(
+                            Format.heading(TextColors.GRAY, "By ", TextColors.GOLD, "viveleroi.\n"),
+                            TextColors.DARK_AQUA, "Tracking so good the NSA stole our name.\n",
+                            TextColors.GRAY, "Help: ", TextColors.WHITE, "/pr ?\n",
+                            TextColors.GRAY, "IRC: ", TextColors.WHITE, "irc.esper.net #prism\n",
+                            TextColors.GRAY, "Site: ", TextColors.WHITE, "http://discover-prism.com"
+                        ));
+                        return CommandResult.empty();
+                    }
+                })
+                .setChildren(ImmutableMap.<List<String>, CommandCallable>of(
+                        ImmutableList.of("l", "lookup"), new LookupCommand()
+                )).build();
     }
 }

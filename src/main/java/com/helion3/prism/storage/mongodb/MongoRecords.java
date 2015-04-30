@@ -145,7 +145,7 @@ public class MongoRecords implements StorageAdapterRecords {
        // Session configs
        int sortDir = 1; // @todo needs implementation
        int rowLimit = 5; // @todo needs implementation
-       boolean shouldGroup = false; // @todo needs implementation
+       boolean shouldGroup = session.getQuery().isAggregate();
 
        // Sorting
        Document sortFields = new Document();

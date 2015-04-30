@@ -23,7 +23,11 @@
  */
 package com.helion3.prism;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -36,7 +40,10 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.config.DefaultConfig;
 import org.spongepowered.api.service.event.EventManager;
 
+import com.google.common.base.Optional;
 import com.google.inject.Inject;
+import com.helion3.prism.api.parameters.ParameterAction;
+import com.helion3.prism.api.parameters.ParameterHandler;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.events.listeners.BlockBreakListener;
@@ -52,9 +59,10 @@ import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
  *
  */
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
-public class Prism {
+final public class Prism {
 
     private static Configuration config;
+    private static List<ParameterHandler> handlers = new ArrayList<ParameterHandler>();
     private static Logger logger;
     private static StorageAdapter storageAdapter;
 
@@ -80,6 +88,9 @@ public class Prism {
         // Load configuration file
         config = new Configuration(defaultConfig, configManager);
 
+        // Register handlers
+        registerParameterHandler(new ParameterAction());
+
         // Listen to events
         registerSpongeEventListeners(game.getEventManager());
 
@@ -102,6 +113,16 @@ public class Prism {
     }
 
     /**
+     *
+     * @param handler
+     */
+    public void registerParameterHandler(ParameterHandler handler) {
+        checkNotNull(handler);
+        // @todo validate alias doesn't exist
+        handlers.add(handler);
+    }
+
+    /**
      * Returns the plugin configuration
      * @return Configuration
      */
@@ -110,11 +131,34 @@ public class Prism {
     }
 
     /**
+     * Returns a specific handler for a given parameter
+     * @param parameter String parameter name
+     * @return
+     */
+    public static Optional<ParameterHandler> getHandlerForParameter(String parameter) {
+        ParameterHandler result = null;
+        for(ParameterHandler handler : Prism.getParameterHandlers()) {
+            if (handler.handles(parameter)) {
+                result = handler;
+            }
+        }
+        return Optional.fromNullable(result);
+    }
+
+    /**
      * Returns the Logger instance for this plugin.
      * @return Logger instance
      */
     public static Logger getLogger() {
         return logger;
+    }
+
+    /**
+     * Returns all currently registered parameter handlers.
+     * @return List of {@link ParameterHandler}
+     */
+    public static List<ParameterHandler> getParameterHandlers() {
+        return handlers;
     }
 
     /**

@@ -21,31 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.query;
+package com.helion3.prism.api.parameters;
 
-/**
- * Represents a record query session, which includes the actual
- * {@link Query} as well as the source, and result set meta data.
- *
- */
-public class QuerySession {
+import com.helion3.prism.api.query.Query;
 
-    protected final Query query;
+public interface ParameterHandler {
 
     /**
-     * Creates a new session with the given {@link Query}
-     * @param query
+     * Returns whether the given value(s) for the handler
+     * are acceptable.
+     * @param value String Value/input for the parameter
+     * @return boolean
      */
-    public QuerySession(Query query){
-        this.query = query;
-    }
+    boolean acceptsValue(String value);
 
     /**
-     * Get the query defined for this session.
+     * Returns whether this handler responds to the given alias.
      *
-     * @return {@link Query}
+     * @param alias String Alias to check against
+     * @return boolean
      */
-    public Query getQuery(){
-        return query;
-    }
+    boolean handles(String alias);
+
+    /**
+     * Processes the given value into conditions which are then
+     * appended to the query.
+     * @param value String Values given with parameter
+     * @param query Query Current query object
+     */
+    void process(String value, Query query);
+
 }

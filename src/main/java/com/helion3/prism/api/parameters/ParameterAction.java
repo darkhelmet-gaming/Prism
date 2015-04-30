@@ -21,31 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.query;
+package com.helion3.prism.api.parameters;
 
-/**
- * Represents a record query session, which includes the actual
- * {@link Query} as well as the source, and result set meta data.
- *
- */
-public class QuerySession {
+import java.util.regex.Pattern;
 
-    protected final Query query;
+import com.google.common.collect.ImmutableList;
+import com.helion3.prism.Prism;
+import com.helion3.prism.api.query.Query;
+
+public class ParameterAction extends SimpleParameterHandler {
+
+    private final Pattern pattern = Pattern.compile( "[~|!]?[\\w,-]+" );
 
     /**
-     * Creates a new session with the given {@link Query}
-     * @param query
+     * Constructor
      */
-    public QuerySession(Query query){
-        this.query = query;
+    public ParameterAction() {
+        super( ImmutableList.of("a", "action") );
     }
 
-    /**
-     * Get the query defined for this session.
-     *
-     * @return {@link Query}
-     */
-    public Query getQuery(){
-        return query;
+    @Override
+    public boolean acceptsValue(String parameter) {
+        return pattern.matcher(parameter).matches();
+    }
+
+    @Override
+    public void process(String value, Query query) {
+
+        Prism.getLogger().debug("Parsing actions from: " + value);
+
+        // @todo actually handle this!
+
     }
 }

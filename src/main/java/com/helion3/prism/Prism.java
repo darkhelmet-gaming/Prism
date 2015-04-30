@@ -42,7 +42,7 @@ import org.spongepowered.api.service.event.EventManager;
 
 import com.google.common.base.Optional;
 import com.google.inject.Inject;
-import com.helion3.prism.api.parameters.ParameterAction;
+import com.helion3.prism.api.parameters.ParameterEventName;
 import com.helion3.prism.api.parameters.ParameterHandler;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
@@ -89,7 +89,7 @@ final public class Prism {
         config = new Configuration(defaultConfig, configManager);
 
         // Register handlers
-        registerParameterHandler(new ParameterAction());
+        registerParameterHandler(new ParameterEventName());
 
         // Listen to events
         registerSpongeEventListeners(game.getEventManager());

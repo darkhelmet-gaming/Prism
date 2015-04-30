@@ -29,15 +29,17 @@ import com.google.common.collect.ImmutableList;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 
-public class ParameterAction extends SimpleParameterHandler {
+public class ParameterEventName extends SimpleParameterHandler {
 
     private final Pattern pattern = Pattern.compile( "[~|!]?[\\w,-]+" );
 
     /**
      * Constructor
      */
-    public ParameterAction() {
-        super( ImmutableList.of("a", "action") );
+    public ParameterEventName() {
+        // For backwards-compat, we're still using "a" for action.
+        // "e" is likely reserved for entity
+        super( ImmutableList.of("a", "event") );
     }
 
     @Override
@@ -47,18 +49,18 @@ public class ParameterAction extends SimpleParameterHandler {
 
     @Override
     public void process(String value, Query query) {
-        final String[] actions = value.split( "," );
+        final String[] eventNames = value.split( "," );
 
-        if (actions[0].startsWith("!")) {
-            actions[0] = actions[0].replace("!", "");
+        if (eventNames[0].startsWith("!")) {
+            eventNames[0] = eventNames[0].replace("!", "");
             query.setEventNameMatchRule(MatchRule.EXCLUDE);
         }
 
-        for (String action : actions) {
+        for (String eventName : eventNames) {
 
-            // @todo pull all matching "real" action names
+            // @todo pull all matching "real" event names
 
-            query.addEventName(action);
+            query.addEventName(eventName);
         }
     }
 }

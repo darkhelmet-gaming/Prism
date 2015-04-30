@@ -86,6 +86,15 @@ public class PrismRecord {
     }
 
     /**
+     * Describes a player quit.
+     * @return
+     */
+    public PrismRecord quit() {
+        this.eventName = "player-quit";
+        return this;
+    }
+
+    /**
      * Build the final event record and send it to the queue.
      */
     public void save(){

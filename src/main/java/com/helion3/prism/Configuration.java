@@ -84,6 +84,11 @@ public class Configuration {
                 eventPlayerJoin.setValue(false);
             }
 
+            ConfigurationNode eventPlayerQuit = rootNode.getNode("events", "player", "quit");
+            if (eventPlayerQuit.isVirtual()) {
+                eventPlayerQuit.setValue(false);
+            }
+
             // Save
             try {
                 configManager.save(rootNode);

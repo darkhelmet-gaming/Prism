@@ -33,7 +33,7 @@ import com.helion3.prism.api.records.PrismRecord;
 public class BlockPlaceListener {
 
     /**
-     * Listens for block break events.
+     * Listens for block place events.
      *
      * @param event
      */

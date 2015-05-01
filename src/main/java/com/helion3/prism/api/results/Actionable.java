@@ -21,14 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.records;
+package com.helion3.prism.api.results;
 
-/**
- * Represents a complete copy of an event record data from
- * a query result. Used for displaying individual entries
- * or for non-lookup actions.
- * 
- */
-public class ResultRecordComplete extends ResultRecord {
+public interface Actionable {
+
+    /**
+     * Reverses the result of this event on a subject
+     * unless the state of the subject has changed since
+     * this event, in way that would conflict.
+     * 
+     * For example, if the subject was a block, and
+     * the action removed the block, this will restore
+     * the block at the same location.
+     * 
+     */
+    public void undo();
+
+    /**
+     * Re-applies the result of this event to a subject,
+     * unless the subject does not exist in a state that
+     * would allow this change.
+     * 
+     */
+    public void redo();
 
 }

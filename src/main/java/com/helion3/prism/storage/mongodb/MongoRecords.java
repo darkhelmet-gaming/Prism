@@ -26,24 +26,29 @@ package com.helion3.prism.storage.mongodb;
 import static com.mongodb.client.model.Filters.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.bson.Document;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
 
+import com.google.common.base.Optional;
+import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.records.EventRecord;
-import com.helion3.prism.api.records.ResultRecord;
-import com.helion3.prism.api.records.ResultRecordAggregate;
-import com.helion3.prism.api.records.ResultRecordComplete;
+import com.helion3.prism.api.results.ResultRecord;
+import com.helion3.prism.api.results.ResultRecordAggregate;
+import com.helion3.prism.api.results.ResultRecordComplete;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
-import com.helion3.prism.records.BlockEventRecord;
+import com.helion3.prism.records.EventRecord;
 import com.mongodb.DBRef;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
@@ -69,7 +74,6 @@ public class MongoRecords implements StorageAdapterRecords {
        for (EventRecord event : events) {
 
            Document document = new Document();
-
            document.put("eventName", event.getEventName());
            document.put("created", event.getDate());
            document.put("subjectName", event.getSubjectDisplayName());
@@ -90,19 +94,6 @@ public class MongoRecords implements StorageAdapterRecords {
                }
            }
 
-           // Block data
-           if (event instanceof BlockEventRecord){
-
-               BlockEventRecord blockRecord = (BlockEventRecord) event;
-
-               if (blockRecord.getExistingBlockId().isPresent()) {
-                   document.put("existingBlockId", blockRecord.getExistingBlockId().get());
-               }
-               if (blockRecord.getReplacementBlockId().isPresent()) {
-                   document.put("replacementBlockId", blockRecord.getReplacementBlockId().get());
-               }
-           }
-
            // Source
            if (event.getSource().isPlayer()) {
                document.put("player", new DBRef(MongoStorageAdapter.collectionPlayersName, event.getSource().getSourceIdentifier()));
@@ -110,9 +101,18 @@ public class MongoRecords implements StorageAdapterRecords {
                document.put("source", event.getSource().getSourceIdentifier());
            }
 
+           Document data = new Document();
+
+           // Store data
+           if (event.getData().isPresent()) {
+               for (Entry<String,String> entry : event.getData().get().entrySet()) {
+                   data.put(entry.getKey(), entry.getValue());
+               }
+               document.put("data", data);
+           }
+
            // Insert
            documents.add(new InsertOneModel<Document>(document));
-
        }
 
        // Write
@@ -219,13 +219,42 @@ public class MongoRecords implements StorageAdapterRecords {
                Document wrapper = cursor.next();
                Document document = shouldGroup ? (Document) wrapper.get("_id") : wrapper;
 
-               // Build our result objectpr
+               // Build our result object
                ResultRecord result = null;
                if (shouldGroup) {
                    result = new ResultRecordAggregate();
                    ((ResultRecordAggregate)result).count = (Integer) wrapper.get("count");
                } else {
-                   result = new ResultRecordComplete();
+                   // Pull record class for this event, if any
+                   Class<? extends ResultRecord> clazz = Prism.getResultRecord(wrapper.getString("eventName"));
+                   if (clazz != null){
+                       result = clazz.newInstance();
+                   } else {
+                       result = new ResultRecordComplete();
+                   }
+
+                   ResultRecordComplete complete = (ResultRecordComplete) result;
+
+                   // Location
+                   if (wrapper.containsKey("world")) {
+                       complete.world = Optional.fromNullable(UUID.fromString(wrapper.getString("world")));
+                   } else {
+                       complete.world = Optional.absent();
+                   }
+                   complete.x = Optional.fromNullable(wrapper.getDouble("x"));
+                   complete.y = Optional.fromNullable(wrapper.getDouble("y"));
+                   complete.z = Optional.fromNullable(wrapper.getDouble("z"));
+
+                   // Data
+                   Map<String,String> dataMap = null;
+                   if (wrapper.containsKey("data")) {
+                       dataMap = new HashMap<String,String>();
+                       Document data = (Document) wrapper.get("data");
+                       for (Entry<String,Object> entry : data.entrySet()) {
+                           dataMap.put(entry.getKey(), (String)entry.getValue());
+                       }
+                   }
+                   complete.data = Optional.fromNullable(dataMap);
                }
 
                // Determine the final name of the event source

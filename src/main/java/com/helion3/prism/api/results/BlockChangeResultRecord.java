@@ -21,48 +21,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.queues;
+package com.helion3.prism.api.results;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.world.Location;
+
+import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
-import com.helion3.prism.records.EventRecord;
 
-public class RecordingQueueManager extends Thread {
+/**
+ * Represents a block change event record.
+ */
+public class BlockChangeResultRecord extends ResultRecordComplete implements Actionable {
 
     @Override
-    public void run() {
-
-        while (true) {
-
-            List<EventRecord> eventsSaveBatch = new ArrayList<EventRecord>();
-
-            // Assume we're iterating everything in the queue
-            while (!RecordingQueue.getQueue().isEmpty()) {
-
-                // Poll the next event, append to list
-                EventRecord event = RecordingQueue.getQueue().poll();
-                if (event != null) {
-                    eventsSaveBatch.add(event);
-                }
-            }
-
-            if (eventsSaveBatch.size() > 0) {
-                try {
-                    Prism.getStorageAdapter().records().write(eventsSaveBatch);
-                } catch (Exception e) {
-                    // @todo handle failures
-                    e.printStackTrace();
-                }
-            }
-
-            // Delay next execution
-            try {
-                sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+    public void undo() {
+        if (!data.isPresent()) {
+            // @todo throw error
         }
+
+        Optional<Location> optionalLoc = getLocation();
+        if (!optionalLoc.isPresent()) {
+            // @todo throw error
+        }
+
+        Location location = optionalLoc.get();
+
+        Map<String,String> dataMap = data.get();
+
+        Optional<BlockType> existingBlockType = Prism.getGame().getRegistry().getType(BlockType.class, dataMap.get("existingBlockId").replace("minecraft:", ""));
+
+        if (!existingBlockType.isPresent()) {
+            // @todo throw error, handle
+        }
+
+        // @todo ensure location is available for a block
+
+        // @todo the type registry is currently unimplemented
+        location.replaceWith(BlockTypes.DIAMOND_BLOCK);
+
+        // @todo add replacement block logic
+    }
+
+    @Override
+    public void redo() {
+
     }
 }

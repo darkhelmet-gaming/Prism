@@ -21,9 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.records;
+package com.helion3.prism.records;
 
 import java.util.Date;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -32,12 +33,14 @@ import org.spongepowered.api.world.Location;
 import com.google.common.base.Optional;
 
 /**
- * Represents a single record of an event. Contains
- * necessary information about the event including the
- * location, subject, time, causation, etc.
+ * Represents a single record of an event. Contains information
+ * about the event including the location, subject, time,
+ * causation, etc.
+ *
+ * Delivers information to the @{link StorageAdapter} for writing.
  *
  */
-abstract public class EventRecord {
+final public class EventRecord {
 
     // Required values
     protected final String eventName;
@@ -46,14 +49,15 @@ abstract public class EventRecord {
 
     // Optional
     protected final Optional<Location> location;
+    protected final Optional<Map<String,String>> data;
 
     /**
      *
      * @param eventName Parameter name of the event
      * @param source Source/cause of the event
      */
-    public EventRecord(String eventName, EventSource source ){
-        this(eventName, source, new Date(), null);
+    public EventRecord(String eventName, EventSource source, @Nullable Map<String,String> data, @Nullable Location location){
+        this(eventName, source, new Date(), data, location);
     }
 
     /**
@@ -63,11 +67,12 @@ abstract public class EventRecord {
      * @param location Location the event occurred
      * @param date Time at which the event occurred
      */
-    public EventRecord(String eventName, EventSource source, Date date, @Nullable Location location ){
+    public EventRecord(String eventName, EventSource source, Date date, @Nullable Map<String,String> data, @Nullable Location location){
         this.eventName = eventName;
         this.source = source;
         this.date = date;
         this.location = Optional.fromNullable(location);
+        this.data = Optional.fromNullable(data);
     }
 
     /**
@@ -86,6 +91,15 @@ abstract public class EventRecord {
      */
     public Optional<Location> getLocation(){
         return location;
+    }
+
+    /**
+     * Returns a map of any extra data this event tracks.
+     *
+     * @return Optional<Map<String,String>> Map of data
+     */
+    public Optional<Map<String,String>> getData() {
+        return data;
     }
 
     /**

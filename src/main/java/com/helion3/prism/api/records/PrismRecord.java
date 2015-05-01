@@ -23,16 +23,18 @@
  */
 package com.helion3.prism.api.records;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.player.Player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Optional;
 import com.helion3.prism.queues.RecordingQueue;
-import com.helion3.prism.records.BlockEventRecord;
-import com.helion3.prism.records.SimpleEventRecord;
+import com.helion3.prism.records.EventRecord;
+import com.helion3.prism.records.EventSource;
 
 /**
  * An easy-to-understand factory class for Prism {@link EventRecord}s.
@@ -48,9 +50,9 @@ import com.helion3.prism.records.SimpleEventRecord;
 public class PrismRecord {
 
     private String eventName;
+    private Location location;
     private EventSource source;
-    private Optional<Location> optionalExistingBlock = Optional.absent();
-    private Optional<BlockSnapshot> optionalReplacementBlock = Optional.absent();
+    private Map<String,String> data = new HashMap<String,String>();
 
     /**
      * Describe the Player responsible for the event this
@@ -73,7 +75,8 @@ public class PrismRecord {
     public PrismRecord brokeBlock(Location block){
         checkNotNull(block);
         this.eventName = "block-break";
-        this.optionalExistingBlock = Optional.of(block);
+        data.put("existingBlockId", block.getType().getId());
+        location = block;
         return this;
     }
 
@@ -86,7 +89,8 @@ public class PrismRecord {
     public PrismRecord placedBlock(Location block){
         checkNotNull(block);
         this.eventName = "block-place";
-        this.optionalExistingBlock = Optional.of(block);
+        data.put("existingBlockId", block.getType().getId());
+        location = block;
         return this;
     }
 
@@ -96,7 +100,9 @@ public class PrismRecord {
      * @return PrismRecord
      */
     public PrismRecord replacing(BlockSnapshot snapshot) {
-        this.optionalReplacementBlock = Optional.of(snapshot);
+        if (snapshot != null) {
+            data.put("replacementBlockId", snapshot.getState().getType().getId());
+        }
         return this;
     }
 
@@ -122,7 +128,7 @@ public class PrismRecord {
      * Build the final event record and send it to the queue.
      */
     public void save(){
-
+        // Validation
         if (source == null) {
             throw new IllegalArgumentException("Event record can not be created - invalid source.");
         }
@@ -130,28 +136,9 @@ public class PrismRecord {
             throw new IllegalArgumentException("Event record can not be created - invalid event name.");
         }
 
-        EventRecord record = null;
-
-        // Block Events
-        if (optionalExistingBlock.isPresent()) {
-            Location location = optionalExistingBlock.get();
-            String existingBlockId = optionalExistingBlock.get().getType().getId();
-
-            String replacementBlockId = null;
-            if (optionalReplacementBlock.isPresent()) {
-                replacementBlockId = optionalReplacementBlock.get().getState().getType().getId();
-            }
-
-            record = new BlockEventRecord(eventName, source, location, existingBlockId, replacementBlockId);
-        }
-
-        // Generic
-        if (record == null) {
-            record = new SimpleEventRecord(eventName, source);
-        }
+        EventRecord record = new EventRecord(eventName, source, data, location);
 
         // Queue the finished record for saving
         RecordingQueue.add(record);
-
     }
 }

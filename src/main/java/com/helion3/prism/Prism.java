@@ -27,7 +27,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -44,6 +46,8 @@ import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.helion3.prism.api.parameters.ParameterEventName;
 import com.helion3.prism.api.parameters.ParameterHandler;
+import com.helion3.prism.api.results.BlockChangeResultRecord;
+import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.events.listeners.BlockBreakListener;
@@ -65,8 +69,10 @@ import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 final public class Prism {
 
     private static Configuration config;
+    private static Game game;
     private static List<ParameterHandler> handlers = new ArrayList<ParameterHandler>();
     private static Logger logger;
+    private static Map<String,Class<? extends ResultRecord>> resultRecords = new HashMap<String,Class<? extends ResultRecord>>();
     private static StorageAdapter storageAdapter;
 
     @Inject
@@ -86,13 +92,16 @@ final public class Prism {
     public void onServerStart(ServerStartedEvent event) {
 
         // Game reference
-        Game game = event.getGame();
+        game = event.getGame();
 
         // Load configuration file
         config = new Configuration(defaultConfig, configManager);
 
+        // Register all result record classes
+        registerEventResultRecords();
+
         // Register handlers
-        registerParameterHandler(new ParameterEventName());
+        registerParameterHandlers();
 
         // Listen to events
         registerSpongeEventListeners(game.getEventManager());
@@ -149,6 +158,14 @@ final public class Prism {
     }
 
     /**
+     * Returns the current game
+     * @return Game
+     */
+    public static Game getGame() {
+        return game;
+    }
+
+    /**
      * Returns the Logger instance for this plugin.
      * @return Logger instance
      */
@@ -162,6 +179,15 @@ final public class Prism {
      */
     public static List<ParameterHandler> getParameterHandlers() {
         return handlers;
+    }
+
+    /**
+     * Returns the result record for a given event.
+     * @param eventName Event name.
+     * @return Result record class.
+     */
+    public static Class<? extends ResultRecord> getResultRecord(String eventName) {
+        return resultRecords.get(eventName);
     }
 
     /**
@@ -179,6 +205,30 @@ final public class Prism {
     @Inject
     private void setLogger(Logger log) {
         logger = log;
+    }
+
+    /**
+     * Registers all default event names and their handling classes
+     */
+    private void registerEventResultRecords() {
+        registerResultRecord("block-break", BlockChangeResultRecord.class);
+    }
+
+    /**
+     * Registers all default parameter handlers
+     */
+    private void registerParameterHandlers() {
+        registerParameterHandler(new ParameterEventName());
+    }
+
+    /**
+     * Register a custom result record for a given event name.
+     * @param eventName
+     * @param record
+     */
+    public void registerResultRecord(String eventName, Class<? extends ResultRecord> clazz) {
+        // @todo ensure no dupes
+        resultRecords.put(eventName, clazz);
     }
 
     /**

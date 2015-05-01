@@ -64,7 +64,8 @@ public class PrismCommands {
                     }
                 })
                 .setChildren(ImmutableMap.<List<String>, CommandCallable>of(
-                        ImmutableList.of("l", "lookup"), new LookupCommand()
+                        ImmutableList.of("l", "lookup"), new LookupCommand(),
+                        ImmutableList.of("rb", "rollback"), new RollbackCommand()
                 )).build();
     }
 }

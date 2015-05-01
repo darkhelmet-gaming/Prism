@@ -27,8 +27,8 @@ import java.util.List;
 
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.records.EventRecord;
-import com.helion3.prism.api.records.ResultRecord;
+import com.helion3.prism.api.results.ResultRecord;
+import com.helion3.prism.records.EventRecord;
 
 public interface StorageAdapterRecords {
 

@@ -25,7 +25,7 @@ package com.helion3.prism.queues;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.helion3.prism.api.records.EventRecord;
+import com.helion3.prism.records.EventRecord;
 
 public class RecordingQueue {
 

@@ -23,12 +23,9 @@
  */
 package com.helion3.prism.commands;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
@@ -38,51 +35,27 @@ import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
+import com.helion3.prism.api.results.Actionable;
 import com.helion3.prism.api.results.ResultRecord;
-import com.helion3.prism.api.results.ResultRecordAggregate;
-import com.helion3.prism.utils.Template;
 
-public class LookupCommand implements CommandCallable {
+public class RollbackCommand implements CommandCallable {
 
     @Override
     public Optional<CommandResult> process(CommandSource source, String arguments) throws CommandException {
         // @todo error out when no args. Currently, "lookup" is passed as the arg when no real args used
 
         final Query query = Query.fromParameters(arguments);
+        query.setAggregate(false);
         final QuerySession session = new QuerySession(query);
 
-        String messageTemplate;
-        // @todo move to configs
-        if (query.isAggregate()) {
-            messageTemplate = "{source} {event} {subject} x{count}";
-        } else {
-            messageTemplate = "{source} {event} {subject}";
-        }
-
         try {
-            // @todo must be async
-
             // Iterate query results
             List<ResultRecord> results = Prism.getStorageAdapter().records().query(session);
             for (ResultRecord result : results) {
-
-                Map<String,String> tokens = new HashMap<String, String>();
-                tokens.put("source", result.source);
-                tokens.put("event", result.eventName);
-                tokens.put("subject", result.subjectName);
-
-                // Aggregate data
-                if (result instanceof ResultRecordAggregate) {
-                    ResultRecordAggregate recordAggregate = (ResultRecordAggregate) result;
-                    tokens.put("count", ""+recordAggregate.count);
+                if(result instanceof Actionable) {
+                    Actionable actionable = (Actionable) result;
+                    actionable.undo();
                 }
-
-                // Complete data
-                else {
-                    //ResultRecordComplete recordComplete = (ResultRecordComplete) result;
-                }
-
-                source.sendMessage(Texts.of(Template.parseTemplate(messageTemplate, tokens)));
             }
         } catch (Exception e) {
             // @todo handle

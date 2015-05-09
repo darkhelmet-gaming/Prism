@@ -29,20 +29,22 @@ public interface Actionable {
      * Reverses the result of this event on a subject
      * unless the state of the subject has changed since
      * this event, in way that would conflict.
-     * 
+     *
      * For example, if the subject was a block, and
      * the action removed the block, this will restore
      * the block at the same location.
-     * 
+     *
+     * @return ActionableResult Results of applier action
      */
-    public void undo();
+    public ActionableResult undo();
 
     /**
      * Re-applies the result of this event to a subject,
      * unless the subject does not exist in a state that
      * would allow this change.
-     * 
+     *
+     * @return ActionableResult Results of applier action
      */
-    public void redo();
+    public ActionableResult redo();
 
 }

@@ -38,7 +38,7 @@ import com.helion3.prism.Prism;
 public class BlockChangeResultRecord extends ResultRecordComplete implements Actionable {
 
     @Override
-    public void undo() {
+    public ActionableResult undo() {
         if (!data.isPresent()) {
             // @todo throw error
         }
@@ -52,7 +52,7 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
 
         Map<String,String> dataMap = data.get();
 
-        Optional<BlockType> existingBlockType = Prism.getGame().getRegistry().getType(BlockType.class, dataMap.get("existingBlockId").replace("minecraft:", ""));
+        Optional<BlockType> existingBlockType = Prism.getGame().getRegistry().getType(BlockType.class, dataMap.get("existingBlockId"));
 
         if (!existingBlockType.isPresent()) {
             // @todo throw error, handle
@@ -64,10 +64,12 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
         location.replaceWith(BlockTypes.DIAMOND_BLOCK);
 
         // @todo add replacement block logic
+
+        return new ActionableResult(true);
     }
 
     @Override
-    public void redo() {
-
+    public ActionableResult redo() {
+        return new ActionableResult(false);
     }
 }

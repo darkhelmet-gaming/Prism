@@ -129,4 +129,24 @@ public class Format {
         checkNotNull(content);
         return Texts.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.GREEN, content);
     }
+
+    /**
+     * Returns content formatted as a bonus message
+     * @param content Object[] Content to format
+     * @return Text Formatted content.
+     */
+    public static Text bonus(Object...objects) {
+        return bonus(Texts.of(objects));
+    }
+
+    /**
+     * Returns content formatted as a bonus string. Usually used
+     * for fun wording inside other messages.
+     * @param content  Text Content to format
+     * @return Text Formatted content.
+     */
+    public static Text bonus(Text content) {
+        checkNotNull(content);
+        return Texts.of(TextColors.GRAY, content);
+    }
 }

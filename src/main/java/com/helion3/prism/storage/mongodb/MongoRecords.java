@@ -27,17 +27,22 @@ import static com.mongodb.client.model.Filters.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bson.Document;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
@@ -61,6 +66,37 @@ public class MongoRecords implements StorageAdapterRecords {
 
     private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
 
+    /**
+     * Converts a DataContainer to a Document, recursively if needed.
+     * @param container Data container.
+     * @return Document for Mongo storage.
+     */
+    private Document documentFromContainer(DataContainer container) {
+        Document document = new Document();
+
+        Set<DataQuery> keys = container.getKeys(false);
+        for (DataQuery query : keys) {
+            Optional<Object> optional = container.get(query);
+            if (optional.isPresent()) {
+                String key = query.asString(".");
+
+                if (optional.get() instanceof ImmutableList) {
+                    @SuppressWarnings("unchecked")
+                    ImmutableList<DataContainer> list = (ImmutableList<DataContainer>) optional.get();
+                    Iterator<DataContainer> iterator = list.iterator();
+                    while (iterator.hasNext()) {
+                        DataContainer subContainer = iterator.next();
+                        document.append(key, documentFromContainer(subContainer));
+                    }
+                } else {
+                    document.append(key, optional.get());
+                }
+            }
+        }
+
+        return document;
+   }
+
    /**
     *
     */
@@ -81,8 +117,15 @@ public class MongoRecords implements StorageAdapterRecords {
            // Location
            if (event.getLocation().isPresent()) {
 
-               // Coordinates
                Location location = event.getLocation().get();
+
+               documentFromContainer(location.getBlockSnapshot().getState().toContainer());
+               document.append("data", documentFromContainer(location.getBlockSnapshot().getState().toContainer()));
+
+               System.out.println("document: " + document);
+
+
+               // Coordinates
                document.put("x", location.getPosition().getX());
                document.put("y", location.getPosition().getY());
                document.put("z", location.getPosition().getZ());
@@ -101,15 +144,15 @@ public class MongoRecords implements StorageAdapterRecords {
                document.put("source", event.getSource().getSourceIdentifier());
            }
 
-           Document data = new Document();
+//           Document data = new Document();
 
            // Store data
-           if (event.getData().isPresent()) {
-               for (Entry<String,String> entry : event.getData().get().entrySet()) {
-                   data.put(entry.getKey(), entry.getValue());
-               }
-               document.put("data", data);
-           }
+//           if (event.getData().isPresent()) {
+//               for (Entry<String,String> entry : event.getData().get().entrySet()) {
+//                   data.put(entry.getKey(), entry.getValue());
+//               }
+//               document.put("data", data);
+//           }
 
            // Insert
            documents.add(new InsertOneModel<Document>(document));

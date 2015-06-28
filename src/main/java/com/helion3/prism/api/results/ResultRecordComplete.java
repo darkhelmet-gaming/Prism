@@ -23,9 +23,7 @@
  */
 package com.helion3.prism.api.results;
 
-import java.util.Map;
-import java.util.UUID;
-
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -33,50 +31,32 @@ import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
 
 /**
- * Represents a complete copy of an event record data from
+ * Represents a complete copy of event record data from
  * a query result. Used for displaying individual entries
  * or for non-lookup actions.
  *
  */
 public class ResultRecordComplete extends ResultRecord {
-
     /**
-     * UUID representing the world the event occurred in
-     */
-    public Optional<UUID> world;
-
-    /**
-     * "x" value of a coordinate
-     */
-    public Optional<Double> x;
-
-    /**
-     * "y" value of a coordinate
-     */
-    public Optional<Double> y;
-
-    /**
-     * "x" value of a coordinate
-     */
-    public Optional<Double> z;
-
-    /**
-     * Map of additional data key/values
-     */
-    public Optional<Map<String,String>> data;
-
-    /**
-     *
-     * @return
+     * Converts location data view to a Location.
+     * @return Optional Location.
      */
     public Optional<Location> getLocation() {
         Location location = null;
-        if (world.isPresent()) {
-            Optional<World> optionalWorld = Prism.getGame().getServer().getWorld(world.get());
+
+        // @todo should be UUID, which isn't serialized by sponge (yet?)
+        Optional<String> optionalWorldId = data.getString(DataQuery.of("location", "WorldName"));
+        Optional<Integer> x = data.getInt(DataQuery.of("location", "x"));
+        Optional<Integer> y = data.getInt(DataQuery.of("location", "y"));
+        Optional<Integer> z = data.getInt(DataQuery.of("location", "z"));
+
+        if (optionalWorldId.isPresent()) {
+            Optional<World> optionalWorld = Prism.getGame().getServer().getWorld(optionalWorldId.get());
             if (optionalWorld.isPresent() && x.isPresent() && y.isPresent() && z.isPresent()) {
                 location = new Location(optionalWorld.get(), x.get(), y.get(), z.get());
             }
         }
+
         return Optional.fromNullable(location);
     }
 }

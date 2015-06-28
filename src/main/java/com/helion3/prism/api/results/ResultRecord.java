@@ -23,21 +23,10 @@
  */
 package com.helion3.prism.api.results;
 
+import org.spongepowered.api.data.DataContainer;
+
 abstract public class ResultRecord {
 
-    /**
-     * Name of the event this record is for
-     */
-    public String eventName;
-
-    /**
-     * Name of the source
-     */
-    public String source;
-
-    /**
-     * Subject display name
-     */
-    public String subjectName;
+    public DataContainer data;
 
 }

@@ -23,9 +23,8 @@
  */
 package com.helion3.prism.api.results;
 
-import java.util.Map;
-
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.world.Location;
 
 import com.google.common.base.Optional;
@@ -40,24 +39,26 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
     @Override
     public ActionableResult undo() {
         // Location
-        Optional<Location> optionalLoc = getLocation();
-        if (!optionalLoc.isPresent()) {
+        Optional<Location> optionalLocation = getLocation();
+        if (!optionalLocation.isPresent()) {
             return new ActionableResult(SkipReason.INVALID_LOCATION);
         }
 
-        // Location & query record
-        Location location = optionalLoc.get();
-        Map<String,String> dataMap = data.get();
+        Location location = optionalLocation.get();
+
+        // Existing/replacement block IDs
+        Optional<String> optionalExistingBlockId = data.getString(DataQuery.of("location", "BlockType"));
+        Optional<String> optionalReplacementBlockId = data.getString(DataQuery.of("state", "BlockType"));
 
         // Sponge currently doesn't support the "minecraft:" namespace...
-        String existingId = dataMap.get("existingBlockId");
-        if (existingId != null) {
-            existingId = existingId.replace("minecraft:", "");
+        String existingId = "air";
+        if (optionalExistingBlockId.isPresent()) {
+            existingId = optionalExistingBlockId.get().replace("minecraft:", "");
         }
 
-        String replacementId = dataMap.get("replacementBlockId");
-        if (replacementId != null) {
-            replacementId = replacementId.replace("minecraft:", "");
+        String replacementId = "air";
+        if (optionalReplacementBlockId.isPresent()) {
+            replacementId = optionalReplacementBlockId.get().replace("minecraft:", "");
         }
 
         // ids -> BlockType

@@ -26,18 +26,15 @@ package com.helion3.prism.storage.mongodb;
 import static com.mongodb.client.model.Filters.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
-import java.util.UUID;
 
 import org.bson.Document;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -96,13 +93,40 @@ public class MongoRecords implements StorageAdapterRecords {
                     document.append(key, documentFromView(subView));
                 }
                 else {
-                    document.append(key, optional.get());
+
+                    if (key.equals("player")) {
+                        document.append("player", new DBRef(MongoStorageAdapter.collectionPlayersName, optional.get()));
+                    } else {
+                        document.append(key, optional.get());
+                    }
                 }
             }
         }
 
         return document;
-   }
+    }
+
+    /**
+     * Convert a mongo Document to a DataContainer.
+     * @param document Mongo document.
+     * @return Data container.
+     */
+    private DataContainer documentToDataContainer(Document document) {
+        DataContainer result = new MemoryDataContainer();
+
+        for (String key : document.keySet()) {
+            DataQuery keyQuery = new DataQuery(key);
+            Object object = document.get(key);
+
+            if (object instanceof Document) {
+                result.set(keyQuery, documentToDataContainer((Document) object));
+            } else {
+                result.set(keyQuery, object);
+            }
+        }
+
+        return result;
+    }
 
    /**
     *
@@ -137,7 +161,6 @@ public class MongoRecords implements StorageAdapterRecords {
     */
    @Override
    public List<ResultRecord> query(QuerySession session) throws Exception {
-
        Query query = session.getQuery();
 
        // Prepare results
@@ -220,16 +243,20 @@ public class MongoRecords implements StorageAdapterRecords {
            MongoCollection<Document> players = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionPlayersName);
 
            while (cursor.hasNext()) {
-
                // Mongo document
                Document wrapper = cursor.next();
                Document document = shouldGroup ? (Document) wrapper.get("_id") : wrapper;
+
+               DataContainer data = documentToDataContainer(document);
+
+               if (shouldGroup) {
+                   data.set(new DataQuery("count"), wrapper.get("count"));
+               }
 
                // Build our result object
                ResultRecord result = null;
                if (shouldGroup) {
                    result = new ResultRecordAggregate();
-                   ((ResultRecordAggregate)result).count = (Integer) wrapper.get("count");
                } else {
                    // Pull record class for this event, if any
                    Class<? extends ResultRecord> clazz = Prism.getResultRecord(wrapper.getString("eventName"));
@@ -238,29 +265,6 @@ public class MongoRecords implements StorageAdapterRecords {
                    } else {
                        result = new ResultRecordComplete();
                    }
-
-                   ResultRecordComplete complete = (ResultRecordComplete) result;
-
-                   // Location
-                   if (wrapper.containsKey("world")) {
-                       complete.world = Optional.fromNullable(UUID.fromString(wrapper.getString("world")));
-                   } else {
-                       complete.world = Optional.absent();
-                   }
-                   complete.x = Optional.fromNullable(wrapper.getDouble("x"));
-                   complete.y = Optional.fromNullable(wrapper.getDouble("y"));
-                   complete.z = Optional.fromNullable(wrapper.getDouble("z"));
-
-                   // Data
-                   Map<String,String> dataMap = null;
-                   if (wrapper.containsKey("data")) {
-                       dataMap = new HashMap<String,String>();
-                       Document data = (Document) wrapper.get("data");
-                       for (Entry<String,Object> entry : data.entrySet()) {
-                           dataMap.put(entry.getKey(), (String)entry.getValue());
-                       }
-                   }
-                   complete.data = Optional.fromNullable(dataMap);
                }
 
                // Determine the final name of the event source
@@ -270,24 +274,21 @@ public class MongoRecords implements StorageAdapterRecords {
                    // @todo Isn't there an easier way to pull refs in v3?
                    Document player = players.find(eq("_id", ref.getId())).first();
                    source = player.getString("name");
+
                } else {
                    source = document.getString("source");
                }
 
-               // Common fields
-               result.eventName = document.getString("eventName");
-               result.source = source;
-               result.subjectName = document.getString("subjectName");
+               data.set(DataQuery.of("source"), source);
 
+               result.data = data;
                results.add(result);
-
            }
        } finally {
            cursor.close();
        }
 
        return results;
-
    }
 
    /**

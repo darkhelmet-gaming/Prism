@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandCallable;
@@ -65,21 +66,14 @@ public class LookupCommand implements CommandCallable {
             // Iterate query results
             List<ResultRecord> results = Prism.getStorageAdapter().records().query(session);
             for (ResultRecord result : results) {
-
                 Map<String,String> tokens = new HashMap<String, String>();
-                tokens.put("source", result.source);
-                tokens.put("event", result.eventName);
-                tokens.put("subject", result.subjectName);
+                tokens.put("source", result.data.getString(DataQuery.of("source")).get());
+                tokens.put("event", result.data.getString(DataQuery.of("eventName")).get());
+//                tokens.put("subject", result.subjectName);
 
                 // Aggregate data
                 if (result instanceof ResultRecordAggregate) {
-                    ResultRecordAggregate recordAggregate = (ResultRecordAggregate) result;
-                    tokens.put("count", ""+recordAggregate.count);
-                }
-
-                // Complete data
-                else {
-                    //ResultRecordComplete recordComplete = (ResultRecordComplete) result;
+                    tokens.put("count", "" + result.data.getInt(DataQuery.of("count")).get());
                 }
 
                 source.sendMessage(Texts.of(Template.parseTemplate(messageTemplate, tokens)));

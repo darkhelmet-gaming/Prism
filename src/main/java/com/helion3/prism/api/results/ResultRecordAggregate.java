@@ -29,11 +29,4 @@ package com.helion3.prism.api.results;
  * etc.
  */
 public class ResultRecordAggregate extends ResultRecord {
-    
-    /**
-     * A count of all records which have been condensed
-     * into this aggregate
-     */
-    public int count;
-
 }

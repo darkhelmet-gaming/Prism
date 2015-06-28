@@ -136,9 +136,9 @@ public class PrismRecord {
         data.set(new DataQuery("created"), new Date());
         data.set(new DataQuery("source"), source.getSourceIdentifier());
 
-//        // Source
-//        if (source.isPlayer()) {
-////            document.put("player", new DBRef(MongoStorageAdapter.collectionPlayersName, event.getSource().getSourceIdentifier()));
+        // Source
+        String sourceKey = source.isPlayer() ? "player" : "source";
+        data.set(new DataQuery(sourceKey), source.getSourceIdentifier());
 
         // Queue the finished record for saving
         RecordingQueue.add(data);

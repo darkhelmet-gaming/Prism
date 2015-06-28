@@ -21,62 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.results;
+package com.helion3.prism.utils;
 
-import java.util.Map;
-import java.util.UUID;
-
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import com.google.common.base.Optional;
-import com.helion3.prism.Prism;
 
-/**
- * Represents a complete copy of an event record data from
- * a query result. Used for displaying individual entries
- * or for non-lookup actions.
- *
- */
-public class ResultRecordComplete extends ResultRecord {
+public class LocationUtil {
+
+    private LocationUtil() {}
 
     /**
-     * UUID representing the world the event occurred in
-     */
-    public Optional<UUID> world;
-
-    /**
-     * "x" value of a coordinate
-     */
-    public Optional<Double> x;
-
-    /**
-     * "y" value of a coordinate
-     */
-    public Optional<Double> y;
-
-    /**
-     * "x" value of a coordinate
-     */
-    public Optional<Double> z;
-
-    /**
-     * Map of additional data key/values
-     */
-    public Optional<Map<String,String>> data;
-
-    /**
+     * Determines if given location will accept a block change. If the current
+     * block type is replaceable, or if the block we expect to be there is.
      *
-     * @return
+     * @param location Location to check.
+     * @param originalBlockType Optional expected block type.
+     * @return If a location accepts a change.
      */
-    public Optional<Location> getLocation() {
-        Location location = null;
-        if (world.isPresent()) {
-            Optional<World> optionalWorld = Prism.getGame().getServer().getWorld(world.get());
-            if (optionalWorld.isPresent() && x.isPresent() && y.isPresent() && z.isPresent()) {
-                location = new Location(optionalWorld.get(), x.get(), y.get(), z.get());
+    public static boolean locationAllowsChange(Location location, Optional<BlockType> originalBlockType) {
+        boolean locationAllowsPlacement = location.getBlockType().isReplaceable();
+
+        if (!locationAllowsPlacement) {
+            // Location has a solid block. Might still be ok if we know about it...
+            if (originalBlockType.isPresent()) {
+                if (location.getBlockType().equals(originalBlockType.get())) {
+                    locationAllowsPlacement = true;
+                    System.out.println("existing location type matches replacement");
+                }
             }
         }
-        return Optional.fromNullable(location);
+
+        return locationAllowsPlacement;
     }
 }

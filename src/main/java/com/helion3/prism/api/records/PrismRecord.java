@@ -89,7 +89,7 @@ public class PrismRecord {
     public PrismRecord placedBlock(Location block){
         checkNotNull(block);
         this.eventName = "block-place";
-        data.put("existingBlockId", block.getBlockType().getId());
+        data.put("replacementBlockId", block.getBlockType().getId());
         location = block;
         return this;
     }
@@ -101,7 +101,7 @@ public class PrismRecord {
      */
     public PrismRecord replacing(BlockSnapshot snapshot) {
         if (snapshot != null) {
-            data.put("replacementBlockId", snapshot.getState().getType().getId());
+            data.put("existingBlockId", snapshot.getState().getType().getId());
         }
         return this;
     }

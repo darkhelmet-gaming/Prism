@@ -26,11 +26,11 @@ package com.helion3.prism.api.results;
 import java.util.Map;
 
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.world.Location;
 
 import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
+import com.helion3.prism.utils.LocationUtil;
 
 /**
  * Represents a block change event record.
@@ -39,37 +39,45 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
 
     @Override
     public ActionableResult undo() {
-        if (!data.isPresent()) {
-            // @todo throw error
-        }
-
+        // Location
         Optional<Location> optionalLoc = getLocation();
         if (!optionalLoc.isPresent()) {
-            // @todo throw error
+            return new ActionableResult(SkipReason.INVALID_LOCATION);
         }
 
+        // Location & query record
         Location location = optionalLoc.get();
-
         Map<String,String> dataMap = data.get();
 
-        Optional<BlockType> existingBlockType = Prism.getGame().getRegistry().getType(BlockType.class, dataMap.get("existingBlockId"));
-
-        if (!existingBlockType.isPresent()) {
-            // @todo throw error, handle
+        // Sponge currently doesn't support the "minecraft:" namespace...
+        String existingId = dataMap.get("existingBlockId");
+        if (existingId != null) {
+            existingId = existingId.replace("minecraft:", "");
         }
 
-        // @todo ensure location is available for a block
+        String replacementId = dataMap.get("replacementBlockId");
+        if (replacementId != null) {
+            replacementId = replacementId.replace("minecraft:", "");
+        }
 
-        // @todo the type registry is currently unimplemented
-        location.setBlockType(BlockTypes.DIAMOND_BLOCK);
+        // ids -> BlockType
+        Optional<BlockType> existingBlockType = Prism.getGame().getRegistry().getType(BlockType.class, existingId);
+        Optional<BlockType> replacementBlockType = Prism.getGame().getRegistry().getType(BlockType.class, replacementId);
+        if (!existingBlockType.isPresent() && !replacementBlockType.isPresent()) {
+            return new ActionableResult(SkipReason.INVALID_BLOCK);
+        }
 
-        // @todo add replacement block logic
+        if (!LocationUtil.locationAllowsChange(location, replacementBlockType)) {
+            return new ActionableResult(SkipReason.OCCUPIED);
+        }
 
-        return new ActionableResult(true);
+        location.setBlockType(existingBlockType.get());
+
+        return new ActionableResult();
     }
 
     @Override
     public ActionableResult redo() {
-        return new ActionableResult(false);
+        return new ActionableResult();
     }
 }

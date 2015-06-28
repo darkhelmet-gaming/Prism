@@ -23,37 +23,25 @@
  */
 package com.helion3.prism.api.results;
 
-public class ActionableResult {
-
-    private final boolean changeWasApplied;
-    private final SkipReason skipReason;
+public enum SkipReason {
 
     /**
-     * Construct an ActionableResult for a successful change.
+     * World or location are missing. Likely if a record was made for
+     * a world which no longer exists.
      */
-    public ActionableResult() {
-        this.changeWasApplied = true;
-        this.skipReason = null;
-    }
-
-    public ActionableResult(SkipReason skipReason) {
-        this.changeWasApplied = false;
-        this.skipReason = skipReason;
-    }
+    INVALID_LOCATION,
 
     /**
-     * Returns whether or not a change was successfully applied.
-     * @return Whether or not a change was successfully applied.
+     * Block types are invalid. Likely due to mods being removed or
+     * block names being changed between updates.
      */
-    public boolean applied() {
-        return changeWasApplied;
-    }
+    INVALID_BLOCK,
 
     /**
-     * Returns the skip reason, if any.
-     * @return SKIP_REASON Reason a change was skipped.
+     * Location or target we're attempting to change exists in
+     * a state we don't expect. For example, if you try to rollback
+     * a block but someone has already placed a new block in that
+     * spot.
      */
-    public SkipReason getSkipReason() {
-        return skipReason;
-    }
+    OCCUPIED
 }

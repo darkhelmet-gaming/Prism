@@ -61,7 +61,7 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
         // @todo ensure location is available for a block
 
         // @todo the type registry is currently unimplemented
-        location.replaceWith(BlockTypes.DIAMOND_BLOCK);
+        location.setBlockType(BlockTypes.DIAMOND_BLOCK);
 
         // @todo add replacement block logic
 

@@ -43,7 +43,7 @@ public class BlockPlaceListener {
         // Player-caused
         if (event instanceof PlayerPlaceBlockEvent) {
 
-            Player player = ((PlayerPlaceBlockEvent) event).getPlayer();
+            Player player = ((PlayerPlaceBlockEvent) event).getEntity();
 
             // Save the record
             new PrismRecord()

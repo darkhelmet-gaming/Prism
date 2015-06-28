@@ -37,6 +37,6 @@ public class PlayerJoinListener {
      */
     @Subscribe
     public void onPlayerJoin(final PlayerJoinEvent event) {
-        new PrismRecord().player(event.getPlayer()).joined().save();
+        new PrismRecord().player(event.getEntity()).joined().save();
     }
 }

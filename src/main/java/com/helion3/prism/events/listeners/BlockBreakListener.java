@@ -46,7 +46,7 @@ public class BlockBreakListener {
         // Player-caused
         if (event instanceof PlayerBreakBlockEvent) {
 
-            Player player = ((PlayerBreakBlockEvent) event).getPlayer();
+            Player player = ((PlayerBreakBlockEvent) event).getEntity();
 
             // Save the record
             new PrismRecord().player(player).brokeBlock(location).save();

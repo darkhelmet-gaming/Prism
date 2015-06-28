@@ -50,7 +50,7 @@ public class PrismCommands {
      */
     public static CommandSpec getCommand(Game game) {
         return CommandSpec.builder()
-                .setExecutor(new CommandExecutor() {
+                .executor(new CommandExecutor() {
                     @Override
                     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
                         src.sendMessage(Texts.of(
@@ -63,7 +63,7 @@ public class PrismCommands {
                         return CommandResult.empty();
                     }
                 })
-                .setChildren(ImmutableMap.<List<String>, CommandCallable>of(
+                .children(ImmutableMap.<List<String>, CommandCallable>of(
                         ImmutableList.of("l", "lookup"), new LookupCommand(),
                         ImmutableList.of("rb", "rollback"), new RollbackCommand()
                 )).build();

@@ -47,7 +47,7 @@ public class RequiredPlayerJoinListener {
             @Override
             public void run(){
                 try {
-                    Prism.getStorageAdapter().players().save(event.getPlayer());
+                    Prism.getStorageAdapter().players().save(event.getEntity());
                 } catch (Exception e) {
                     // @todo handle
                     e.printStackTrace();

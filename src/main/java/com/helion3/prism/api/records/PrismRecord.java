@@ -75,7 +75,7 @@ public class PrismRecord {
     public PrismRecord brokeBlock(Location block){
         checkNotNull(block);
         this.eventName = "block-break";
-        data.put("existingBlockId", block.getType().getId());
+        data.put("existingBlockId", block.getBlockType().getId());
         location = block;
         return this;
     }
@@ -89,7 +89,7 @@ public class PrismRecord {
     public PrismRecord placedBlock(Location block){
         checkNotNull(block);
         this.eventName = "block-place";
-        data.put("existingBlockId", block.getType().getId());
+        data.put("existingBlockId", block.getBlockType().getId());
         location = block;
         return this;
     }

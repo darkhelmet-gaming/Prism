@@ -25,10 +25,11 @@ package com.helion3.prism.api.storage;
 
 import java.util.List;
 
+import org.spongepowered.api.data.DataContainer;
+
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.results.ResultRecord;
-import com.helion3.prism.records.EventRecord;
 
 public interface StorageAdapterRecords {
 
@@ -39,7 +40,7 @@ public interface StorageAdapterRecords {
      * @return {@link StorageWriteResult}
      * @throws Exception
      */
-    StorageWriteResult write(List<EventRecord> events) throws Exception;
+    StorageWriteResult write(List<DataContainer> containers) throws Exception;
 
     /**
      * Execute a query session for a list of resulting actions

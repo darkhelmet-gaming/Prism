@@ -26,8 +26,9 @@ package com.helion3.prism.queues;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.spongepowered.api.data.DataContainer;
+
 import com.helion3.prism.Prism;
-import com.helion3.prism.records.EventRecord;
 
 public class RecordingQueueManager extends Thread {
 
@@ -36,13 +37,13 @@ public class RecordingQueueManager extends Thread {
 
         while (true) {
 
-            List<EventRecord> eventsSaveBatch = new ArrayList<EventRecord>();
+            List<DataContainer> eventsSaveBatch = new ArrayList<DataContainer>();
 
             // Assume we're iterating everything in the queue
             while (!RecordingQueue.getQueue().isEmpty()) {
 
                 // Poll the next event, append to list
-                EventRecord event = RecordingQueue.getQueue().poll();
+                DataContainer event = RecordingQueue.getQueue().poll();
                 if (event != null) {
                     eventsSaveBatch.add(event);
                 }

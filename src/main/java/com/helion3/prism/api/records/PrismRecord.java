@@ -23,17 +23,18 @@
  */
 package com.helion3.prism.api.records;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
 
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.player.Player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.helion3.prism.queues.RecordingQueue;
-import com.helion3.prism.records.EventRecord;
 import com.helion3.prism.records.EventSource;
 
 /**
@@ -48,11 +49,9 @@ import com.helion3.prism.records.EventSource;
  *
  */
 public class PrismRecord {
-
     private String eventName;
-    private Location location;
     private EventSource source;
-    private Map<String,String> data = new HashMap<String,String>();
+    private DataContainer data = new MemoryDataContainer();
 
     /**
      * Describe the Player responsible for the event this
@@ -72,11 +71,10 @@ public class PrismRecord {
      * @param block Block broken.
      * @return PrismRecord
      */
-    public PrismRecord brokeBlock(Location block){
-        checkNotNull(block);
+    public PrismRecord brokeBlock(Location location){
+        checkNotNull(location);
         this.eventName = "block-break";
-        data.put("existingBlockId", block.getBlockType().getId());
-        location = block;
+        data.set(new DataQuery("location"), location.toContainer());
         return this;
     }
 
@@ -86,11 +84,10 @@ public class PrismRecord {
      * @param block Block placed.
      * @return PrismRecord
      */
-    public PrismRecord placedBlock(Location block){
-        checkNotNull(block);
+    public PrismRecord placedBlock(Location location){
+        checkNotNull(location);
         this.eventName = "block-place";
-        data.put("replacementBlockId", block.getBlockType().getId());
-        location = block;
+        data.set(new DataQuery("location"), location.toContainer());
         return this;
     }
 
@@ -100,9 +97,8 @@ public class PrismRecord {
      * @return PrismRecord
      */
     public PrismRecord replacing(BlockSnapshot snapshot) {
-        if (snapshot != null) {
-            data.put("existingBlockId", snapshot.getState().getType().getId());
-        }
+        checkNotNull(snapshot);
+        data.set(new DataQuery("state"), snapshot.getState().toContainer());
         return this;
     }
 
@@ -136,9 +132,15 @@ public class PrismRecord {
             throw new IllegalArgumentException("Event record can not be created - invalid event name.");
         }
 
-        EventRecord record = new EventRecord(eventName, source, data, location);
+        data.set(new DataQuery("eventName"), eventName);
+        data.set(new DataQuery("created"), new Date());
+        data.set(new DataQuery("source"), source.getSourceIdentifier());
+
+//        // Source
+//        if (source.isPlayer()) {
+////            document.put("player", new DBRef(MongoStorageAdapter.collectionPlayersName, event.getSource().getSourceIdentifier()));
 
         // Queue the finished record for saving
-        RecordingQueue.add(record);
+        RecordingQueue.add(data);
     }
 }

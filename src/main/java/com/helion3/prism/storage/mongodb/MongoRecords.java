@@ -37,9 +37,7 @@ import java.util.UUID;
 import org.bson.Document;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.Extent;
+import org.spongepowered.api.data.DataView;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -53,7 +51,6 @@ import com.helion3.prism.api.results.ResultRecordComplete;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
-import com.helion3.prism.records.EventRecord;
 import com.mongodb.DBRef;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
@@ -67,28 +64,38 @@ public class MongoRecords implements StorageAdapterRecords {
     private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
 
     /**
-     * Converts a DataContainer to a Document, recursively if needed.
-     * @param container Data container.
+     * Converts a DataView to a Document, recursively if needed.
+     * @param view Data view/container.
      * @return Document for Mongo storage.
      */
-    private Document documentFromContainer(DataContainer container) {
+    private Document documentFromView(DataView view) {
         Document document = new Document();
 
-        Set<DataQuery> keys = container.getKeys(false);
+        Set<DataQuery> keys = view.getKeys(false);
         for (DataQuery query : keys) {
-            Optional<Object> optional = container.get(query);
+            Optional<Object> optional = view.get(query);
             if (optional.isPresent()) {
                 String key = query.asString(".");
 
                 if (optional.get() instanceof ImmutableList) {
-                    @SuppressWarnings("unchecked")
-                    ImmutableList<DataContainer> list = (ImmutableList<DataContainer>) optional.get();
-                    Iterator<DataContainer> iterator = list.iterator();
+                    ImmutableList<?> list = (ImmutableList<?>) optional.get();
+                    Iterator<?> iterator = list.iterator();
                     while (iterator.hasNext()) {
-                        DataContainer subContainer = iterator.next();
-                        document.append(key, documentFromContainer(subContainer));
+                        Object object = iterator.next();
+
+                        if (object instanceof DataView) {
+                            DataView subView = (DataView) object;
+                            document.append(key, documentFromView(subView));
+                        } else {
+                            Prism.getLogger().error("Unsupported list data type: " + object.getClass().getName());
+                        }
                     }
-                } else {
+                }
+                else if (optional.get() instanceof DataView) {
+                    DataView subView = (DataView) optional.get();
+                    document.append(key, documentFromView(subView));
+                }
+                else {
                     document.append(key, optional.get());
                 }
             }
@@ -101,58 +108,14 @@ public class MongoRecords implements StorageAdapterRecords {
     *
     */
    @Override
-   public StorageWriteResult write(List<EventRecord> events) throws Exception {
+   public StorageWriteResult write(List<DataContainer> containers) throws Exception {
 
        MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
 
        // Build an array of documents
        List<WriteModel<Document>> documents = new ArrayList<WriteModel<Document>>();
-       for (EventRecord event : events) {
-
-           Document document = new Document();
-           document.put("eventName", event.getEventName());
-           document.put("created", event.getDate());
-           document.put("subjectName", event.getSubjectDisplayName());
-
-           // Location
-           if (event.getLocation().isPresent()) {
-
-               Location location = event.getLocation().get();
-
-               documentFromContainer(location.getBlockSnapshot().getState().toContainer());
-               document.append("data", documentFromContainer(location.getBlockSnapshot().getState().toContainer()));
-
-               System.out.println("document: " + document);
-
-
-               // Coordinates
-               document.put("x", location.getPosition().getX());
-               document.put("y", location.getPosition().getY());
-               document.put("z", location.getPosition().getZ());
-
-               // World
-               Extent extent = location.getExtent();
-               if (extent instanceof World) {
-                   document.put("world", ((World) extent).getUniqueId().toString());
-               }
-           }
-
-           // Source
-           if (event.getSource().isPlayer()) {
-               document.put("player", new DBRef(MongoStorageAdapter.collectionPlayersName, event.getSource().getSourceIdentifier()));
-           } else {
-               document.put("source", event.getSource().getSourceIdentifier());
-           }
-
-//           Document data = new Document();
-
-           // Store data
-//           if (event.getData().isPresent()) {
-//               for (Entry<String,String> entry : event.getData().get().entrySet()) {
-//                   data.put(entry.getKey(), entry.getValue());
-//               }
-//               document.put("data", data);
-//           }
+       for (DataContainer container : containers) {
+           Document document = documentFromView(container);
 
            // Insert
            documents.add(new InsertOneModel<Document>(document));

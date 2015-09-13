@@ -24,7 +24,7 @@
 package com.helion3.prism.storage.mongodb;
 
 import org.bson.Document;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 
 import com.helion3.prism.api.storage.StorageAdapterPlayers;
 import com.helion3.prism.api.storage.StorageWriteResult;
@@ -32,7 +32,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
 
 public class MongoPlayers implements StorageAdapterPlayers {
-
     @Override
     public StorageWriteResult save(Player player) throws Exception {
 

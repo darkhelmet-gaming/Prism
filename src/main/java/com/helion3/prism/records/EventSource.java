@@ -23,21 +23,21 @@
  */
 package com.helion3.prism.records;
 
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 
 /**
  * A simple wrapper for describing the source, or cause, of
  * an event which we're going to record.
- * 
+ *
  * Players will have their UUID stored, while every other cause
  * will simply be named.
- * 
+ *
  */
 final public class EventSource {
-    
+
     private final String source;
     private final boolean isPlayer;
-    
+
     /**
      * A named event source which isn't a player.
      * @param source String Name of source (cause) of event
@@ -45,20 +45,20 @@ final public class EventSource {
     public EventSource(String source){
         this(source,false);
     }
-    
+
     /**
      * A known Player is the source (cause) of this event.
-     * 
+     *
      * @param player Player
      */
     public EventSource(Player player){
         this(player.getUniqueId().toString(),true);
     }
-    
+
     /**
      * Parent constructor for creating the proper type
      * of event source.
-     * 
+     *
      * @private
      * @param source
      * @param isPlayer
@@ -67,19 +67,19 @@ final public class EventSource {
         this.source = source;
         this.isPlayer = isPlayer;
     }
-    
+
     /**
      * Returns a string naming the source of an event
-     * 
+     *
      * @return String Name of event source
      */
     public String getSourceIdentifier(){
         return source;
     }
-    
+
     /**
      * Whether or not the named source is a real player
-     * 
+     *
      * @return Boolean If a real player
      */
     public boolean isPlayer(){

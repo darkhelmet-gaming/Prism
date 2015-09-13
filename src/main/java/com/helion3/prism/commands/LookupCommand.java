@@ -46,7 +46,7 @@ import com.helion3.prism.utils.Template;
 public class LookupCommand implements CommandCallable {
 
     @Override
-    public Optional<CommandResult> process(CommandSource source, String arguments) throws CommandException {
+    public CommandResult process(CommandSource source, String arguments) throws CommandException {
         // @todo error out when no args. Currently, "lookup" is passed as the arg when no real args used
 
         final Query query = Query.fromParameters(arguments);
@@ -83,7 +83,7 @@ public class LookupCommand implements CommandCallable {
             e.printStackTrace();
         }
 
-        return Optional.of(CommandResult.success());
+        return CommandResult.success();
     }
 
     @Override

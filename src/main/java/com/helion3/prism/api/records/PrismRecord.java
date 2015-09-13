@@ -25,12 +25,13 @@ package com.helion3.prism.api.records;
 
 import java.util.Date;
 
-import org.spongepowered.api.world.Location;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.Location;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -66,28 +67,46 @@ public class PrismRecord {
     }
 
     /**
+     * Helper method for writing block transaction data, using only
+     * the final replacement value.
+     *
+     * @param transaction
+     */
+    private void writeBlockTransaction(BlockTransaction transaction) {
+        checkNotNull(transaction);
+
+        // Need a little prep, since location has redundant block info for our concerns
+        DataContainer location = transaction.getOriginal().getLocation().get().toContainer();
+        location.remove(new DataQuery("BlockType"));
+
+        data.set(new DataQuery("location"), location);
+
+        // Storing the state only, so we don't also get location
+        data.set(new DataQuery("original"), transaction.getOriginal().getState());
+        data.set(new DataQuery("replacement"), transaction.getFinalReplacement().getState());
+    }
+
+    /**
      * Describes a single block break at a given Location.
      *
-     * @param block Block broken.
+     * @param transaction Block broken.
      * @return PrismRecord
      */
-    public PrismRecord brokeBlock(Location location){
-        checkNotNull(location);
+    public PrismRecord brokeBlock(BlockTransaction transaction){
         this.eventName = "block-break";
-        data.set(new DataQuery("location"), location.toContainer());
+        writeBlockTransaction(transaction);
         return this;
     }
 
     /**
      * Describes a single block place at a given Location.
      *
-     * @param block Block placed.
+     * @param transaction Block placed.
      * @return PrismRecord
      */
-    public PrismRecord placedBlock(Location location){
-        checkNotNull(location);
+    public PrismRecord placedBlock(BlockTransaction transaction){
         this.eventName = "block-place";
-        data.set(new DataQuery("location"), location.toContainer());
+        writeBlockTransaction(transaction);
         return this;
     }
 
@@ -99,6 +118,16 @@ public class PrismRecord {
     public PrismRecord replacing(BlockSnapshot snapshot) {
         checkNotNull(snapshot);
         data.set(new DataQuery("state"), snapshot.getState().toContainer());
+        return this;
+    }
+
+    /**
+     * Describes a single location an event occurred at.
+     * @param location Location of event
+     * @return PrismRecord
+     */
+    public PrismRecord at(Location<?> location) {
+        data.set(new DataQuery("location"), location.toContainer());
         return this;
     }
 

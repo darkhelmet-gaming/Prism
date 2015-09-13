@@ -23,12 +23,12 @@
  */
 package com.helion3.prism.events.listeners;
 
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.block.BlockBreakEvent;
-import org.spongepowered.api.event.entity.player.PlayerBreakBlockEvent;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.block.BlockTransaction;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.BreakBlockEvent;
 
+import com.google.common.base.Optional;
 import com.helion3.prism.api.records.PrismRecord;
 
 public class BlockBreakListener {
@@ -38,19 +38,15 @@ public class BlockBreakListener {
      *
      * @param event
      */
-    @Subscribe
-    public void onBlockBreak(BlockBreakEvent event) {
-
-        Location location = event.getBlock();
-
+    @Listener
+    public void onBlockBreak(BreakBlockEvent event) {
         // Player-caused
-        if (event instanceof PlayerBreakBlockEvent) {
-
-            Player player = ((PlayerBreakBlockEvent) event).getEntity();
-
-            // Save the record
-            new PrismRecord().player(player).brokeBlock(location).save();
-
+        Optional<Player> player = event.getCause().first(Player.class);
+        if (player.isPresent()) {
+            for (BlockTransaction transaction : event.getTransactions()) {
+                // Save
+                new PrismRecord().player(player.get()).brokeBlock(transaction).save();
+            }
         }
     }
 }

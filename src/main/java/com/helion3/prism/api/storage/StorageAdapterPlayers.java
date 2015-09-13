@@ -23,7 +23,7 @@
  */
 package com.helion3.prism.api.storage;
 
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 
 public interface StorageAdapterPlayers {
 

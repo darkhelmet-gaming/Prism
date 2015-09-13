@@ -36,8 +36,8 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.state.ServerStartedEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.service.config.DefaultConfig;
 import org.spongepowered.api.service.event.EventManager;
@@ -88,8 +88,8 @@ final public class Prism {
      *
      * @param event Server started
      */
-    @Subscribe
-    public void onServerStart(ServerStartedEvent event) {
+    @Listener
+    public void onServerStart(GameStartedServerEvent event) {
 
         // Game reference
         game = event.getGame();
@@ -236,26 +236,24 @@ final public class Prism {
      * Register all event listeners.
      */
     private void registerSpongeEventListeners(EventManager eventManager) {
-
         // Block events
         if (config.getNode("events", "block", "break").getBoolean()) {
-            eventManager.register(this, new BlockBreakListener());
+            eventManager.registerListeners(this, new BlockBreakListener());
         }
 
         if (config.getNode("events", "block", "place").getBoolean()) {
-            eventManager.register(this, new BlockPlaceListener());
+            eventManager.registerListeners(this, new BlockPlaceListener());
         }
 
         // Player events
         if (config.getNode("events", "player", "join").getBoolean()) {
-            eventManager.register(this, new PlayerJoinListener());
+            eventManager.registerListeners(this, new PlayerJoinListener());
         }
         if (config.getNode("events", "player", "quit").getBoolean()) {
-            eventManager.register(this, new PlayerQuitListener());
+            eventManager.registerListeners(this, new PlayerQuitListener());
         }
 
         // Events required for internal operation
-        eventManager.register(this, new RequiredPlayerJoinListener());
-
+        eventManager.registerListeners(this, new RequiredPlayerJoinListener());
     }
 }

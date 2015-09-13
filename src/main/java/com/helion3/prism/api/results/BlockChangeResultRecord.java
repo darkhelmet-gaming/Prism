@@ -38,41 +38,41 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
 
     @Override
     public ActionableResult undo() {
-        // Location
-        Optional<Location> optionalLocation = getLocation();
-        if (!optionalLocation.isPresent()) {
-            return new ActionableResult(SkipReason.INVALID_LOCATION);
-        }
-
-        Location location = optionalLocation.get();
-
-        // Existing/replacement block IDs
-        Optional<String> optionalExistingBlockId = data.getString(DataQuery.of("location", "BlockType"));
-        Optional<String> optionalReplacementBlockId = data.getString(DataQuery.of("state", "BlockType"));
-
-        // Sponge currently doesn't support the "minecraft:" namespace...
-        String existingId = "air";
-        if (optionalExistingBlockId.isPresent()) {
-            existingId = optionalExistingBlockId.get().replace("minecraft:", "");
-        }
-
-        String replacementId = "air";
-        if (optionalReplacementBlockId.isPresent()) {
-            replacementId = optionalReplacementBlockId.get().replace("minecraft:", "");
-        }
-
-        // ids -> BlockType
-        Optional<BlockType> existingBlockType = Prism.getGame().getRegistry().getType(BlockType.class, existingId);
-        Optional<BlockType> replacementBlockType = Prism.getGame().getRegistry().getType(BlockType.class, replacementId);
-        if (!existingBlockType.isPresent() && !replacementBlockType.isPresent()) {
-            return new ActionableResult(SkipReason.INVALID_BLOCK);
-        }
-
-        if (!LocationUtil.locationAllowsChange(location, replacementBlockType)) {
-            return new ActionableResult(SkipReason.OCCUPIED);
-        }
-
-        location.setBlockType(existingBlockType.get());
+//        // Location
+//        Optional<Location> optionalLocation = getLocation();
+//        if (!optionalLocation.isPresent()) {
+//            return new ActionableResult(SkipReason.INVALID_LOCATION);
+//        }
+//
+//        Location location = optionalLocation.get();
+//
+//        // Existing/replacement block IDs
+//        Optional<String> optionalExistingBlockId = data.getString(DataQuery.of("location", "BlockType"));
+//        Optional<String> optionalReplacementBlockId = data.getString(DataQuery.of("state", "BlockType"));
+//
+//        // Sponge currently doesn't support the "minecraft:" namespace...
+//        String existingId = "air";
+//        if (optionalExistingBlockId.isPresent()) {
+//            existingId = optionalExistingBlockId.get().replace("minecraft:", "");
+//        }
+//
+//        String replacementId = "air";
+//        if (optionalReplacementBlockId.isPresent()) {
+//            replacementId = optionalReplacementBlockId.get().replace("minecraft:", "");
+//        }
+//
+//        // ids -> BlockType
+//        Optional<BlockType> existingBlockType = Prism.getGame().getRegistry().getType(BlockType.class, existingId);
+//        Optional<BlockType> replacementBlockType = Prism.getGame().getRegistry().getType(BlockType.class, replacementId);
+//        if (!existingBlockType.isPresent() && !replacementBlockType.isPresent()) {
+//            return new ActionableResult(SkipReason.INVALID_BLOCK);
+//        }
+//
+//        if (!LocationUtil.locationAllowsChange(location, replacementBlockType)) {
+//            return new ActionableResult(SkipReason.OCCUPIED);
+//        }
+//
+//        location.setBlockType(existingBlockType.get());
 
         return new ActionableResult();
     }

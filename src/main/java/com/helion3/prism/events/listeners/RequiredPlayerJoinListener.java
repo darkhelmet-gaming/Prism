@@ -23,8 +23,8 @@
  */
 package com.helion3.prism.events.listeners;
 
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.network.ClientConnectionEvent.Join;
 
 import com.helion3.prism.Prism;
 
@@ -39,15 +39,15 @@ public class RequiredPlayerJoinListener {
      *
      * @param event
      */
-    @Subscribe
-    public void onPlayerJoin(final PlayerJoinEvent event) {
+    @Listener
+    public void onPlayerJoin(final Join event) {
 
         // Run our database query async
         new Thread(new Runnable() {
             @Override
             public void run(){
                 try {
-                    Prism.getStorageAdapter().players().save(event.getEntity());
+                    Prism.getStorageAdapter().players().save(event.getTargetEntity());
                 } catch (Exception e) {
                     // @todo handle
                     e.printStackTrace();

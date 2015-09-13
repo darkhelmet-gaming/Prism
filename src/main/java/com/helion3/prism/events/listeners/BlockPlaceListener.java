@@ -23,35 +23,30 @@
  */
 package com.helion3.prism.events.listeners;
 
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.block.BlockPlaceEvent;
-import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
+import org.spongepowered.api.block.BlockTransaction;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.PlaceBlockEvent;
 
+import com.google.common.base.Optional;
 import com.helion3.prism.api.records.PrismRecord;
 
 public class BlockPlaceListener {
 
     /**
-     * Listens for block place events.
+     * Listens for block break events.
      *
      * @param event
      */
-    @Subscribe
-    public void onBlockPlace(BlockPlaceEvent event) {
-
+    @Listener
+    public void onPlaceBlock(PlaceBlockEvent event) {
         // Player-caused
-        if (event instanceof PlayerPlaceBlockEvent) {
-
-            Player player = ((PlayerPlaceBlockEvent) event).getEntity();
-
-            // Save the record
-            new PrismRecord()
-                .player(player)
-                .placedBlock(event.getBlock())
-                .replacing(event.getReplacementBlock())
-                .save();
-
+        Optional<Player> player = event.getCause().first(Player.class);
+        if (player.isPresent()) {
+            for (BlockTransaction transaction : event.getTransactions()) {
+                // Save
+                new PrismRecord().player(player.get()).placedBlock(transaction).save();
+            }
         }
     }
 }

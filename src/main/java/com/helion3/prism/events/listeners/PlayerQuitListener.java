@@ -23,8 +23,8 @@
  */
 package com.helion3.prism.events.listeners;
 
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerQuitEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.network.ClientConnectionEvent.Disconnect;
 
 import com.helion3.prism.api.records.PrismRecord;
 
@@ -35,8 +35,8 @@ public class PlayerQuitListener {
      *
      * @param event
      */
-    @Subscribe
-    public void onPlayerQuit(final PlayerQuitEvent event) {
-        new PrismRecord().player(event.getEntity()).quit().save();
+    @Listener
+    public void onPlayerQuit(final Disconnect event) {
+        new PrismRecord().player(event.getTargetEntity()).quit().save();
     }
 }

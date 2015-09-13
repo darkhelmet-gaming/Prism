@@ -23,12 +23,6 @@
  */
 package com.helion3.prism.api.results;
 
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-
-import com.google.common.base.Optional;
-import com.helion3.prism.Prism;
 
 /**
  * Represents a complete copy of event record data from
@@ -37,26 +31,26 @@ import com.helion3.prism.Prism;
  *
  */
 public class ResultRecordComplete extends ResultRecord {
-    /**
-     * Converts location data view to a Location.
-     * @return Optional Location.
-     */
-    public Optional<Location> getLocation() {
-        Location location = null;
-
-        // @todo should be UUID, which isn't serialized by sponge (yet?)
-        Optional<String> optionalWorldId = data.getString(DataQuery.of("location", "WorldName"));
-        Optional<Integer> x = data.getInt(DataQuery.of("location", "x"));
-        Optional<Integer> y = data.getInt(DataQuery.of("location", "y"));
-        Optional<Integer> z = data.getInt(DataQuery.of("location", "z"));
-
-        if (optionalWorldId.isPresent()) {
-            Optional<World> optionalWorld = Prism.getGame().getServer().getWorld(optionalWorldId.get());
-            if (optionalWorld.isPresent() && x.isPresent() && y.isPresent() && z.isPresent()) {
-                location = new Location(optionalWorld.get(), x.get(), y.get(), z.get());
-            }
-        }
-
-        return Optional.fromNullable(location);
-    }
+//    /**
+//     * Converts location data view to a Location.
+//     * @return Optional Location.
+//     */
+//    public Optional<Location> getLocation() {
+//        Location location = null;
+//
+//        // @todo should be UUID, which isn't serialized by sponge (yet?)
+//        Optional<String> optionalWorldId = data.getString(DataQuery.of("location", "WorldName"));
+//        Optional<Integer> x = data.getInt(DataQuery.of("location", "x"));
+//        Optional<Integer> y = data.getInt(DataQuery.of("location", "y"));
+//        Optional<Integer> z = data.getInt(DataQuery.of("location", "z"));
+//
+//        if (optionalWorldId.isPresent()) {
+//            Optional<World> optionalWorld = Prism.getGame().getServer().getWorld(optionalWorldId.get());
+//            if (optionalWorld.isPresent() && x.isPresent() && y.isPresent() && z.isPresent()) {
+//                location = new Location(optionalWorld.get(), x.get(), y.get(), z.get());
+//            }
+//        }
+//
+//        return Optional.fromNullable(location);
+//    }
 }

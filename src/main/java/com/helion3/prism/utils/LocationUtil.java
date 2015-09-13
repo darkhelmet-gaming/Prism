@@ -40,7 +40,7 @@ public class LocationUtil {
      * @param originalBlockType Optional expected block type.
      * @return If a location accepts a change.
      */
-    public static boolean locationAllowsChange(Location location, Optional<BlockType> originalBlockType) {
+    public static boolean locationAllowsChange(Location<?> location, Optional<BlockType> originalBlockType) {
         boolean locationAllowsPlacement = location.getBlockType().isReplaceable();
 
         if (!locationAllowsPlacement) {

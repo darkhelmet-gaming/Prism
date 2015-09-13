@@ -23,8 +23,8 @@
  */
 package com.helion3.prism.events.listeners;
 
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.network.ClientConnectionEvent.Join;
 
 import com.helion3.prism.api.records.PrismRecord;
 
@@ -35,8 +35,8 @@ public class PlayerJoinListener {
      *
      * @param event
      */
-    @Subscribe
-    public void onPlayerJoin(final PlayerJoinEvent event) {
-        new PrismRecord().player(event.getEntity()).joined().save();
+    @Listener
+    public void onPlayerJoin(final Join event) {
+        new PrismRecord().player(event.getTargetEntity()).joined().save();
     }
 }

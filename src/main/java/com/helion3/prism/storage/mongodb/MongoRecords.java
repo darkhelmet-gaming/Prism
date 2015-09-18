@@ -37,7 +37,6 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
@@ -74,8 +73,8 @@ public class MongoRecords implements StorageAdapterRecords {
             if (optional.isPresent()) {
                 String key = query.asString(".");
 
-                if (optional.get() instanceof ImmutableList) {
-                    ImmutableList<?> list = (ImmutableList<?>) optional.get();
+                if (optional.get() instanceof List) {
+                    List<?> list = (List<?>) optional.get();
                     Iterator<?> iterator = list.iterator();
                     while (iterator.hasNext()) {
                         Object object = iterator.next();
@@ -205,7 +204,6 @@ public class MongoRecords implements StorageAdapterRecords {
            Document groupFields = new Document();
            groupFields.put("eventName", "$eventName");
            groupFields.put("player", "$player");
-           groupFields.put("subjectName", "$subjectName");
            groupFields.put("dayOfMonth", new Document("$dayOfMonth", "$created"));
            groupFields.put("month", new Document("$month", "$created"));
            groupFields.put("year", new Document("$year", "$created"));
@@ -233,6 +231,8 @@ public class MongoRecords implements StorageAdapterRecords {
            pipeline.add(limit);
 
            aggregated = collection.aggregate(pipeline);
+
+           System.out.println(aggregated);
 
        }
 

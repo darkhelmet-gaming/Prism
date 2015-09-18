@@ -25,18 +25,18 @@ package com.helion3.prism.api.records;
 
 import java.util.Date;
 
-import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Optional;
 import com.helion3.prism.queues.RecordingQueue;
 import com.helion3.prism.records.EventSource;
+import com.helion3.prism.utils.DataQueries;
 
 /**
  * An easy-to-understand factory class for Prism {@link EventRecord}s.
@@ -68,22 +68,30 @@ public class PrismRecord {
 
     /**
      * Helper method for writing block transaction data, using only
-     * the final replacement value.
+     * the final replacement value. We must alter the data structure
+     * slightly to avoid duplication, decoupling location from blocks, etc.
      *
-     * @param transaction
+     * @param transaction BlockTransaction representing a block change in the world.
      */
     private void writeBlockTransaction(BlockTransaction transaction) {
         checkNotNull(transaction);
 
         // Need a little prep, since location has redundant block info for our concerns
         DataContainer location = transaction.getOriginal().getLocation().get().toContainer();
-        location.remove(new DataQuery("BlockType"));
+        location.remove(DataQueries.BlockType);
 
-        data.set(new DataQuery("location"), location);
+        data.set(DataQueries.Location, location);
+
+        DataContainer original = transaction.getOriginal().getState().toContainer();
+        Optional<Object> extra = transaction.getOriginal().toContainer().get(DataQueries.ExtraData);
+        if (extra.isPresent()) {
+            System.out.println("EXTRA EXISTS");
+            original.set(DataQueries.ExtraData, extra.get());
+        }
 
         // Storing the state only, so we don't also get location
-        data.set(new DataQuery("original"), transaction.getOriginal().getState());
-        data.set(new DataQuery("replacement"), transaction.getFinalReplacement().getState());
+        data.set(DataQueries.OriginalBlock, original);
+        data.set(DataQueries.ReplacementBlock, transaction.getFinalReplacement().getState());
     }
 
     /**
@@ -107,27 +115,6 @@ public class PrismRecord {
     public PrismRecord placedBlock(BlockTransaction transaction){
         this.eventName = "block-place";
         writeBlockTransaction(transaction);
-        return this;
-    }
-
-    /**
-     * Describes which block was replaced by a block action.
-     * @param snapshot BlockSnapshot Snapshot of the former block
-     * @return PrismRecord
-     */
-    public PrismRecord replacing(BlockSnapshot snapshot) {
-        checkNotNull(snapshot);
-        data.set(new DataQuery("state"), snapshot.getState().toContainer());
-        return this;
-    }
-
-    /**
-     * Describes a single location an event occurred at.
-     * @param location Location of event
-     * @return PrismRecord
-     */
-    public PrismRecord at(Location<?> location) {
-        data.set(new DataQuery("location"), location.toContainer());
         return this;
     }
 
@@ -161,13 +148,13 @@ public class PrismRecord {
             throw new IllegalArgumentException("Event record can not be created - invalid event name.");
         }
 
-        data.set(new DataQuery("eventName"), eventName);
-        data.set(new DataQuery("created"), new Date());
-        data.set(new DataQuery("source"), source.getSourceIdentifier());
+        data.set(DataQueries.EventName, eventName);
+        data.set(DataQueries.Created, new Date());
+        data.set(DataQueries.Source, source.getSourceIdentifier());
 
         // Source
-        String sourceKey = source.isPlayer() ? "player" : "source";
-        data.set(new DataQuery(sourceKey), source.getSourceIdentifier());
+        DataQuery sourceKey = source.isPlayer() ? DataQueries.Player : DataQueries.Source;
+        data.set(sourceKey, source.getSourceIdentifier());
 
         // Queue the finished record for saving
         RecordingQueue.add(data);

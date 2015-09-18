@@ -23,13 +23,15 @@
  */
 package com.helion3.prism.api.results;
 
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.MemoryDataView;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import com.helion3.prism.Prism;
-import com.helion3.prism.utils.LocationUtil;
+import com.helion3.prism.utils.DataQueries;
 
 /**
  * Represents a block change event record.
@@ -38,41 +40,58 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
 
     @Override
     public ActionableResult undo() {
-//        // Location
-//        Optional<Location> optionalLocation = getLocation();
-//        if (!optionalLocation.isPresent()) {
-//            return new ActionableResult(SkipReason.INVALID_LOCATION);
-//        }
-//
-//        Location location = optionalLocation.get();
-//
-//        // Existing/replacement block IDs
-//        Optional<String> optionalExistingBlockId = data.getString(DataQuery.of("location", "BlockType"));
-//        Optional<String> optionalReplacementBlockId = data.getString(DataQuery.of("state", "BlockType"));
-//
-//        // Sponge currently doesn't support the "minecraft:" namespace...
-//        String existingId = "air";
-//        if (optionalExistingBlockId.isPresent()) {
-//            existingId = optionalExistingBlockId.get().replace("minecraft:", "");
-//        }
-//
-//        String replacementId = "air";
-//        if (optionalReplacementBlockId.isPresent()) {
-//            replacementId = optionalReplacementBlockId.get().replace("minecraft:", "");
-//        }
-//
-//        // ids -> BlockType
-//        Optional<BlockType> existingBlockType = Prism.getGame().getRegistry().getType(BlockType.class, existingId);
-//        Optional<BlockType> replacementBlockType = Prism.getGame().getRegistry().getType(BlockType.class, replacementId);
-//        if (!existingBlockType.isPresent() && !replacementBlockType.isPresent()) {
-//            return new ActionableResult(SkipReason.INVALID_BLOCK);
-//        }
-//
-//        if (!LocationUtil.locationAllowsChange(location, replacementBlockType)) {
-//            return new ActionableResult(SkipReason.OCCUPIED);
-//        }
-//
-//        location.setBlockType(existingBlockType.get());
+        // Our data is stored with a different structure, so we'll need
+        // a little manual effort to reformat it.
+        DataView restoration = new MemoryDataContainer();
+
+        // Build World UUID / Vec3 data BlockSnapshot expects
+        Optional<Object> optionalLocation = data.get(DataQueries.Location);
+        if (!optionalLocation.isPresent()) {
+         // @todo error/skip
+        }
+
+        DataView location = (MemoryDataView) optionalLocation.get();
+        DataView position = new MemoryDataContainer();
+        position.set(DataQueries.X, location.get(DataQueries.x).get());
+        position.set(DataQueries.Y, location.get(DataQueries.y).get());
+        position.set(DataQueries.Z, location.get(DataQueries.z).get());
+        restoration.set(DataQueries.Position, position);
+        restoration.set(DataQueries.WorldUuid, location.get(DataQueries.WorldUuid).get());
+
+        // Build BlockState data BlockSnapshot expects
+        Optional<Object> optionalOriginalBlock = data.get(DataQueries.OriginalBlock);
+        if (!optionalOriginalBlock.isPresent()) {
+         // @todo error/skip
+        }
+
+        DataView original = (DataView) optionalOriginalBlock.get();
+
+        // Store extra data
+        Optional<Object> extra = original.get(DataQueries.ExtraData);
+        if (extra.isPresent()) {
+            restoration.set(DataQueries.ExtraData, original.get(DataQueries.ExtraData).get());
+            original.remove(DataQueries.ExtraData);
+        } else {
+            // @todo hopefully sponge can help me avoid this line
+            restoration.set(DataQueries.ExtraData, Lists.newArrayList());
+        }
+
+        // Provide empty Data list
+        // @todo hopefully sponge can help me avoid this line
+        if (!original.get(DataQueries.Data).isPresent()) {
+            original.set(DataQueries.Data, Lists.newArrayList());
+        }
+
+        restoration.set(DataQueries.BlockState, original);
+
+        // DataContainer -> BlockSnapshot
+        Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBlockSnapshotBuilder().build(restoration);
+        if (!optionalSnapshot.isPresent()) {
+            // @todo error/skip
+        }
+
+        // Actually restore!
+        optionalSnapshot.get().restore(true, true);
 
         return new ActionableResult();
     }

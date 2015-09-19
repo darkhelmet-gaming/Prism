@@ -25,18 +25,22 @@ package com.helion3.prism.api.records;
 
 import java.util.Date;
 
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.living.player.Player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Optional;
+import com.helion3.prism.Prism;
 import com.helion3.prism.queues.RecordingQueue;
 import com.helion3.prism.records.EventSource;
 import com.helion3.prism.utils.DataQueries;
+import com.helion3.prism.utils.DataUtils;
 
 /**
  * An easy-to-understand factory class for Prism {@link EventRecord}s.
@@ -76,22 +80,40 @@ public class PrismRecord {
     private void writeBlockTransaction(BlockTransaction transaction) {
         checkNotNull(transaction);
 
-        // Need a little prep, since location has redundant block info for our concerns
+        Prism.getLogger().debug(DataUtils.jsonFromDataView(transaction.getOriginal().toContainer()).toString());
+
+        // Location
         DataContainer location = transaction.getOriginal().getLocation().get().toContainer();
         location.remove(DataQueries.BlockType);
-
+        location.remove(DataQueries.WorldName);
         data.set(DataQueries.Location, location);
 
-        DataContainer original = transaction.getOriginal().getState().toContainer();
-        Optional<Object> extra = transaction.getOriginal().toContainer().get(DataQueries.ExtraData);
-        if (extra.isPresent()) {
-            System.out.println("EXTRA EXISTS");
-            original.set(DataQueries.ExtraData, extra.get());
+        // Storing the state only, so we don't also get location
+        data.set(DataQueries.OriginalBlock, formatBlockDataContainer(transaction.getOriginal()));
+        data.set(DataQueries.ReplacementBlock, formatBlockDataContainer(transaction.getFinalReplacement()));
+    }
+
+    /**
+     * Removes unnecessary/duplicate data from a BlockSnapshot's DataContainer.
+     *
+     * @param blockSnapshot Block Snapshot.
+     * @return DataContainer Formatted Data Container.
+     */
+    private DataContainer formatBlockDataContainer(BlockSnapshot blockSnapshot) {
+        DataContainer block = blockSnapshot.toContainer();
+        block.remove(DataQueries.WorldUuid);
+        block.remove(DataQueries.Position);
+
+        Optional<Object> optionalUnsafeData = block.get(DataQueries.UnsafeData);
+        if (optionalUnsafeData.isPresent()) {
+            DataView unsafeData = (DataView) optionalUnsafeData.get();
+            unsafeData.remove(DataQueries.x);
+            unsafeData.remove(DataQueries.y);
+            unsafeData.remove(DataQueries.z);
+            block.set(DataQueries.UnsafeData, unsafeData);
         }
 
-        // Storing the state only, so we don't also get location
-        data.set(DataQueries.OriginalBlock, original);
-        data.set(DataQueries.ReplacementBlock, transaction.getFinalReplacement().getState());
+        return block;
     }
 
     /**
@@ -150,7 +172,6 @@ public class PrismRecord {
 
         data.set(DataQueries.EventName, eventName);
         data.set(DataQueries.Created, new Date());
-        data.set(DataQueries.Source, source.getSourceIdentifier());
 
         // Source
         DataQuery sourceKey = source.isPlayer() ? DataQueries.Player : DataQueries.Source;

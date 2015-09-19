@@ -32,6 +32,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.helion3.prism.Prism;
 import com.helion3.prism.utils.DataQueries;
+import com.helion3.prism.utils.DataUtils;
 
 /**
  * Represents a block change event record.
@@ -40,14 +41,20 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
 
     @Override
     public ActionableResult undo() {
+        Optional<Object> optionalOriginal = data.get(DataQueries.OriginalBlock);
+
+        if (!optionalOriginal.isPresent()) {
+            // @todo error/skip
+        }
+
         // Our data is stored with a different structure, so we'll need
         // a little manual effort to reformat it.
-        DataView restoration = new MemoryDataContainer();
+        DataView restoration = ((DataView) optionalOriginal.get()).copy();
 
         // Build World UUID / Vec3 data BlockSnapshot expects
         Optional<Object> optionalLocation = data.get(DataQueries.Location);
         if (!optionalLocation.isPresent()) {
-         // @todo error/skip
+            // @todo error/skip
         }
 
         DataView location = (MemoryDataView) optionalLocation.get();
@@ -58,31 +65,31 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
         restoration.set(DataQueries.Position, position);
         restoration.set(DataQueries.WorldUuid, location.get(DataQueries.WorldUuid).get());
 
-        // Build BlockState data BlockSnapshot expects
-        Optional<Object> optionalOriginalBlock = data.get(DataQueries.OriginalBlock);
-        if (!optionalOriginalBlock.isPresent()) {
-         // @todo error/skip
-        }
-
-        DataView original = (DataView) optionalOriginalBlock.get();
-
-        // Store extra data
-        Optional<Object> extra = original.get(DataQueries.ExtraData);
-        if (extra.isPresent()) {
-            restoration.set(DataQueries.ExtraData, original.get(DataQueries.ExtraData).get());
-            original.remove(DataQueries.ExtraData);
-        } else {
-            // @todo hopefully sponge can help me avoid this line
+        // Provide empty ExtraData List
+        // @todo hopefully sponge can help me avoid this line
+        Optional<Object> extra = restoration.get(DataQueries.ExtraData);
+        if (!extra.isPresent()) {
             restoration.set(DataQueries.ExtraData, Lists.newArrayList());
         }
 
-        // Provide empty Data list
+        DataView blockState = (DataView) restoration.get(DataQueries.BlockState).get();
+
+        // Provide empty Data List
         // @todo hopefully sponge can help me avoid this line
-        if (!original.get(DataQueries.Data).isPresent()) {
-            original.set(DataQueries.Data, Lists.newArrayList());
+        if (!blockState.get(DataQueries.Data).isPresent()) {
+            blockState.set(DataQueries.Data, Lists.newArrayList());
+            restoration.set(DataQueries.BlockState, blockState);
         }
 
-        restoration.set(DataQueries.BlockState, original);
+        // Unsafe data includes coordinates
+        Optional<Object> optionalUnsafeData = restoration.get(DataQueries.UnsafeData);
+        if (optionalUnsafeData.isPresent()) {
+            DataView unsafeData = (DataView) optionalUnsafeData.get();
+            unsafeData.set(DataQueries.x, location.get(DataQueries.x).get());
+            unsafeData.set(DataQueries.y, location.get(DataQueries.y).get());
+            unsafeData.set(DataQueries.z, location.get(DataQueries.z).get());
+            restoration.set(DataQueries.UnsafeData, unsafeData);
+        }
 
         // DataContainer -> BlockSnapshot
         Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBlockSnapshotBuilder().build(restoration);
@@ -91,7 +98,11 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
         }
 
         // Actually restore!
-        optionalSnapshot.get().restore(true, true);
+        if (!optionalSnapshot.get().restore(true, true)) {
+            // @todo error/skip
+        }
+
+        System.out.println(DataUtils.jsonFromDataView(restoration));
 
         return new ActionableResult();
     }

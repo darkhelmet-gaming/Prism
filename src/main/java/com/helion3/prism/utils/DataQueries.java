@@ -36,12 +36,15 @@ public class DataQueries {
     public static final DataQuery Data = of("Data");
     public static final DataQuery EventName = of("eventName");
     public static final DataQuery ExtraData = of("ExtraData");
+    public static final DataQuery id = of("id");
     public static final DataQuery Location = of("location");
     public static final DataQuery OriginalBlock = of("original");
     public static final DataQuery Player = of("player");
     public static final DataQuery Position = of("Position");
     public static final DataQuery ReplacementBlock = of("replacement");
     public static final DataQuery Source = of("source");
+    public static final DataQuery UnsafeData = of("UnsafeData");
+    public static final DataQuery WorldName = of("WorldName");
     public static final DataQuery WorldUuid = of("WorldUuid");
 
     // @todo awaiting sponge fix...

@@ -25,11 +25,8 @@ package com.helion3.prism.api.query;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.spongepowered.api.data.DataQuery;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
@@ -37,7 +34,7 @@ import com.helion3.prism.api.parameters.ParameterHandler;
 
 final public class Query {
     private boolean isAggregate = true;
-    private Map<DataQuery, Condition> conditions = new HashMap<DataQuery, Condition>();
+    private List<Condition> conditions = new ArrayList<Condition>();
 
     /**
      * Builds a {@link Query} by parsing a string of parameters
@@ -120,15 +117,15 @@ final public class Query {
      * @param condition
      */
     public void addCondition(Condition condition) {
-        conditions.put(condition.getDataQuery(), condition);
+        conditions.add(condition);
     }
 
     /**
      *
      * @return
      */
-    public Collection<Condition> getConditions() {
-        return conditions.values();
+    public List<Condition> getConditions() {
+        return conditions;
     }
 
     /**

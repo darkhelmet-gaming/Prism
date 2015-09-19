@@ -70,6 +70,6 @@ public class ParameterEventName extends SimpleParameterHandler {
             eventNames.add(eventName);
         }
 
-        query.addCondition(new Condition(DataQueries.EventName, MatchRule.INCLUDES, eventNames));
+        query.addCondition(new Condition(DataQueries.EventName.toString(), MatchRule.INCLUDES, eventNames));
     }
 }

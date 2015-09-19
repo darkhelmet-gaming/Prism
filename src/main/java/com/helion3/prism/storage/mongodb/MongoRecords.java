@@ -37,6 +37,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Range;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Condition;
 import com.helion3.prism.api.query.MatchRule;
@@ -178,7 +179,26 @@ public class MongoRecords implements StorageAdapterRecords {
            // Match an array of items
            if (value instanceof List) {
                String matchRule = condition.getMatchRule().equals(MatchRule.INCLUDES) ? "$in" : "$nin";
-               conditions.append(condition.getDataQuery().toString(), new Document(matchRule, value));
+               conditions.append(condition.getFieldName(), new Document(matchRule, value));
+           }
+
+           else if (condition.getMatchRule().equals(MatchRule.GREATER_THAN_EQUAL)) {
+               conditions.append(condition.getFieldName(), new Document("$gte", value));
+           }
+
+           else if (condition.getMatchRule().equals(MatchRule.LESS_THAN_EQUAL)) {
+               conditions.append(condition.getFieldName(), new Document("$lte", value));
+           }
+
+           else if (condition.getMatchRule().equals(MatchRule.BETWEEN)) {
+               if (!(value instanceof Range)) {
+                   throw new IllegalArgumentException("\"Between\" match value must be a Range.");
+               }
+
+               Range<?> range = (Range<?>) value;
+
+               Document between = new Document("$gte", range.lowerEndpoint()).append("$lte", range.upperEndpoint());
+               conditions.append(condition.getFieldName(), between);
            }
        }
 
@@ -224,6 +244,8 @@ public class MongoRecords implements StorageAdapterRecords {
            pipeline.add(sorter);
            pipeline.add(limit);
 
+           Prism.getLogger().debug(pipeline.toString());
+
            aggregated = collection.aggregate(pipeline);
        } else {
            // Aggregation pipeline
@@ -231,6 +253,8 @@ public class MongoRecords implements StorageAdapterRecords {
            pipeline.add(matcher);
            pipeline.add(sorter);
            pipeline.add(limit);
+
+           Prism.getLogger().debug(pipeline.toString());
 
            aggregated = collection.aggregate(pipeline);
        }

@@ -25,12 +25,35 @@ package com.helion3.prism.api.query;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.spongepowered.api.data.DataQuery;
+import com.google.common.collect.Range;
 
 final public class Condition {
-    private final DataQuery dataQuery;
+    private final String field;
     private final MatchRule matchRule;
     private final Object value;
+
+    /**
+     * Statically build a new condition.
+     *
+     * @param dataQuery DataQuery matching the field name.
+     * @param rule MatchRule describing comparison of values.
+     * @param value List, String or Number value.
+     * @return Condition
+     */
+    public static Condition of(String field, MatchRule matchRule, Object value) {
+        return new Condition(field, matchRule, value);
+    }
+
+    /**
+     * Statically build a new condition.
+     *
+     * @param dataQuery DataQuery matching the field name.
+     * @param value Range of values.
+     * @return Condition
+     */
+    public static Condition of(String field, Range<?> value) {
+        return new Condition(field, MatchRule.BETWEEN, value);
+    }
 
     /**
      * Build a condition for use with querying the storage.
@@ -39,11 +62,11 @@ final public class Condition {
      * @param rule MatchRule describing comparison of values.
      * @param value List, String or Number value.
      */
-    public Condition(DataQuery dataQuery, MatchRule matchRule, Object value) {
-        checkNotNull(dataQuery);
+    public Condition(String field, MatchRule matchRule, Object value) {
+        checkNotNull(field);
         checkNotNull(matchRule);
         checkNotNull(value);
-        this.dataQuery = dataQuery;
+        this.field = field;
         this.matchRule = matchRule;
         this.value = value;
     }
@@ -54,8 +77,8 @@ final public class Condition {
      *
      * @return DataQuery DataQuery field name.
      */
-    public DataQuery getDataQuery() {
-        return dataQuery;
+    public String getFieldName() {
+        return field;
     }
 
     /**

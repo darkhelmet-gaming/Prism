@@ -11,6 +11,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Range;
 import com.helion3.prism.api.query.Condition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
@@ -47,17 +48,22 @@ public class ParameterRadius extends SimpleParameterHandler {
         if (session.getCommandSource().get() instanceof Player) {
             Location<World> location = ((Player) session.getCommandSource().get()).getLocation();
 
-            query.addCondition(new Condition(DataQueries.WorldUuid, MatchRule.INCLUDES, location.getExtent().getUniqueId().toString()));
+            String fieldPath = DataQueries.Location.toString() + ".";
 
-            // Minimum
-            query.addCondition(new Condition(DataQueries.x, MatchRule.GREATER_THAN_EQUAL, location.getBlockX() - radius));
-            query.addCondition(new Condition(DataQueries.y, MatchRule.GREATER_THAN_EQUAL, location.getBlockY() - radius));
-            query.addCondition(new Condition(DataQueries.z, MatchRule.GREATER_THAN_EQUAL, location.getBlockZ() - radius));
+            // World
+            query.addCondition(new Condition(fieldPath + DataQueries.WorldUuid.toString(), MatchRule.INCLUDES, location.getExtent().getUniqueId().toString()));
 
-            // Maximum
-            query.addCondition(new Condition(DataQueries.x, MatchRule.LESS_THAN_EQUAL, location.getBlockX() + radius));
-            query.addCondition(new Condition(DataQueries.y, MatchRule.LESS_THAN_EQUAL, location.getBlockY() + radius));
-            query.addCondition(new Condition(DataQueries.z, MatchRule.LESS_THAN_EQUAL, location.getBlockZ() + radius));
+            // X
+            Range<Integer> xRange = Range.open(location.getBlockX() - radius, location.getBlockX() + radius);
+            query.addCondition(Condition.of(fieldPath + DataQueries.x, xRange));
+
+            // Y
+            Range<Integer> yRange = Range.open(location.getBlockY() - radius, location.getBlockY() + radius);
+            query.addCondition(Condition.of(fieldPath + DataQueries.y, yRange));
+
+            // Z
+            Range<Integer> zRange = Range.open(location.getBlockZ() - radius, location.getBlockZ() + radius);
+            query.addCondition(Condition.of(fieldPath + DataQueries.z, zRange));
         }
     }
 }

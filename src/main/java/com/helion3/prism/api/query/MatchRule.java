@@ -27,5 +27,6 @@ public enum MatchRule {
     EXCLUDES,
     INCLUDES,
     GREATER_THAN_EQUAL,
-    LESS_THAN_EQUAL
+    LESS_THAN_EQUAL,
+    BETWEEN
 }

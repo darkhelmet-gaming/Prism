@@ -26,7 +26,6 @@ package com.helion3.prism.api.parameters;
 import com.google.common.collect.ImmutableList;
 
 public abstract class SimpleParameterHandler implements ParameterHandler {
-
     private final ImmutableList<String> aliases;
 
     /**

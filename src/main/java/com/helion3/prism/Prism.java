@@ -46,6 +46,7 @@ import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.helion3.prism.api.parameters.ParameterEventName;
 import com.helion3.prism.api.parameters.ParameterHandler;
+import com.helion3.prism.api.parameters.ParameterRadius;
 import com.helion3.prism.api.results.BlockChangeResultRecord;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.storage.StorageAdapter;
@@ -220,6 +221,7 @@ final public class Prism {
      */
     private void registerParameterHandlers() {
         registerParameterHandler(new ParameterEventName());
+        registerParameterHandler(new ParameterRadius());
     }
 
     /**
@@ -228,7 +230,10 @@ final public class Prism {
      * @param record
      */
     public void registerResultRecord(String eventName, Class<? extends ResultRecord> clazz) {
-        // @todo ensure no dupes
+        if (resultRecords.containsKey(eventName)) {
+            throw new IllegalArgumentException("A result record is already registered for event \"" + eventName + "\"");
+        }
+
         resultRecords.put(eventName, clazz);
     }
 

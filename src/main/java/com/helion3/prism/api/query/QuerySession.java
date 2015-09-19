@@ -23,21 +23,45 @@
  */
 package com.helion3.prism.api.query;
 
+import org.spongepowered.api.util.command.CommandSource;
+
+import com.google.common.base.Optional;
+
 /**
  * Represents a record query session, which includes the actual
  * {@link Query} as well as the source, and result set meta data.
  *
  */
 public class QuerySession {
-
-    protected final Query query;
+    protected Query query;
+    protected final CommandSource commandSource;
 
     /**
-     * Creates a new session with the given {@link Query}
-     * @param query
+     * Constructs a new session without any command source.
      */
-    public QuerySession(Query query){
-        this.query = query;
+    public QuerySession() {
+        this.commandSource = null;
+    }
+
+    /**
+     * Constructs a new query session with a known command source.
+     *
+     * Queries may behave differently based on a user - for example a Player
+     * may lookup a radius but a console command or API call has no location.
+     *
+     * @param commandSource CommandSource this session belongs to.
+     */
+    public QuerySession(CommandSource commandSource) {
+        this.commandSource = commandSource;
+    }
+
+    /**
+     * Returns the command source this session belongs to, if any.
+     *
+     * @return CommandSource
+     */
+    public Optional<CommandSource> getCommandSource(){
+        return Optional.of(commandSource);
     }
 
     /**
@@ -45,7 +69,16 @@ public class QuerySession {
      *
      * @return {@link Query}
      */
-    public Query getQuery(){
-        return query;
+    public Optional<Query> getQuery(){
+        return Optional.of(query);
+    }
+
+    /**
+     * Sets a query.
+     *
+     * @param query Query
+     */
+    public void setQuery(Query query) {
+        this.query = query;
     }
 }

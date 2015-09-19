@@ -23,15 +23,28 @@
  */
 package com.helion3.prism.api.parameters;
 
+import javax.annotation.Nullable;
+
+import org.spongepowered.api.util.command.CommandSource;
+
 import com.helion3.prism.api.query.Query;
+import com.helion3.prism.api.query.QuerySession;
 
 public interface ParameterHandler {
+    /**
+     * Returns whether this parameter is allowed for the current
+     * command source. Example: radius parameter only for Player.
+     *
+     * @param source CommandSource of current parameter.
+     * @return boolean Whether this command source may use this parameter.
+     */
+    boolean acceptsSource(@Nullable CommandSource source);
 
     /**
      * Returns whether the given value(s) for the handler
      * are acceptable.
      * @param value String Value/input for the parameter
-     * @return boolean
+     * @return boolean Whether this value is legal for this parameter.
      */
     boolean acceptsValue(String value);
 
@@ -39,7 +52,7 @@ public interface ParameterHandler {
      * Returns whether this handler responds to the given alias.
      *
      * @param alias String Alias to check against
-     * @return boolean
+     * @return boolean Whether this handler responds to an alias.
      */
     boolean handles(String alias);
 
@@ -49,6 +62,5 @@ public interface ParameterHandler {
      * @param value String Values given with parameter
      * @param query Query Current query object
      */
-    void process(String value, Query query);
-
+    void process(QuerySession session, String value, Query query);
 }

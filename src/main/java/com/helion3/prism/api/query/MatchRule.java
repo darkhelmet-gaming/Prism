@@ -25,5 +25,7 @@ package com.helion3.prism.api.query;
 
 public enum MatchRule {
     EXCLUDES,
-    INCLUDES
+    INCLUDES,
+    GREATER_THAN_EQUAL,
+    LESS_THAN_EQUAL
 }

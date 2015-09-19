@@ -46,9 +46,8 @@ final public class Query {
      * @param parameters String Parameter: value string
      * @return {@link Query} Database query object
      */
-    public static Query fromParameters(String parameters) {
-        checkNotNull(parameters);
-        return fromParameters(parameters.split(" "));
+    public static Query fromParameters(QuerySession session, String parameters) {
+        return fromParameters(session, parameters.split(" "));
     }
 
     /**
@@ -58,8 +57,9 @@ final public class Query {
      * @param parameters String[] Parameter:value list
      * @return {@link Query} Database query object
      */
-    public static Query fromParameters(String[] parameters) {
+    public static Query fromParameters(QuerySession session, String[] parameters) {
         checkNotNull(parameters);
+        checkNotNull(session);
 
         Query query = new Query();
 
@@ -95,13 +95,19 @@ final public class Query {
 
                 ParameterHandler handler = optionalHandler.get();
 
+                // Allows this command source?
+                if (!handler.acceptsSource(session.getCommandSource().get())) {
+                    // @todo throw error
+                    break;
+                }
+
                 // Validate value
                 if (!handler.acceptsValue(value)) {
                     // @todo throw syntax error
                     break;
                 }
 
-                handler.process(value, query);
+                handler.process(session, value, query);
             }
         }
 

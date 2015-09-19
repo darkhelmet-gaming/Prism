@@ -27,14 +27,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
+
+import org.spongepowered.api.util.command.CommandSource;
+
 import com.google.common.collect.ImmutableList;
 import com.helion3.prism.api.query.Condition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
+import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.utils.DataQueries;
 
 public class ParameterEventName extends SimpleParameterHandler {
-    private final Pattern pattern = Pattern.compile( "[~|!]?[\\w,-]+" );
+    private final Pattern pattern = Pattern.compile("[~|!]?[\\w,-]+");
 
     /**
      * Parameter handling the event name field.
@@ -42,7 +47,12 @@ public class ParameterEventName extends SimpleParameterHandler {
     public ParameterEventName() {
         // For backwards-compat, we're still using "a" for action.
         // "e" is likely reserved for entity
-        super( ImmutableList.of("a", "event") );
+        super(ImmutableList.of("a", "event"));
+    }
+
+    @Override
+    public boolean acceptsSource(@Nullable CommandSource source) {
+        return true;
     }
 
     @Override
@@ -51,7 +61,7 @@ public class ParameterEventName extends SimpleParameterHandler {
     }
 
     @Override
-    public void process(String value, Query query) {
+    public void process(QuerySession session, String value, Query query) {
         final String[] nameArgs = value.split(",");
 
         List<String> eventNames = new ArrayList<String>();

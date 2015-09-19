@@ -50,11 +50,13 @@ public class RollbackCommand implements CommandCallable {
 
     @Override
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
-        // @todo error out when no args. Currently, "lookup" is passed as the arg when no real args used
+        // Create a new query session
+        final QuerySession session = new QuerySession(source);
 
-        final Query query = Query.fromParameters(arguments);
+        // Build a query from the arguments
+        final Query query = Query.fromParameters(session, arguments);
         query.setAggregate(false);
-        final QuerySession session = new QuerySession(query);
+        session.setQuery(query);
 
         try {
             List<ActionableResult> actionResults = new ArrayList<ActionableResult>();

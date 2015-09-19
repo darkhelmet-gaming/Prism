@@ -48,8 +48,12 @@ public class LookupCommand implements CommandCallable {
 
     @Override
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
-        final Query query = Query.fromParameters(arguments);
-        final QuerySession session = new QuerySession(query);
+        // Create a new query session
+        final QuerySession session = new QuerySession(source);
+
+        // Build a query from the arguments
+        final Query query = Query.fromParameters(session, arguments);
+        session.setQuery(query);
 
         String messageTemplate;
         // @todo move to configs

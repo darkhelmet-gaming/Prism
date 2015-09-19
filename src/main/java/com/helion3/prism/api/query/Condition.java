@@ -25,8 +25,6 @@ package com.helion3.prism.api.query;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
-
 import org.spongepowered.api.data.DataQuery;
 
 final public class Condition {
@@ -39,15 +37,15 @@ final public class Condition {
      *
      * @param dataQuery DataQuery matching the field name.
      * @param rule MatchRule describing comparison of values.
-     * @param list List of String or Number values.
+     * @param value List, String or Number value.
      */
-    public Condition(DataQuery dataQuery, MatchRule matchRule, List<?> list) {
+    public Condition(DataQuery dataQuery, MatchRule matchRule, Object value) {
         checkNotNull(dataQuery);
         checkNotNull(matchRule);
-        checkNotNull(list);
+        checkNotNull(value);
         this.dataQuery = dataQuery;
         this.matchRule = matchRule;
-        this.value = list;
+        this.value = value;
     }
 
     /**

@@ -158,7 +158,11 @@ public class MongoRecords implements StorageAdapterRecords {
     */
    @Override
    public List<ResultRecord> query(QuerySession session) throws Exception {
-       Query query = session.getQuery();
+       if (!session.getQuery().isPresent()) {
+           throw new IllegalArgumentException("No valid query in session.");
+       }
+
+       Query query = session.getQuery().get();
 
        // Prepare results
        List<ResultRecord> results = new ArrayList<ResultRecord>();

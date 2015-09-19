@@ -50,7 +50,7 @@ import com.helion3.prism.utils.DataUtils;
  *
  * For example:
  *
- * new PrismRecord().player(player).brokeBlock(blockLoc).save()
+ * new PrismRecord().player(player).brokeBlock(transaction).save()
  *
  */
 public class PrismRecord {

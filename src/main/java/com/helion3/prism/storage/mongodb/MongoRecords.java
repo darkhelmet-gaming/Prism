@@ -38,6 +38,7 @@ import org.spongepowered.api.data.MemoryDataContainer;
 
 import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
+import com.helion3.prism.api.query.Condition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
@@ -56,7 +57,6 @@ import com.mongodb.client.model.InsertOneModel;
 import com.mongodb.client.model.WriteModel;
 
 public class MongoRecords implements StorageAdapterRecords {
-
     private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
 
     /**
@@ -92,7 +92,6 @@ public class MongoRecords implements StorageAdapterRecords {
                     document.append(key, documentFromView(subView));
                 }
                 else {
-
                     if (key.equals("player")) {
                         document.append("player", new DBRef(MongoStorageAdapter.collectionPlayersName, optional.get()));
                     } else {
@@ -132,7 +131,6 @@ public class MongoRecords implements StorageAdapterRecords {
     */
    @Override
    public StorageWriteResult write(List<DataContainer> containers) throws Exception {
-
        MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
 
        // Build an array of documents
@@ -170,11 +168,14 @@ public class MongoRecords implements StorageAdapterRecords {
 
        // Query conditions
        Document conditions = new Document();
+       for (Condition condition : query.getConditions()) {
+           Object value = condition.getValue();
 
-       // Actions
-       if (query.getEventNames().size() > 0) {
-           String matchRule = query.getEventNameMatchRule().equals(MatchRule.INCLUDE) ? "$in" : "$nin";
-           conditions.append("eventName", new Document(matchRule, query.getEventNames()));
+           // Match an array of items
+           if (value instanceof List) {
+               String matchRule = condition.getMatchRule().equals(MatchRule.INCLUDES) ? "$in" : "$nin";
+               conditions.append(condition.getDataQuery().toString(), new Document(matchRule, value));
+           }
        }
 
        // Append all conditions
@@ -199,7 +200,6 @@ public class MongoRecords implements StorageAdapterRecords {
        // Build aggregators
        AggregateIterable<Document> aggregated = null;
        if (shouldGroup) {
-
            // Grouping fields
            Document groupFields = new Document();
            groupFields.put("eventName", "$eventName");
@@ -221,9 +221,7 @@ public class MongoRecords implements StorageAdapterRecords {
            pipeline.add(limit);
 
            aggregated = collection.aggregate(pipeline);
-
        } else {
-
            // Aggregation pipeline
            List<Document> pipeline = new ArrayList<Document>();
            pipeline.add(matcher);
@@ -231,15 +229,11 @@ public class MongoRecords implements StorageAdapterRecords {
            pipeline.add(limit);
 
            aggregated = collection.aggregate(pipeline);
-
-           System.out.println(aggregated);
-
        }
 
        // Iterate results and build our event record list
        MongoCursor<Document> cursor = aggregated.iterator();
        try {
-
            MongoCollection<Document> players = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionPlayersName);
 
            while (cursor.hasNext()) {

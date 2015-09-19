@@ -23,18 +23,21 @@
  */
 package com.helion3.prism.api.parameters;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import com.google.common.collect.ImmutableList;
+import com.helion3.prism.api.query.Condition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
+import com.helion3.prism.utils.DataQueries;
 
 public class ParameterEventName extends SimpleParameterHandler {
-
     private final Pattern pattern = Pattern.compile( "[~|!]?[\\w,-]+" );
 
     /**
-     * Constructor
+     * Parameter handling the event name field.
      */
     public ParameterEventName() {
         // For backwards-compat, we're still using "a" for action.
@@ -49,18 +52,14 @@ public class ParameterEventName extends SimpleParameterHandler {
 
     @Override
     public void process(String value, Query query) {
-        final String[] eventNames = value.split( "," );
+        final String[] nameArgs = value.split(",");
 
-        if (eventNames[0].startsWith("!")) {
-            eventNames[0] = eventNames[0].replace("!", "");
-            query.setEventNameMatchRule(MatchRule.EXCLUDE);
+        List<String> eventNames = new ArrayList<String>();
+        for (String eventName : nameArgs) {
+            // @todo partial name matching, validation
+            eventNames.add(eventName);
         }
 
-        for (String eventName : eventNames) {
-
-            // @todo pull all matching "real" event names
-
-            query.addEventName(eventName);
-        }
+        query.addCondition(new Condition(DataQueries.EventName, MatchRule.INCLUDES, eventNames));
     }
 }

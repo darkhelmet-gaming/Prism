@@ -41,14 +41,13 @@ import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.results.ResultRecordAggregate;
+import com.helion3.prism.utils.Format;
 import com.helion3.prism.utils.Template;
 
 public class LookupCommand implements CommandCallable {
 
     @Override
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
-        // @todo error out when no args. Currently, "lookup" is passed as the arg when no real args used
-
         final Query query = Query.fromParameters(arguments);
         final QuerySession session = new QuerySession(query);
 
@@ -65,18 +64,22 @@ public class LookupCommand implements CommandCallable {
 
             // Iterate query results
             List<ResultRecord> results = Prism.getStorageAdapter().records().query(session);
-            for (ResultRecord result : results) {
-                Map<String,String> tokens = new HashMap<String, String>();
-                tokens.put("source", result.data.getString(DataQuery.of("source")).get());
-                tokens.put("event", result.data.getString(DataQuery.of("eventName")).get());
-//                tokens.put("subject", result.subjectName);
+            if (results.isEmpty()) {
+                // @todo move to language files
+                source.sendMessage(Format.error(Texts.of("Nothing found. See /pr ? for help.")));
+            } else {
+                for (ResultRecord result : results) {
+                    Map<String,String> tokens = new HashMap<String, String>();
+                    tokens.put("source", result.data.getString(DataQuery.of("source")).get());
+                    tokens.put("event", result.data.getString(DataQuery.of("eventName")).get());
 
-                // Aggregate data
-                if (result instanceof ResultRecordAggregate) {
-                    tokens.put("count", "" + result.data.getInt(DataQuery.of("count")).get());
+                    // Aggregate data
+                    if (result instanceof ResultRecordAggregate) {
+                        tokens.put("count", "" + result.data.getInt(DataQuery.of("count")).get());
+                    }
+
+                    source.sendMessage(Texts.of(Template.parseTemplate(messageTemplate, tokens)));
                 }
-
-                source.sendMessage(Texts.of(Template.parseTemplate(messageTemplate, tokens)));
             }
         } catch (Exception e) {
             // @todo handle
@@ -99,16 +102,16 @@ public class LookupCommand implements CommandCallable {
 
     @Override
     public Optional<Text> getShortDescription(CommandSource source) {
-        return null;
+        return Optional.of(Texts.of("Search event records."));
     }
 
     @Override
     public Optional<Text> getHelp(CommandSource source) {
-        return null;
+        return Optional.of(Texts.of("See /pr ? for help with search parameters."));
     }
 
     @Override
     public Text getUsage(CommandSource source) {
-        return null;
+        return Texts.of("/pr l (parameters)");
     }
 }

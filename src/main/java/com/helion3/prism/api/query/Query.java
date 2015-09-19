@@ -25,18 +25,19 @@ package com.helion3.prism.api.query;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.spongepowered.api.data.DataQuery;
 
 import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.parameters.ParameterHandler;
 
 final public class Query {
-
     private boolean isAggregate = true;
-    private List<String> eventNames = new ArrayList<String>();
-    private MatchRule eventMatchRule = MatchRule.INCLUDE;
+    private Map<DataQuery, Condition> conditions = new HashMap<DataQuery, Condition>();
 
     /**
      * Builds a {@link Query} by parsing a string of parameters
@@ -58,6 +59,8 @@ final public class Query {
      * @return {@link Query} Database query object
      */
     public static Query fromParameters(String[] parameters) {
+        checkNotNull(parameters);
+
         Query query = new Query();
 
         if (parameters.length > 0) {
@@ -106,6 +109,23 @@ final public class Query {
     }
 
     /**
+     *
+     * @param query
+     * @param condition
+     */
+    public void addCondition(Condition condition) {
+        conditions.put(condition.getDataQuery(), condition);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Collection<Condition> getConditions() {
+        return conditions.values();
+    }
+
+    /**
      * Returns whether records will be aggregated/grouped.
      *
      * @return boolean
@@ -120,39 +140,5 @@ final public class Query {
      */
     public void setAggregate(boolean isAggregate) {
         this.isAggregate = isAggregate;
-    }
-
-    /**
-     * Returns the {@link MatchRule} the event condition will use.
-     * @return MatchRule
-     */
-    public MatchRule getEventNameMatchRule() {
-        return eventMatchRule;
-    }
-
-    /**
-     * Sets the {@link MatchRule} the event condition will use.
-     * @param rule {@link MatchRule}
-     */
-    public void setEventNameMatchRule(MatchRule rule) {
-        eventMatchRule = rule;
-    }
-
-    /**
-     * Add a named event to the query condition. This will be
-     * a white or black list depending on the event {@link MatchRule}
-     * @param action String action name
-     */
-    public void addEventName(String action) {
-        checkNotNull(action);
-        eventNames.add(action);
-    }
-
-    /**
-     * Returns a list of named actions.
-     * @return List of named actions.
-     */
-    public List<String> getEventNames() {
-        return eventNames;
     }
 }

@@ -25,7 +25,6 @@ package com.helion3.prism.commands;
 
 import java.util.List;
 
-import org.spongepowered.api.Game;
 import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
@@ -41,14 +40,13 @@ import com.google.common.collect.ImmutableMap;
 import com.helion3.prism.utils.Format;
 
 public class PrismCommands {
-
     private PrismCommands(){}
 
     /**
      * Build a complete command hierarchy
      * @return
      */
-    public static CommandSpec getCommand(Game game) {
+    public static CommandSpec getCommand() {
         return CommandSpec.builder()
                 .executor(new CommandExecutor() {
                     @Override

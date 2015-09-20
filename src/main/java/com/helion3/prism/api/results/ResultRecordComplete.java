@@ -23,6 +23,11 @@
  */
 package com.helion3.prism.api.results;
 
+import java.util.Date;
+
+import com.helion3.prism.utils.DataQueries;
+import com.helion3.prism.utils.DateUtils;
+
 /**
  * Represents a complete copy of event record data from
  * a query result. Used for displaying individual entries
@@ -30,5 +35,14 @@ package com.helion3.prism.api.results;
  *
  */
 public class ResultRecordComplete extends ResultRecord {
-
+    /**
+     * Returns a user-friendly relative "time since" value.
+     *
+     * @return String "time since" value.
+     */
+    @Override
+    public String getRelativeTime() {
+        Date created = (Date) data.get(DataQueries.Created).get();
+        return DateUtils.getTimeSince(created);
+    }
 }

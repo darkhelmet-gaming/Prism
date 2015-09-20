@@ -32,6 +32,7 @@ public class DataQueries {
 
     public static final DataQuery BlockType = of("BlockType");
     public static final DataQuery BlockState = of("BlockState");
+    public static final DataQuery Count = of("count");
     public static final DataQuery Created = of("created");
     public static final DataQuery Data = of("Data");
     public static final DataQuery EventName = of("eventName");

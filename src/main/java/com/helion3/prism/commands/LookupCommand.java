@@ -23,13 +23,11 @@
  */
 package com.helion3.prism.commands;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
@@ -41,11 +39,10 @@ import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.results.ResultRecordAggregate;
+import com.helion3.prism.utils.DataQueries;
 import com.helion3.prism.utils.Format;
-import com.helion3.prism.utils.Template;
 
 public class LookupCommand implements CommandCallable {
-
     @Override
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
         // Create a new query session
@@ -55,40 +52,39 @@ public class LookupCommand implements CommandCallable {
         final Query query = Query.fromParameters(session, arguments);
         session.setQuery(query);
 
-        String messageTemplate;
-        // @todo move to configs
-        if (query.isAggregate()) {
-            messageTemplate = "{source} {event} {subject} x{count}";
-        } else {
-            messageTemplate = "{source} {event} {subject}";
-        }
+        // Query the database asynchronously
+        Prism.getGame().getScheduler().createTaskBuilder().async().execute(new Runnable(){
+            @Override
+            public void run(){
+                try {
+                    // Iterate query results
+                    List<ResultRecord> results = Prism.getStorageAdapter().records().query(session);
+                    if (results.isEmpty()) {
+                        // @todo move to language files
+                        source.sendMessage(Format.error(Texts.of("Nothing found. See /pr ? for help.")));
+                    } else {
+                        for (ResultRecord result : results) {
+                            // Aggregate data
+                            int count = 1;
+                            if (result instanceof ResultRecordAggregate) {
+                                count = result.data.getInt(DataQueries.Count).get();
+                            }
 
-        try {
-            // @todo must be async
-
-            // Iterate query results
-            List<ResultRecord> results = Prism.getStorageAdapter().records().query(session);
-            if (results.isEmpty()) {
-                // @todo move to language files
-                source.sendMessage(Format.error(Texts.of("Nothing found. See /pr ? for help.")));
-            } else {
-                for (ResultRecord result : results) {
-                    Map<String,String> tokens = new HashMap<String, String>();
-                    tokens.put("source", result.data.getString(DataQuery.of("source")).get());
-                    tokens.put("event", result.data.getString(DataQuery.of("eventName")).get());
-
-                    // Aggregate data
-                    if (result instanceof ResultRecordAggregate) {
-                        tokens.put("count", "" + result.data.getInt(DataQuery.of("count")).get());
+                            source.sendMessage(Texts.of(
+                                TextColors.DARK_AQUA, result.getSourceName(), " ",
+                                TextColors.WHITE, result.getEventVerb(), " ",
+                                TextColors.DARK_AQUA, result.getTargetName(), " ",
+                                (count > 1 ? "x" + count : ""),
+                                TextColors.WHITE, result.getRelativeTime()
+                            ));
+                        }
                     }
-
-                    source.sendMessage(Texts.of(Template.parseTemplate(messageTemplate, tokens)));
+                } catch (Exception e) {
+                    // @todo handle
+                    e.printStackTrace();
                 }
             }
-        } catch (Exception e) {
-            // @todo handle
-            e.printStackTrace();
-        }
+        }).submit(Prism.getPlugin());
 
         return CommandResult.success();
     }

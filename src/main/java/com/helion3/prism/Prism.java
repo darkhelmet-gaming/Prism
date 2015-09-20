@@ -68,12 +68,12 @@ import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
  */
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
 final public class Prism {
-
     private static Configuration config;
     private static Game game;
     private static List<ParameterHandler> handlers = new ArrayList<ParameterHandler>();
     private static Logger logger;
     private static Map<String,Class<? extends ResultRecord>> resultRecords = new HashMap<String,Class<? extends ResultRecord>>();
+    private static Object plugin;
     private static StorageAdapter storageAdapter;
 
     @Inject
@@ -91,6 +91,7 @@ final public class Prism {
      */
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
+        plugin = this;
 
         // Game reference
         game = event.getGame();
@@ -120,7 +121,7 @@ final public class Prism {
         new RecordingQueueManager().start();
 
         // Commands
-        game.getCommandDispatcher().register(this, PrismCommands.getCommand(game), "prism", "pr");
+        game.getCommandDispatcher().register(this, PrismCommands.getCommand(), "prism", "pr");
 
         logger.info("Prism started successfully. Bad guys beware.");
     }
@@ -180,6 +181,14 @@ final public class Prism {
      */
     public static List<ParameterHandler> getParameterHandlers() {
         return handlers;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static Object getPlugin() {
+        return plugin;
     }
 
     /**

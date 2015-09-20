@@ -38,7 +38,6 @@ import com.helion3.prism.utils.DataUtils;
  * Represents a block change event record.
  */
 public class BlockChangeResultRecord extends ResultRecordComplete implements Actionable {
-
     @Override
     public ActionableResult undo() {
         Optional<Object> optionalOriginal = data.get(DataQueries.OriginalBlock);

@@ -25,8 +25,103 @@ package com.helion3.prism.api.results;
 
 import org.spongepowered.api.data.DataContainer;
 
-abstract public class ResultRecord {
+import com.google.common.base.Optional;
+import com.helion3.prism.utils.DataQueries;
+import com.helion3.prism.utils.TypeUtils;
 
+abstract public class ResultRecord {
     public DataContainer data;
 
+    /**
+     * Returns a verb variant of the event group name.
+     *
+     * @return String verb variant of event group.
+     */
+    public String getEventVerb() {
+        return TypeUtils.translateToPastTense(getEventGroupName());
+    }
+
+    /**
+     * Returns the group portion of an event name.
+     *
+     * @return String event group name.
+     */
+    public String getEventGroupName() {
+        String value = getEventName();
+
+        if (value.contains("-")) {
+            value = value.split("-")[1];
+        }
+
+        return value;
+    }
+
+    /**
+     * Returns the event name.
+     *
+     * @return String event name.
+     */
+    public String getEventName() {
+        String value = "unknown";
+
+        Optional<String> optional = data.getString(DataQueries.EventName);
+        if (optional.isPresent()) {
+            value = optional.get();
+        }
+
+        return value;
+    }
+
+    /**
+     * Returns a user-friendly string describing the source.
+     *
+     * @return String source name.
+     */
+    public String getSourceName() {
+        String value = "unknown";
+
+        Optional<String> optional = data.getString(DataQueries.Source);
+        if (optional.isPresent()) {
+            value = optional.get();
+        }
+
+        return value;
+    }
+
+    /**
+     * Returns a user-friendly name of the target item,
+     * block, or entity of this event record.
+     *
+     * @return String target name.
+     */
+    public String getTargetName() {
+        String value = "unknown";
+
+        String eventName = data.getString(DataQueries.EventName).get();
+
+        // @todo probably should be used differently. Like ResultRecord<Block> or something.
+        if (eventName.contains("block")) {
+
+            Optional<String> optionalBlockType = data.getString(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
+            if (optionalBlockType.isPresent()) {
+                value = optionalBlockType.get();
+
+                if (value.contains(":")) {
+                    value = value.split(":")[1];
+                }
+            }
+        }
+
+        return value;
+    }
+
+    /**
+     * Returns a user-friendly relative "time since" value.
+     *
+     * @return String "time since" value.
+     */
+    public String getRelativeTime() {
+        // todo varies based on aggregate or complete
+        return "";
+    }
 }

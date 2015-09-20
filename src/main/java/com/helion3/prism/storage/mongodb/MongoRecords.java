@@ -49,6 +49,7 @@ import com.helion3.prism.api.results.ResultRecordComplete;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
+import com.helion3.prism.utils.DataQueries;
 import com.mongodb.DBRef;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
@@ -228,6 +229,7 @@ public class MongoRecords implements StorageAdapterRecords {
            Document groupFields = new Document();
            groupFields.put("eventName", "$eventName");
            groupFields.put("player", "$player");
+           groupFields.put("original", new Document("BlockState", "$original.BlockState"));
            groupFields.put("dayOfMonth", new Document("$dayOfMonth", "$created"));
            groupFields.put("month", new Document("$month", "$created"));
            groupFields.put("year", new Document("$year", "$created"));
@@ -269,10 +271,11 @@ public class MongoRecords implements StorageAdapterRecords {
                Document wrapper = cursor.next();
                Document document = shouldGroup ? (Document) wrapper.get("_id") : wrapper;
 
+               Prism.getLogger().debug(document.toString());
                DataContainer data = documentToDataContainer(document);
 
                if (shouldGroup) {
-                   data.set(new DataQuery("count"), wrapper.get("count"));
+                   data.set(DataQueries.Count, wrapper.get("count"));
                }
 
                // Build our result object
@@ -301,7 +304,7 @@ public class MongoRecords implements StorageAdapterRecords {
                    source = document.getString("source");
                }
 
-               data.set(DataQuery.of("source"), source);
+               data.set(DataQueries.Source, source);
 
                result.data = data;
                results.add(result);

@@ -36,7 +36,7 @@ public class TypeUtils {
      * @param subject String value to match against.
      * @return Array of matches.
      */
-    public static String[] preg_match_all(Pattern p, String subject) {
+    public static String[] pregMatchAll(Pattern p, String subject) {
         Matcher m = p.matcher(subject);
         StringBuilder out = new StringBuilder();
         boolean split = false;

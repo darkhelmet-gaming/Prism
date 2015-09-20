@@ -40,7 +40,7 @@ public class DateUtils {
      * @return String relative "time since" value.
      */
     public static String getTimeSince(final Date start) {
-        String time_ago = "";
+        String result = "";
 
         long diffInSeconds = ( new Date().getTime() - start.getTime() ) / 1000;
         long diff[] = new long[] { 0, 0, 0, 0 };
@@ -52,65 +52,69 @@ public class DateUtils {
 
         // Only show days if more than 1
         if( diff[0] >= 1 ) {
-            time_ago += diff[0] + "d";
+            result += diff[0] + "d";
         }
         // Only show hours if > 1
         if( diff[1] >= 1 ) {
-            time_ago += diff[1] + "h";
+            result += diff[1] + "h";
         }
         // Only show minutes if > 1 and less than 60
         if( diff[2] > 1 && diff[2] < 60 ) {
-            time_ago += diff[2] + "m";
+            result += diff[2] + "m";
         }
-        if( !time_ago.isEmpty() ) {
-            time_ago += " ago";
+        if( !result.isEmpty() ) {
+            result += " ago";
         }
 
         if( diff[0] == 0 && diff[1] == 0 && diff[2] <= 1 ) {
-            time_ago = "just now";
+            result = "just now";
         }
 
-        return time_ago;
+        return result;
     }
 
-    public static Long translateTimeStringToDate(String arg_value) {
-        Long dateFrom = 0L;
-
+    /**
+     * Parses a special time/date shorthand into a Date.
+     *
+     * @param shorthand String shorthand value.
+     * @return Date final object.
+     */
+    public static Date parseTimeStringToDate(String shorthand) {
         final Calendar calendar = Calendar.getInstance();
 
-        final String[] matches = TypeUtils.preg_match_all(relativeTimeDeclaration, arg_value);
+        final String[] matches = TypeUtils.pregMatchAll(relativeTimeDeclaration, shorthand);
         if (matches.length > 0) {
-            for (final String match : matches) {
-                final Matcher m = relativeTimeDeclaration.matcher(match);
-                if (m.matches()) {
-                    if (m.groupCount() == 2) {
-                        final int tfValue = Integer.parseInt(m.group(1));
-                        final String tfFormat = m.group(2);
+            throw new IllegalArgumentException("Invalid date shorthand.");
+        }
 
-                        if (tfFormat.equals("w")) {
-                            calendar.add(Calendar.WEEK_OF_YEAR, -1 * tfValue);
-                        }
-                        else if( tfFormat.equals( "d" ) ) {
-                            calendar.add(Calendar.DAY_OF_MONTH, -1 * tfValue);
-                        }
-                        else if (tfFormat.equals( "h" ) ) {
-                            calendar.add(Calendar.HOUR, -1 * tfValue);
-                        }
-                        else if (tfFormat.equals( "m" )) {
-                            calendar.add(Calendar.MINUTE, -1 * tfValue);
-                        }
-                        else if (tfFormat.equals("s")) {
-                            calendar.add(Calendar.SECOND, -1 * tfValue);
-                        } else {
-                            return null;
-                        }
+        for (final String match : matches) {
+            final Matcher m = relativeTimeDeclaration.matcher(match);
+            if (m.matches()) {
+                if (m.groupCount() == 2) {
+                    final int tfValue = Integer.parseInt(m.group(1));
+                    final String tfFormat = m.group(2);
+
+                    if (tfFormat.equals("w")) {
+                        calendar.add(Calendar.WEEK_OF_YEAR, -1 * tfValue);
+                    }
+                    else if( tfFormat.equals( "d" ) ) {
+                        calendar.add(Calendar.DAY_OF_MONTH, -1 * tfValue);
+                    }
+                    else if (tfFormat.equals( "h" ) ) {
+                        calendar.add(Calendar.HOUR, -1 * tfValue);
+                    }
+                    else if (tfFormat.equals( "m" )) {
+                        calendar.add(Calendar.MINUTE, -1 * tfValue);
+                    }
+                    else if (tfFormat.equals("s")) {
+                        calendar.add(Calendar.SECOND, -1 * tfValue);
+                    } else {
+                        return null;
                     }
                 }
             }
-            dateFrom = calendar.getTime().getTime();
         }
 
-        return dateFrom;
-
+        return calendar.getTime();
     }
 }

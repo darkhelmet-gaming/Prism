@@ -213,10 +213,10 @@ public class MongoRecords implements StorageAdapterRecords {
 
        // Sorting
        Document sortFields = new Document();
-       sortFields.put("created",sortDir);
-       sortFields.put( "x", 1 );
-       sortFields.put( "z", 1 );
-       sortFields.put( "y", 1 );
+       sortFields.put(DataQueries.Created.toString(), sortDir);
+       sortFields.put(DataQueries.x.toString(), 1);
+       sortFields.put(DataQueries.z.toString(), 1);
+       sortFields.put(DataQueries.y.toString(), 1);
        Document sorter = new Document("$sort", sortFields);
 
        // Offset/Limit
@@ -227,15 +227,16 @@ public class MongoRecords implements StorageAdapterRecords {
        if (shouldGroup) {
            // Grouping fields
            Document groupFields = new Document();
-           groupFields.put("eventName", "$eventName");
-           groupFields.put("player", "$player");
-           groupFields.put("original", new Document("BlockState", "$original.BlockState"));
-           groupFields.put("dayOfMonth", new Document("$dayOfMonth", "$created"));
-           groupFields.put("month", new Document("$month", "$created"));
-           groupFields.put("year", new Document("$year", "$created"));
+           groupFields.put(DataQueries.EventName.toString(), "$" + DataQueries.EventName);
+           groupFields.put(DataQueries.Player.toString(), "$" + DataQueries.Player);
+           groupFields.put(DataQueries.OriginalBlock.toString(), new Document(DataQueries.BlockState.toString(),
+               "$" + DataQueries.OriginalBlock + "." + DataQueries.BlockState));
+           groupFields.put("dayOfMonth", new Document("$dayOfMonth", "$" + DataQueries.Created));
+           groupFields.put("month", new Document("$month", "$" + DataQueries.Created));
+           groupFields.put("year", new Document("$year", "$" + DataQueries.Created));
 
            Document groupHolder = new Document("_id", groupFields);
-           groupHolder.put("count", new Document("$sum", 1));
+           groupHolder.put(DataQueries.Count.toString(), new Document("$sum", 1));
 
            Document group = new Document("$group", groupHolder);
 
@@ -275,7 +276,7 @@ public class MongoRecords implements StorageAdapterRecords {
                DataContainer data = documentToDataContainer(document);
 
                if (shouldGroup) {
-                   data.set(DataQueries.Count, wrapper.get("count"));
+                   data.set(DataQueries.Count, wrapper.get(DataQueries.Count.toString()));
                }
 
                // Build our result object
@@ -284,7 +285,7 @@ public class MongoRecords implements StorageAdapterRecords {
                    result = new ResultRecordAggregate();
                } else {
                    // Pull record class for this event, if any
-                   Class<? extends ResultRecord> clazz = Prism.getResultRecord(wrapper.getString("eventName"));
+                   Class<? extends ResultRecord> clazz = Prism.getResultRecord(wrapper.getString(DataQueries.EventName.toString()));
                    if (clazz != null){
                        result = clazz.newInstance();
                    } else {
@@ -294,14 +295,14 @@ public class MongoRecords implements StorageAdapterRecords {
 
                // Determine the final name of the event source
                String source = "unknown";
-               if (document.containsKey("player")) {
-                   DBRef ref = (DBRef) document.get("player");
+               if (document.containsKey(DataQueries.Player.toString())) {
+                   DBRef ref = (DBRef) document.get(DataQueries.Player.toString());
                    // @todo Isn't there an easier way to pull refs in v3?
                    Document player = players.find(eq("_id", ref.getId())).first();
                    source = player.getString("name");
 
                } else {
-                   source = document.getString("source");
+                   source = document.getString(DataQueries.Source.toString());
                }
 
                data.set(DataQueries.Source, source);

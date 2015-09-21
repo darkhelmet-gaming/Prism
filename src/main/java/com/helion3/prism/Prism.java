@@ -53,9 +53,9 @@ import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.events.listeners.ChangeBlockListener;
-import com.helion3.prism.events.listeners.PlayerJoinListener;
-import com.helion3.prism.events.listeners.PlayerQuitListener;
-import com.helion3.prism.events.listeners.RequiredPlayerJoinListener;
+import com.helion3.prism.events.listeners.JoinListener;
+import com.helion3.prism.events.listeners.QuitListener;
+import com.helion3.prism.events.listeners.RequiredJoinListener;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 
@@ -256,13 +256,13 @@ final public class Prism {
 
         // Player events
         if (config.getNode("events", "player", "join").getBoolean()) {
-            eventManager.registerListeners(this, new PlayerJoinListener());
+            eventManager.registerListeners(this, new JoinListener());
         }
         if (config.getNode("events", "player", "quit").getBoolean()) {
-            eventManager.registerListeners(this, new PlayerQuitListener());
+            eventManager.registerListeners(this, new QuitListener());
         }
 
         // Events required for internal operation
-        eventManager.registerListeners(this, new RequiredPlayerJoinListener());
+        eventManager.registerListeners(this, new RequiredJoinListener());
     }
 }

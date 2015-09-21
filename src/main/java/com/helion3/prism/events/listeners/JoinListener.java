@@ -24,19 +24,18 @@
 package com.helion3.prism.events.listeners;
 
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent.Disconnect;
+import org.spongepowered.api.event.network.ClientConnectionEvent.Join;
 
 import com.helion3.prism.api.records.PrismRecord;
 
-public class PlayerQuitListener {
-
+public class JoinListener {
     /**
-     * Saves event records when a player quits.
+     * Saves event records when a player joins.
      *
-     * @param event
+     * @param event Join event.
      */
     @Listener
-    public void onPlayerQuit(final Disconnect event) {
-        new PrismRecord().player(event.getTargetEntity()).quit().save();
+    public void onJoin(final Join event) {
+        new PrismRecord().player(event.getTargetEntity()).joined().save();
     }
 }

@@ -24,35 +24,18 @@
 package com.helion3.prism.events.listeners;
 
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent.Join;
+import org.spongepowered.api.event.network.ClientConnectionEvent.Disconnect;
 
-import com.helion3.prism.Prism;
+import com.helion3.prism.api.records.PrismRecord;
 
-public class RequiredPlayerJoinListener {
-
+public class QuitListener {
     /**
-     * Listens for player join events so that we can properly identify
-     * players.
+     * Saves event records when a player quits.
      *
-     * Note: This listener is required and is *not* involved with tracking
-     * join events.
-     *
-     * @param event
+     * @param event Disconnect event.
      */
     @Listener
-    public void onPlayerJoin(final Join event) {
-
-        // Run our database query async
-        new Thread(new Runnable() {
-            @Override
-            public void run(){
-                try {
-                    Prism.getStorageAdapter().players().save(event.getTargetEntity());
-                } catch (Exception e) {
-                    // @todo handle
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+    public void onQuit(final Disconnect event) {
+        new PrismRecord().player(event.getTargetEntity()).quit().save();
     }
 }

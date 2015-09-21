@@ -23,8 +23,7 @@
  */
 package com.helion3.prism.api.parameters;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -37,17 +36,16 @@ import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.utils.DataQueries;
+import com.helion3.prism.utils.DateUtils;
 
-public class ParameterEventName extends SimpleParameterHandler {
-    private final Pattern pattern = Pattern.compile("[~|!]?[\\w,-]+");
+public class ParameterTime extends SimpleParameterHandler {
+    private final Pattern pattern = Pattern.compile("[\\w,:-]+");
 
     /**
-     * Parameter handling the event name field.
+     * Handler for time-related parameters.
      */
-    public ParameterEventName() {
-        // For backwards-compat, we're still using "a" for action.
-        // "e" is likely reserved for entity
-        super(ImmutableList.of("a", "event"));
+    public ParameterTime() {
+        super(ImmutableList.of("b", "before", "s", "since"));
     }
 
     @Override
@@ -57,19 +55,29 @@ public class ParameterEventName extends SimpleParameterHandler {
 
     @Override
     public boolean acceptsValue(String value) {
-        return pattern.matcher(value).matches();
+        boolean matches = pattern.matcher(value).matches();
+
+        if (matches) {
+            try {
+                DateUtils.parseTimeStringToDate(value);
+            } catch(Exception e) {
+                matches = false;
+            }
+        }
+
+        return matches;
     }
 
     @Override
     public void process(QuerySession session, String parameter, String value, Query query) {
-        final String[] nameArgs = value.split(",");
+        Date date = DateUtils.parseTimeStringToDate(value);
 
-        List<String> eventNames = new ArrayList<String>();
-        for (String eventName : nameArgs) {
-            // @todo partial name matching, validation
-            eventNames.add(eventName);
+        // Determine match rule based on before/since
+        MatchRule rule = MatchRule.LESS_THAN_EQUAL;
+        if (parameter.equalsIgnoreCase("s") || parameter.equalsIgnoreCase("since")) {
+            rule = MatchRule.GREATER_THAN_EQUAL;
         }
 
-        query.addCondition(new Condition(DataQueries.EventName.toString(), MatchRule.INCLUDES, eventNames));
+        query.addCondition(Condition.of(DataQueries.Created.toString(), rule, date));
     }
 }

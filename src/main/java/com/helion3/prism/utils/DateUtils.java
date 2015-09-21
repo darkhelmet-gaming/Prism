@@ -83,7 +83,7 @@ public class DateUtils {
         final Calendar calendar = Calendar.getInstance();
 
         final String[] matches = TypeUtils.pregMatchAll(relativeTimeDeclaration, shorthand);
-        if (matches.length > 0) {
+        if (matches.length == 0) {
             throw new IllegalArgumentException("Invalid date shorthand.");
         }
 

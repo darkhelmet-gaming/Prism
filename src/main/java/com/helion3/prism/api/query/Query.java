@@ -104,7 +104,7 @@ final public class Query {
                     break;
                 }
 
-                handler.process(session, value, query);
+                handler.process(session, alias, value, query);
             }
         }
 

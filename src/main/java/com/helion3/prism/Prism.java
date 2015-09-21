@@ -47,6 +47,7 @@ import com.google.inject.Inject;
 import com.helion3.prism.api.parameters.ParameterEventName;
 import com.helion3.prism.api.parameters.ParameterHandler;
 import com.helion3.prism.api.parameters.ParameterRadius;
+import com.helion3.prism.api.parameters.ParameterTime;
 import com.helion3.prism.api.results.BlockChangeResultRecord;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.storage.StorageAdapter;
@@ -231,6 +232,7 @@ final public class Prism {
     private void registerParameterHandlers() {
         registerParameterHandler(new ParameterEventName());
         registerParameterHandler(new ParameterRadius());
+        registerParameterHandler(new ParameterTime());
     }
 
     /**

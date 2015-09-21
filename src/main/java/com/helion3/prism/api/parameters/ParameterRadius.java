@@ -59,12 +59,12 @@ public class ParameterRadius extends SimpleParameterHandler {
     }
 
     @Override
-    public boolean acceptsValue(String parameter) {
-        return pattern.matcher(parameter).matches();
+    public boolean acceptsValue(String value) {
+        return pattern.matcher(value).matches();
     }
 
     @Override
-    public void process(QuerySession session, String value, Query query) {
+    public void process(QuerySession session, String parameter, String value, Query query) {
         // @todo error on NumberFormatException
         int radius = Integer.parseInt(value);
 

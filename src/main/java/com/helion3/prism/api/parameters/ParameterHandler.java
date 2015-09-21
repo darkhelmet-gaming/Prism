@@ -43,6 +43,7 @@ public interface ParameterHandler {
     /**
      * Returns whether the given value(s) for the handler
      * are acceptable.
+     *
      * @param value String Value/input for the parameter
      * @return boolean Whether this value is legal for this parameter.
      */
@@ -59,8 +60,11 @@ public interface ParameterHandler {
     /**
      * Processes the given value into conditions which are then
      * appended to the query.
-     * @param value String Values given with parameter
+     *
+     * @param session Current Query Session
+     * @param parameter String parameter used
+     * @param value String value(s) given with parameter
      * @param query Query Current query object
      */
-    void process(QuerySession session, String value, Query query);
+    void process(QuerySession session, String parameter, String value, Query query);
 }

@@ -32,18 +32,18 @@ public class DataQueries {
 
     public static final DataQuery BlockType = of("BlockType");
     public static final DataQuery BlockState = of("BlockState");
-    public static final DataQuery Count = of("count");
-    public static final DataQuery Created = of("created");
+    public static final DataQuery Count = of("Count");
+    public static final DataQuery Created = of("Created");
     public static final DataQuery Data = of("Data");
-    public static final DataQuery EventName = of("eventName");
+    public static final DataQuery EventName = of("EventName");
     public static final DataQuery ExtraData = of("ExtraData");
-    public static final DataQuery id = of("id");
-    public static final DataQuery Location = of("location");
-    public static final DataQuery OriginalBlock = of("original");
-    public static final DataQuery Player = of("player");
+    public static final DataQuery id = of("Id");
+    public static final DataQuery Location = of("Location");
+    public static final DataQuery OriginalBlock = of("Original");
+    public static final DataQuery Player = of("Player");
     public static final DataQuery Position = of("Position");
-    public static final DataQuery ReplacementBlock = of("replacement");
-    public static final DataQuery Source = of("source");
+    public static final DataQuery ReplacementBlock = of("Replacement");
+    public static final DataQuery Source = of("Source");
     public static final DataQuery UnsafeData = of("UnsafeData");
     public static final DataQuery WorldName = of("WorldName");
     public static final DataQuery WorldUuid = of("WorldUuid");

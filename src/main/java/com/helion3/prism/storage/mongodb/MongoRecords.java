@@ -229,6 +229,7 @@ public class MongoRecords implements StorageAdapterRecords {
            Document groupFields = new Document();
            groupFields.put(DataQueries.EventName.toString(), "$" + DataQueries.EventName);
            groupFields.put(DataQueries.Player.toString(), "$" + DataQueries.Player);
+           groupFields.put(DataQueries.Cause.toString(), "$" + DataQueries.Cause);
            groupFields.put(DataQueries.OriginalBlock.toString(), new Document(DataQueries.BlockState.toString(),
                "$" + DataQueries.OriginalBlock + "." + DataQueries.BlockState));
            groupFields.put("dayOfMonth", new Document("$dayOfMonth", "$" + DataQueries.Created));
@@ -294,7 +295,7 @@ public class MongoRecords implements StorageAdapterRecords {
                }
 
                // Determine the final name of the event source
-               String source = "unknown";
+               String source;
                if (document.containsKey(DataQueries.Player.toString())) {
                    DBRef ref = (DBRef) document.get(DataQueries.Player.toString());
                    // @todo Isn't there an easier way to pull refs in v3?
@@ -302,10 +303,10 @@ public class MongoRecords implements StorageAdapterRecords {
                    source = player.getString("name");
 
                } else {
-                   source = document.getString(DataQueries.Source.toString());
+                   source = document.getString(DataQueries.Cause.toString());
                }
 
-               data.set(DataQueries.Source, source);
+               data.set(DataQueries.Cause, source);
 
                result.data = data;
                results.add(result);

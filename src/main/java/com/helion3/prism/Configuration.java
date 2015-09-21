@@ -79,6 +79,16 @@ public class Configuration {
                 eventBlockBreak.setValue(true);
             }
 
+            ConfigurationNode eventBlockDecay = rootNode.getNode("events", "block", "decay");
+            if (eventBlockDecay.isVirtual()) {
+                eventBlockDecay.setValue(true);
+            }
+
+            ConfigurationNode eventBlockGrow = rootNode.getNode("events", "block", "grow");
+            if (eventBlockGrow.isVirtual()) {
+                eventBlockGrow.setValue(true);
+            }
+
             ConfigurationNode eventBlockPlace = rootNode.getNode("events", "block", "place");
             if (eventBlockPlace.isVirtual()) {
                 eventBlockPlace.setValue(true);

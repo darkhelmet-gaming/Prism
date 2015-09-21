@@ -32,13 +32,14 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.world.World;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
 import com.helion3.prism.queues.RecordingQueue;
-import com.helion3.prism.records.EventSource;
 import com.helion3.prism.utils.DataQueries;
 import com.helion3.prism.utils.DataUtils;
 
@@ -55,19 +56,144 @@ import com.helion3.prism.utils.DataUtils;
  */
 public class PrismRecord {
     private String eventName;
-    private EventSource source;
+    private Object cause;
     private DataContainer data = new MemoryDataContainer();
 
     /**
-     * Describe the Player responsible for the event this
-     * record describes.
+     * Set a cause based on a Cause chain.
+     *
+     * @param cause Cause of event.
+     * @return PrismRecord
+     */
+    public PrismRecord causedBy(Cause cause) {
+        // Player?
+        Optional<Player> player = cause.first(Player.class);
+        if (player.isPresent()) {
+            this.cause = player.get();
+        }
+
+        // World?
+        Optional<World> world = cause.first(World.class);
+        if (world.isPresent()) {
+            this.cause = world.get();
+        }
+
+        return this;
+    }
+
+    /**
+     * Set the Player responsible for this event.
      *
      * @param player Player responsible for this event
      * @return PrismRecord
      */
     public PrismRecord player(Player player){
-        this.source = new EventSource(player);
+        this.cause = player;
         return this;
+    }
+
+    /**
+     * Describes a single block break at a given Location.
+     *
+     * @param transaction Block broken.
+     * @return PrismRecord
+     */
+    public PrismRecord brokeBlock(BlockTransaction transaction){
+        this.eventName = "block-break";
+        writeBlockTransaction(transaction);
+        return this;
+    }
+
+    /**
+     * Describes a single block break at a given Location.
+     *
+     * @param transaction Block broken.
+     * @return PrismRecord
+     */
+    public PrismRecord decayedBlock(BlockTransaction transaction){
+        this.eventName = "block-decay";
+        writeBlockTransaction(transaction);
+        return this;
+    }
+
+    /**
+     * Describes a single block break at a given Location.
+     *
+     * @param transaction Block broken.
+     * @return PrismRecord
+     */
+    public PrismRecord grewBlock(BlockTransaction transaction){
+        this.eventName = "block-grow";
+        writeBlockTransaction(transaction);
+        return this;
+    }
+
+    /**
+     * Describes a single block place at a given Location.
+     *
+     * @param transaction Block placed.
+     * @return PrismRecord
+     */
+    public PrismRecord placedBlock(BlockTransaction transaction){
+        this.eventName = "block-place";
+        writeBlockTransaction(transaction);
+        return this;
+    }
+
+    /**
+     * Describes a player join.
+     * @return
+     */
+    public PrismRecord joined() {
+        this.eventName = "player-join";
+        return this;
+    }
+
+    /**
+     * Describes a player quit.
+     * @return
+     */
+    public PrismRecord quit() {
+        this.eventName = "player-quit";
+        return this;
+    }
+
+    /**
+     * Returns whether or not this record is valid and ready to be saved.
+     *
+     * @return Boolean
+     */
+    public boolean isValid() {
+        return (cause != null && eventName != null);
+    }
+
+    /**
+     * Build the final event record and send it to the queue.
+     */
+    public void save(){
+        // Validation
+        if (cause == null) {
+            throw new IllegalArgumentException("Event record can not be created - invalid cause.");
+        }
+        else if (eventName == null) {
+            throw new IllegalArgumentException("Event record can not be created - invalid event name.");
+        }
+
+        data.set(DataQueries.EventName, eventName);
+        data.set(DataQueries.Created, new Date());
+
+        // Cause
+        DataQuery causeKey = (cause instanceof Player) ? DataQueries.Player : DataQueries.Cause;
+
+        String causeIdentifier = "environment";
+        if (cause instanceof Player) {
+            causeIdentifier = ((Player) cause).getUniqueId().toString();
+        }
+
+        data.set(causeKey, causeIdentifier);
+
+        // Queue the finished record for saving
+        RecordingQueue.add(data);
     }
 
     /**
@@ -114,79 +240,5 @@ public class PrismRecord {
         }
 
         return block;
-    }
-
-    /**
-     * Describes a single block break at a given Location.
-     *
-     * @param transaction Block broken.
-     * @return PrismRecord
-     */
-    public PrismRecord brokeBlock(BlockTransaction transaction){
-        this.eventName = "block-break";
-        writeBlockTransaction(transaction);
-        return this;
-    }
-
-    /**
-     * Describes a single block place at a given Location.
-     *
-     * @param transaction Block placed.
-     * @return PrismRecord
-     */
-    public PrismRecord placedBlock(BlockTransaction transaction){
-        this.eventName = "block-place";
-        writeBlockTransaction(transaction);
-        return this;
-    }
-
-    /**
-     * Describes a player join.
-     * @return
-     */
-    public PrismRecord joined() {
-        this.eventName = "player-join";
-        return this;
-    }
-
-    /**
-     * Describes a player quit.
-     * @return
-     */
-    public PrismRecord quit() {
-        this.eventName = "player-quit";
-        return this;
-    }
-
-    /**
-     * Returns whether or not this record is valid and ready to be saved.
-     *
-     * @return Boolean
-     */
-    public boolean isValid() {
-        return (source == null && eventName == null);
-    }
-
-    /**
-     * Build the final event record and send it to the queue.
-     */
-    public void save(){
-        // Validation
-        if (source == null) {
-            throw new IllegalArgumentException("Event record can not be created - invalid source.");
-        }
-        else if (eventName == null) {
-            throw new IllegalArgumentException("Event record can not be created - invalid event name.");
-        }
-
-        data.set(DataQueries.EventName, eventName);
-        data.set(DataQueries.Created, new Date());
-
-        // Source
-        DataQuery sourceKey = source.isPlayer() ? DataQueries.Player : DataQueries.Source;
-        data.set(sourceKey, source.getSourceIdentifier());
-
-        // Queue the finished record for saving
-        RecordingQueue.add(data);
     }
 }

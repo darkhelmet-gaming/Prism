@@ -80,7 +80,7 @@ abstract public class ResultRecord {
     public String getSourceName() {
         String value = "unknown";
 
-        Optional<String> optional = data.getString(DataQueries.Source);
+        Optional<String> optional = data.getString(DataQueries.Cause);
         if (optional.isPresent()) {
             value = optional.get();
         }

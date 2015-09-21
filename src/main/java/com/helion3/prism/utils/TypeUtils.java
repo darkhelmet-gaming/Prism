@@ -61,6 +61,12 @@ public class TypeUtils {
             case "break":
                 verb = "broke";
                 break;
+            case "decay":
+                verb = "decayed";
+                break;
+            case "grow":
+                verb = "grew";
+                break;
             case "place":
                 verb = "placed";
                 break;

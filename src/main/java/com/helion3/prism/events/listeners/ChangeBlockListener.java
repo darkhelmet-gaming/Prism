@@ -24,18 +24,21 @@
 package com.helion3.prism.events.listeners;
 
 import org.spongepowered.api.block.BlockTransaction;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.BreakBlockEvent;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.block.DecayBlockEvent;
+import org.spongepowered.api.event.block.GrowBlockEvent;
 import org.spongepowered.api.event.block.PlaceBlockEvent;
 
-import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.records.PrismRecord;
 
 public class ChangeBlockListener {
+    // @todo move these to ignore
     private final boolean hearBreak = Prism.getConfig().getNode("events", "block", "break").getBoolean();
+    private final boolean hearDecay = Prism.getConfig().getNode("events", "block", "decay").getBoolean();
+    private final boolean hearGrow = Prism.getConfig().getNode("events", "block", "grow").getBoolean();
     private final boolean hearPlace = Prism.getConfig().getNode("events", "block", "place").getBoolean();
 
     /**
@@ -45,17 +48,8 @@ public class ChangeBlockListener {
      */
     @Listener
     public void onChangeBlock(final ChangeBlockEvent event) {
-        Optional<Player> player = event.getCause().first(Player.class);
-
         for (BlockTransaction transaction : event.getTransactions()) {
-            PrismRecord record = new PrismRecord();
-
-            // Player-caused
-            if (player.isPresent()) {
-                record.player(player.get());
-            } else {
-                // @todo handle this
-            }
+            PrismRecord record = new PrismRecord().causedBy(event.getCause());
 
             if (event instanceof BreakBlockEvent) {
                 if (hearBreak) {
@@ -65,6 +59,16 @@ public class ChangeBlockListener {
             else if (event instanceof PlaceBlockEvent && hearPlace) {
                 if (hearPlace) {
                     record.placedBlock(transaction);
+                }
+            }
+            else if (event instanceof DecayBlockEvent) {
+                if (hearDecay) {
+                    record.decayedBlock(transaction);
+                }
+            }
+            else if (event instanceof GrowBlockEvent) {
+                if (hearGrow) {
+                    record.grewBlock(transaction);
                 }
             }
 

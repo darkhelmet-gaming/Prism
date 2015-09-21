@@ -222,6 +222,8 @@ final public class Prism {
      */
     private void registerEventResultRecords() {
         registerResultRecord("block-break", BlockChangeResultRecord.class);
+        registerResultRecord("block-decay", BlockChangeResultRecord.class);
+        registerResultRecord("block-grow", BlockChangeResultRecord.class);
         registerResultRecord("block-place", BlockChangeResultRecord.class);
     }
 

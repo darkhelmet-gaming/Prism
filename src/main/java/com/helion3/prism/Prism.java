@@ -52,8 +52,7 @@ import com.helion3.prism.api.results.BlockChangeResultRecord;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
-import com.helion3.prism.events.listeners.BlockBreakListener;
-import com.helion3.prism.events.listeners.BlockPlaceListener;
+import com.helion3.prism.events.listeners.ChangeBlockListener;
 import com.helion3.prism.events.listeners.PlayerJoinListener;
 import com.helion3.prism.events.listeners.PlayerQuitListener;
 import com.helion3.prism.events.listeners.RequiredPlayerJoinListener;
@@ -253,13 +252,7 @@ final public class Prism {
      */
     private void registerSpongeEventListeners(EventManager eventManager) {
         // Block events
-        if (config.getNode("events", "block", "break").getBoolean()) {
-            eventManager.registerListeners(this, new BlockBreakListener());
-        }
-
-        if (config.getNode("events", "block", "place").getBoolean()) {
-            eventManager.registerListeners(this, new BlockPlaceListener());
-        }
+        eventManager.registerListeners(this, new ChangeBlockListener());
 
         // Player events
         if (config.getNode("events", "player", "join").getBoolean()) {

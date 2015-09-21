@@ -159,6 +159,15 @@ public class PrismRecord {
     }
 
     /**
+     * Returns whether or not this record is valid and ready to be saved.
+     *
+     * @return Boolean
+     */
+    public boolean isValid() {
+        return (source == null && eventName == null);
+    }
+
+    /**
      * Build the final event record and send it to the queue.
      */
     public void save(){

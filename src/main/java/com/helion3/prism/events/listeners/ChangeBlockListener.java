@@ -26,26 +26,50 @@ package com.helion3.prism.events.listeners;
 import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.BreakBlockEvent;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.PlaceBlockEvent;
 
 import com.google.common.base.Optional;
+import com.helion3.prism.Prism;
 import com.helion3.prism.api.records.PrismRecord;
 
-public class BlockPlaceListener {
+public class ChangeBlockListener {
+    private final boolean hearBreak = Prism.getConfig().getNode("events", "block", "break").getBoolean();
+    private final boolean hearPlace = Prism.getConfig().getNode("events", "block", "place").getBoolean();
 
     /**
-     * Listens for block break events.
+     * Listens to the base change block event.
      *
      * @param event
      */
     @Listener
-    public void onPlaceBlock(PlaceBlockEvent event) {
-        // Player-caused
+    public void onChangeBlock(final ChangeBlockEvent event) {
         Optional<Player> player = event.getCause().first(Player.class);
-        if (player.isPresent()) {
-            for (BlockTransaction transaction : event.getTransactions()) {
-                // Save
-                new PrismRecord().player(player.get()).placedBlock(transaction).save();
+
+        for (BlockTransaction transaction : event.getTransactions()) {
+            PrismRecord record = new PrismRecord();
+
+            // Player-caused
+            if (player.isPresent()) {
+                record.player(player.get());
+            } else {
+                // @todo handle this
+            }
+
+            if (event instanceof BreakBlockEvent) {
+                if (hearBreak) {
+                    record.brokeBlock(transaction);
+                }
+            }
+            else if (event instanceof PlaceBlockEvent && hearPlace) {
+                if (hearPlace) {
+                    record.placedBlock(transaction);
+                }
+            }
+
+            if (record.isValid()) {
+                record.save();
             }
         }
     }

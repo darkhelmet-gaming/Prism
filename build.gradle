@@ -5,6 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.2'
     }
 }
 
@@ -15,6 +16,7 @@ apply plugin: 'checkstyle'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 // Default tasks
 defaultTasks 'licenseFormat', 'check', 'build'
@@ -48,6 +50,12 @@ repositories {
 dependencies {
     compile 'org.spongepowered:spongeapi:2.1-SNAPSHOT'
     compile 'org.mongodb:mongo-java-driver:3.1.0-SNAPSHOT'
+}
+
+shadowJar {
+  dependencies {
+    include(dependency('org.mongodb:.*'))
+  }
 }
 
 // Filter, process, and include resources

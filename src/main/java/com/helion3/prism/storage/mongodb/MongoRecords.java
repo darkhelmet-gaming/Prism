@@ -94,8 +94,8 @@ public class MongoRecords implements StorageAdapterRecords {
                     document.append(key, documentFromView(subView));
                 }
                 else {
-                    if (key.equals("player")) {
-                        document.append("player", new DBRef(MongoStorageAdapter.collectionPlayersName, optional.get()));
+                    if (key.equals(DataQueries.Player.toString())) {
+                        document.append(DataQueries.Player.toString(), new DBRef(MongoStorageAdapter.collectionPlayersName, optional.get()));
                     } else {
                         document.append(key, optional.get());
                     }
@@ -210,9 +210,9 @@ public class MongoRecords implements StorageAdapterRecords {
        // Sorting
        Document sortFields = new Document();
        sortFields.put(DataQueries.Created.toString(), sortDir);
-       sortFields.put(DataQueries.x.toString(), 1);
-       sortFields.put(DataQueries.z.toString(), 1);
-       sortFields.put(DataQueries.y.toString(), 1);
+       sortFields.put(DataQueries.X.toString(), 1);
+       sortFields.put(DataQueries.Z.toString(), 1);
+       sortFields.put(DataQueries.Y.toString(), 1);
        Document sorter = new Document("$sort", sortFields);
 
        // Offset/Limit

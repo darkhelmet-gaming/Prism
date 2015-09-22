@@ -58,9 +58,9 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
 
         DataView location = (MemoryDataView) optionalLocation.get();
         DataView position = new MemoryDataContainer();
-        position.set(DataQueries.X, location.get(DataQueries.x).get());
-        position.set(DataQueries.Y, location.get(DataQueries.y).get());
-        position.set(DataQueries.Z, location.get(DataQueries.z).get());
+        position.set(DataQueries.X, location.get(DataQueries.X).get());
+        position.set(DataQueries.Y, location.get(DataQueries.Y).get());
+        position.set(DataQueries.Z, location.get(DataQueries.Z).get());
         restoration.set(DataQueries.Position, position);
         restoration.set(DataQueries.WorldUuid, location.get(DataQueries.WorldUuid).get());
 
@@ -71,24 +71,25 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
             restoration.set(DataQueries.ExtraData, Lists.newArrayList());
         }
 
-        DataView blockState = (DataView) restoration.get(DataQueries.BlockState).get();
+//        DataView blockState = (DataView) restoration.get(DataQueries.BlockState).get();
 
         // Provide empty Data List
         // @todo hopefully sponge can help me avoid this line
-        if (!blockState.get(DataQueries.Data).isPresent()) {
-            blockState.set(DataQueries.Data, Lists.newArrayList());
-            restoration.set(DataQueries.BlockState, blockState);
+        if (!restoration.get(DataQueries.Data).isPresent()) {
+            restoration.set(DataQueries.Data, Lists.newArrayList());
         }
 
         // Unsafe data includes coordinates
         Optional<Object> optionalUnsafeData = restoration.get(DataQueries.UnsafeData);
         if (optionalUnsafeData.isPresent()) {
             DataView unsafeData = (DataView) optionalUnsafeData.get();
-            unsafeData.set(DataQueries.x, location.get(DataQueries.x).get());
-            unsafeData.set(DataQueries.y, location.get(DataQueries.y).get());
-            unsafeData.set(DataQueries.z, location.get(DataQueries.z).get());
+            unsafeData.set(DataQueries.X, location.get(DataQueries.X).get());
+            unsafeData.set(DataQueries.Y, location.get(DataQueries.Y).get());
+            unsafeData.set(DataQueries.Z, location.get(DataQueries.Z).get());
             restoration.set(DataQueries.UnsafeData, unsafeData);
         }
+
+        System.out.println(DataUtils.jsonFromDataView(restoration));
 
         // DataContainer -> BlockSnapshot
         Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBlockSnapshotBuilder().build(restoration);
@@ -100,8 +101,6 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
         if (!optionalSnapshot.get().restore(true, true)) {
             // @todo error/skip
         }
-
-        System.out.println(DataUtils.jsonFromDataView(restoration));
 
         return new ActionableResult();
     }

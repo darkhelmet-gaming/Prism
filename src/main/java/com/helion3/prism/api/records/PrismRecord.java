@@ -238,9 +238,9 @@ public class PrismRecord {
         Optional<Object> optionalUnsafeData = block.get(DataQueries.UnsafeData);
         if (optionalUnsafeData.isPresent()) {
             DataView unsafeData = (DataView) optionalUnsafeData.get();
-            unsafeData.remove(DataQueries.x);
-            unsafeData.remove(DataQueries.y);
-            unsafeData.remove(DataQueries.z);
+            unsafeData.remove(DataQueries.X);
+            unsafeData.remove(DataQueries.Y);
+            unsafeData.remove(DataQueries.Z);
             block.set(DataQueries.UnsafeData, unsafeData);
         }
 

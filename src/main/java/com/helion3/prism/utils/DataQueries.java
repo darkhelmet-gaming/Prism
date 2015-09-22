@@ -47,12 +47,7 @@ public class DataQueries {
     public static final DataQuery UnsafeData = of("UnsafeData");
     public static final DataQuery WorldName = of("WorldName");
     public static final DataQuery WorldUuid = of("WorldUuid");
-
-    // @todo awaiting sponge fix...
     public static final DataQuery X = of("X");
-    public static final DataQuery x = of("x");
     public static final DataQuery Y = of("Y");
-    public static final DataQuery y = of("y");
     public static final DataQuery Z = of("Z");
-    public static final DataQuery z = of("z");
 }

@@ -22,9 +22,9 @@ public class Conditions {
         String fieldPath = DataQueries.Location.toString() + ".";
 
         conditions.add(new Condition(fieldPath + DataQueries.WorldUuid.toString(), MatchRule.INCLUDES, location.getExtent().getUniqueId().toString()));
-        conditions.add(Condition.of(fieldPath + DataQueries.x, MatchRule.EQUALS, location.getBlockX()));
-        conditions.add(Condition.of(fieldPath + DataQueries.y, MatchRule.EQUALS, location.getBlockY()));
-        conditions.add(Condition.of(fieldPath + DataQueries.z, MatchRule.EQUALS, location.getBlockZ()));
+        conditions.add(Condition.of(fieldPath + DataQueries.X, MatchRule.EQUALS, location.getBlockX()));
+        conditions.add(Condition.of(fieldPath + DataQueries.Y, MatchRule.EQUALS, location.getBlockY()));
+        conditions.add(Condition.of(fieldPath + DataQueries.Z, MatchRule.EQUALS, location.getBlockZ()));
 
         return conditions;
     }
@@ -45,15 +45,15 @@ public class Conditions {
 
         // X
         Range<Integer> xRange = Range.open(location.getBlockX() - radius, location.getBlockX() + radius);
-        conditions.add(Condition.of(fieldPath + DataQueries.x, xRange));
+        conditions.add(Condition.of(fieldPath + DataQueries.X, xRange));
 
         // Y
         Range<Integer> yRange = Range.open(location.getBlockY() - radius, location.getBlockY() + radius);
-        conditions.add(Condition.of(fieldPath + DataQueries.y, yRange));
+        conditions.add(Condition.of(fieldPath + DataQueries.Y, yRange));
 
         // Z
         Range<Integer> zRange = Range.open(location.getBlockZ() - radius, location.getBlockZ() + radius);
-        conditions.add(Condition.of(fieldPath + DataQueries.z, zRange));
+        conditions.add(Condition.of(fieldPath + DataQueries.Z, zRange));
 
         return conditions;
     }

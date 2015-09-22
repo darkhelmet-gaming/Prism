@@ -179,6 +179,10 @@ public class MongoRecords implements StorageAdapterRecords {
                conditions.append(condition.getFieldName(), new Document(matchRule, value));
            }
 
+           else if (condition.getMatchRule().equals(MatchRule.EQUALS)) {
+               conditions.append(condition.getFieldName(), value);
+           }
+
            else if (condition.getMatchRule().equals(MatchRule.GREATER_THAN_EQUAL)) {
                conditions.append(condition.getFieldName(), new Document("$gte", value));
            }

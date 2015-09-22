@@ -29,7 +29,6 @@ import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.MemoryDataView;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 import com.helion3.prism.Prism;
 import com.helion3.prism.utils.DataQueries;
 import com.helion3.prism.utils.DataUtils;
@@ -64,21 +63,6 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
         restoration.set(DataQueries.Position, position);
         restoration.set(DataQueries.WorldUuid, location.get(DataQueries.WorldUuid).get());
 
-        // Provide empty ExtraData List
-        // @todo hopefully sponge can help me avoid this line
-        Optional<Object> extra = restoration.get(DataQueries.ExtraData);
-        if (!extra.isPresent()) {
-            restoration.set(DataQueries.ExtraData, Lists.newArrayList());
-        }
-
-//        DataView blockState = (DataView) restoration.get(DataQueries.BlockState).get();
-
-        // Provide empty Data List
-        // @todo hopefully sponge can help me avoid this line
-        if (!restoration.get(DataQueries.Data).isPresent()) {
-            restoration.set(DataQueries.Data, Lists.newArrayList());
-        }
-
         // Unsafe data includes coordinates
         Optional<Object> optionalUnsafeData = restoration.get(DataQueries.UnsafeData);
         if (optionalUnsafeData.isPresent()) {
@@ -89,7 +73,7 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
             restoration.set(DataQueries.UnsafeData, unsafeData);
         }
 
-        System.out.println(DataUtils.jsonFromDataView(restoration));
+        Prism.getLogger().debug(DataUtils.jsonFromDataView(restoration).toString());
 
         // DataContainer -> BlockSnapshot
         Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBlockSnapshotBuilder().build(restoration);

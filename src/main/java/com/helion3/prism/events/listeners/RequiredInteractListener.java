@@ -29,7 +29,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.InteractEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.event.block.InteractBlockEvent.Primary;
+import org.spongepowered.api.event.block.InteractBlockEvent.Secondary;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -70,8 +70,8 @@ public class RequiredInteractListener {
                 // Location of block
                 Location<World> location = blockEvent.getTargetBlock().getLocation().get();
 
-                // Primary click gets location relative to side clicked
-                if (event instanceof Primary) {
+                // Secondary click gets location relative to side clicked
+                if (event instanceof Secondary) {
                     location = location.getRelative(blockEvent.getTargetSide());
                 }
 

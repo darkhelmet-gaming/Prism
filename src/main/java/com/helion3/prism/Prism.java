@@ -36,6 +36,7 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
@@ -53,6 +54,7 @@ import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.events.listeners.ChangeBlockListener;
+import com.helion3.prism.events.listeners.RequiredInteractListener;
 import com.helion3.prism.events.listeners.JoinListener;
 import com.helion3.prism.events.listeners.QuitListener;
 import com.helion3.prism.events.listeners.RequiredJoinListener;
@@ -68,6 +70,7 @@ import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
  */
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
 final public class Prism {
+    private static List<Player> activeWands = new ArrayList<Player>();
     private static Configuration config;
     private static Game game;
     private static List<ParameterHandler> handlers = new ArrayList<ParameterHandler>();
@@ -134,6 +137,15 @@ final public class Prism {
         checkNotNull(handler);
         // @todo validate alias doesn't exist
         handlers.add(handler);
+    }
+
+    /**
+     * Returns a list of players who have active inspection wands.
+     *
+     * @return List of Players.
+     */
+    public static List<Player> getActiveWands() {
+        return activeWands;
     }
 
     /**
@@ -266,5 +278,6 @@ final public class Prism {
 
         // Events required for internal operation
         eventManager.registerListeners(this, new RequiredJoinListener());
+        eventManager.registerListeners(this, new RequiredInteractListener());
     }
 }

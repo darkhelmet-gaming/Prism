@@ -112,12 +112,21 @@ final public class Query {
     }
 
     /**
+     * Add a condition.
      *
-     * @param query
-     * @param condition
+     * @param condition Condition
      */
     public void addCondition(Condition condition) {
         conditions.add(condition);
+    }
+
+    /**
+     * Add a list of conditions.
+     *
+     * @param conditions List of conditions.
+     */
+    public void addConditions(List<Condition> conditions) {
+        this.conditions.addAll(conditions);
     }
 
     /**

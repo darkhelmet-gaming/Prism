@@ -34,12 +34,9 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Range;
-import com.helion3.prism.api.query.Condition;
-import com.helion3.prism.api.query.MatchRule;
+import com.helion3.prism.api.query.Conditions;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.utils.DataQueries;
 
 public class ParameterRadius extends SimpleParameterHandler {
     private final Pattern pattern = Pattern.compile("[\\w,:-]+");
@@ -65,28 +62,9 @@ public class ParameterRadius extends SimpleParameterHandler {
 
     @Override
     public void process(QuerySession session, String parameter, String value, Query query) {
-        // @todo error on NumberFormatException
-        int radius = Integer.parseInt(value);
-
         if (session.getCommandSource().get() instanceof Player) {
             Location<World> location = ((Player) session.getCommandSource().get()).getLocation();
-
-            String fieldPath = DataQueries.Location.toString() + ".";
-
-            // World
-            query.addCondition(new Condition(fieldPath + DataQueries.WorldUuid.toString(), MatchRule.INCLUDES, location.getExtent().getUniqueId().toString()));
-
-            // X
-            Range<Integer> xRange = Range.open(location.getBlockX() - radius, location.getBlockX() + radius);
-            query.addCondition(Condition.of(fieldPath + DataQueries.x, xRange));
-
-            // Y
-            Range<Integer> yRange = Range.open(location.getBlockY() - radius, location.getBlockY() + radius);
-            query.addCondition(Condition.of(fieldPath + DataQueries.y, yRange));
-
-            // Z
-            Range<Integer> zRange = Range.open(location.getBlockZ() - radius, location.getBlockZ() + radius);
-            query.addCondition(Condition.of(fieldPath + DataQueries.z, zRange));
+            query.addConditions(Conditions.from(location, Integer.parseInt(value)));
         }
     }
 }

@@ -35,7 +35,6 @@ import org.spongepowered.api.util.command.CommandSource;
 
 import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.results.ResultRecordAggregate;
@@ -47,10 +46,7 @@ public class LookupCommand implements CommandCallable {
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
         // Create a new query session
         final QuerySession session = new QuerySession(source);
-
-        // Build a query from the arguments
-        final Query query = Query.fromParameters(session, arguments);
-        session.setQuery(query);
+        session.newQueryFromParameters(arguments);
 
         // Query the database asynchronously
         Prism.getGame().getScheduler().createTaskBuilder().async().execute(new Runnable(){

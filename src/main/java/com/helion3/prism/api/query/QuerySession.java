@@ -56,6 +56,20 @@ public class QuerySession {
     }
 
     /**
+     * Constructs a new query session with a known command source.
+     *
+     * Queries may behave differently based on a user - for example a Player
+     * may lookup a radius but a console command or API call has no location.
+     *
+     * @param commandSource CommandSource this session belongs to.
+     * @param parameters String parameters.
+     */
+    public QuerySession(CommandSource commandSource, String parameters) {
+        this.commandSource = commandSource;
+        newQueryFromParameters(parameters);
+    }
+
+    /**
      * Returns the command source this session belongs to, if any.
      *
      * @return CommandSource
@@ -71,6 +85,17 @@ public class QuerySession {
      */
     public Optional<Query> getQuery(){
         return Optional.of(query);
+    }
+
+    /**
+     * Create a new Query from the given parameters.
+     *
+     * @param parameters String parameters
+     * @return Query
+     */
+    public Query newQueryFromParameters(String parameters) {
+        this.query = Query.fromParameters(this, parameters);
+        return query;
     }
 
     /**

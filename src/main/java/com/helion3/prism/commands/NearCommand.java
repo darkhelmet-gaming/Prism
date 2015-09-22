@@ -35,22 +35,18 @@ import org.spongepowered.api.util.command.CommandSource;
 
 import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.results.ResultRecordAggregate;
 import com.helion3.prism.utils.DataQueries;
 import com.helion3.prism.utils.Format;
 
-public class LookupCommand implements CommandCallable {
+public class NearCommand implements CommandCallable {
     @Override
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
         // Create a new query session
-        final QuerySession session = new QuerySession(source);
-
-        // Build a query from the arguments
-        final Query query = Query.fromParameters(session, arguments);
-        session.setQuery(query);
+        // @todo config this default
+        final QuerySession session = new QuerySession(source, "r:5");
 
         // Query the database asynchronously
         Prism.getGame().getScheduler().createTaskBuilder().async().execute(new Runnable(){
@@ -102,16 +98,17 @@ public class LookupCommand implements CommandCallable {
 
     @Override
     public Optional<Text> getShortDescription(CommandSource source) {
-        return Optional.of(Texts.of("Search event records."));
+        return Optional.of(Texts.of("Search nearby events."));
     }
 
     @Override
     public Optional<Text> getHelp(CommandSource source) {
-        return Optional.of(Texts.of("See /pr ? for help with search parameters."));
+        return Optional.of(Texts.of("Alias of /pr l r:(default radius)"));
     }
 
     @Override
     public Text getUsage(CommandSource source) {
-        return Texts.of("/pr l (parameters)");
+        return Texts.of("/pr near");
     }
 }
+

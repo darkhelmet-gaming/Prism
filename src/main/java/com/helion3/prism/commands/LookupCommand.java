@@ -27,19 +27,14 @@ import java.util.List;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.command.CommandCallable;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
 
 import com.google.common.base.Optional;
-import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.results.ResultRecord;
-import com.helion3.prism.api.results.ResultRecordAggregate;
-import com.helion3.prism.utils.DataQueries;
-import com.helion3.prism.utils.Format;
+import com.helion3.prism.utils.AsyncUtils;
 
 public class LookupCommand implements CommandCallable {
     @Override
@@ -48,39 +43,8 @@ public class LookupCommand implements CommandCallable {
         final QuerySession session = new QuerySession(source);
         session.newQueryFromParameters(arguments);
 
-        // Query the database asynchronously
-        Prism.getGame().getScheduler().createTaskBuilder().async().execute(new Runnable(){
-            @Override
-            public void run(){
-                try {
-                    // Iterate query results
-                    List<ResultRecord> results = Prism.getStorageAdapter().records().query(session);
-                    if (results.isEmpty()) {
-                        // @todo move to language files
-                        source.sendMessage(Format.error(Texts.of("Nothing found. See /pr ? for help.")));
-                    } else {
-                        for (ResultRecord result : results) {
-                            // Aggregate data
-                            int count = 1;
-                            if (result instanceof ResultRecordAggregate) {
-                                count = result.data.getInt(DataQueries.Count).get();
-                            }
-
-                            source.sendMessage(Texts.of(
-                                TextColors.DARK_AQUA, result.getSourceName(), " ",
-                                TextColors.WHITE, result.getEventVerb(), " ",
-                                TextColors.DARK_AQUA, result.getTargetName(), " ",
-                                (count > 1 ? "x" + count : ""),
-                                TextColors.WHITE, result.getRelativeTime()
-                            ));
-                        }
-                    }
-                } catch (Exception e) {
-                    // @todo handle
-                    e.printStackTrace();
-                }
-            }
-        }).submit(Prism.getPlugin());
+        // Pass off to an async lookup helper
+        AsyncUtils.lookup(session);
 
         return CommandResult.success();
     }

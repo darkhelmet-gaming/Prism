@@ -24,12 +24,14 @@
 package com.helion3.prism.events.listeners;
 
 import org.spongepowered.api.block.BlockTransaction;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.BreakBlockEvent;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.DecayBlockEvent;
 import org.spongepowered.api.event.block.GrowBlockEvent;
 import org.spongepowered.api.event.block.PlaceBlockEvent;
+import org.spongepowered.api.event.world.ExplosionEvent.Detonate;
 
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.records.PrismRecord;
@@ -51,12 +53,13 @@ public class ChangeBlockListener {
         for (BlockTransaction transaction : event.getTransactions()) {
             PrismRecord record = new PrismRecord().causedBy(event.getCause());
 
-            if (event instanceof BreakBlockEvent) {
-                if (hearBreak) {
+            if (event instanceof BreakBlockEvent || event instanceof Detonate) {
+                // Air blocks are listed from Detonate events
+                if (hearBreak && !transaction.getOriginal().getState().getType().equals(BlockTypes.AIR)) {
                     record.brokeBlock(transaction);
                 }
             }
-            else if (event instanceof PlaceBlockEvent && hearPlace) {
+            else if (event instanceof PlaceBlockEvent) {
                 if (hearPlace) {
                     record.placedBlock(transaction);
                 }

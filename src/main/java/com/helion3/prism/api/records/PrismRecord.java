@@ -66,6 +66,11 @@ public class PrismRecord {
      * @return PrismRecord
      */
     public PrismRecord causedBy(Cause cause) {
+        // @todo debug
+        for (Object obj : cause.all()) {
+            Prism.getLogger().debug("Cause: " + obj.getClass().getName());
+        }
+
         // Player?
         Optional<Player> player = cause.first(Player.class);
         if (player.isPresent()) {

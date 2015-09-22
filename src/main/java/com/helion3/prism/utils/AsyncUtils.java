@@ -45,23 +45,47 @@ public class AsyncUtils {
             // @todo handle this. would be best with a callback system
         }
 
+        async(session, new AsyncCallback() {
+            @Override
+            public void success(List<ResultRecord> results) {
+                for (ResultRecord result : results) {
+                    session.getCommandSource().get().sendMessage(Messages.from(result));
+                }
+            }
+
+            @Override
+            public void empty() {
+                // @todo move to language files
+                session.getCommandSource().get().sendMessage(Format.error(Texts.of("Nothing found. See /pr ? for help.")));
+            }
+
+            @Override
+            public void error(Exception e) {
+                // @todo move to language files
+                session.getCommandSource().get().sendMessage(Format.error(Texts.of("An error occurred. Please see the console.")));
+            }
+        });
+    }
+
+    /**
+     * Internal helper for executing database queries asynchronously.
+     *
+     * @param session QuerySession
+     * @param callback AsyncCallback describing the success, empty, and error callbacks.
+     */
+    private static void async(final QuerySession session, AsyncCallback callback) {
         Prism.getGame().getScheduler().createTaskBuilder().async().execute(new Runnable(){
             @Override
             public void run(){
                 try {
-                    // Iterate query results
                     List<ResultRecord> results = Prism.getStorageAdapter().records().query(session);
                     if (results.isEmpty()) {
-                        // @todo move to language files
-                        session.getCommandSource().get().sendMessage(Format.error(Texts.of("Nothing found. See /pr ? for help.")));
+                        callback.empty();
                     } else {
-                        for (ResultRecord result : results) {
-                            session.getCommandSource().get().sendMessage(Messages.from(result));
-                        }
+                        callback.success(results);
                     }
                 } catch (Exception e) {
-                    // @todo move to language files
-                    session.getCommandSource().get().sendMessage(Format.error(Texts.of("An error occurred. Please see the console.")));
+                    callback.error(e);
                     e.printStackTrace();
                 }
             }

@@ -23,9 +23,9 @@
  */
 package com.helion3.prism.api.query;
 
-import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.command.CommandSource;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 /**
  * Represents a record query session, which includes the actual

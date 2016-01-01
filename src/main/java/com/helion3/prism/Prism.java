@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -37,13 +38,12 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.service.config.DefaultConfig;
-import org.spongepowered.api.service.event.EventManager;
+import org.spongepowered.api.config.DefaultConfig;
 
-import com.google.common.base.Optional;
 import com.google.inject.Inject;
 import com.helion3.prism.api.parameters.ParameterEventName;
 import com.helion3.prism.api.parameters.ParameterHandler;
@@ -54,6 +54,7 @@ import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.events.listeners.ChangeBlockListener;
+import com.helion3.prism.events.listeners.DeathListener;
 import com.helion3.prism.events.listeners.RequiredInteractListener;
 import com.helion3.prism.events.listeners.JoinListener;
 import com.helion3.prism.events.listeners.QuitListener;
@@ -87,6 +88,11 @@ final public class Prism {
     @DefaultConfig(sharedRoot = false)
     private ConfigurationLoader<CommentedConfigurationNode> configManager;
 
+    @Inject
+    public void setGame(Game injectGame) {
+        game = injectGame;
+    }
+
     /**
      * Performs bootstrapping of Prism resources/objects.
      *
@@ -95,9 +101,6 @@ final public class Prism {
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
         plugin = this;
-
-        // Game reference
-        game = event.getGame();
 
         // Load configuration file
         config = new Configuration(defaultConfig, configManager);
@@ -124,7 +127,7 @@ final public class Prism {
         new RecordingQueueManager().start();
 
         // Commands
-        game.getCommandDispatcher().register(this, PrismCommands.getCommand(), "prism", "pr");
+        game.getCommandManager().register(this, PrismCommands.getCommand(), "prism", "pr");
 
         logger.info("Prism started successfully. Bad guys beware.");
     }
@@ -168,7 +171,8 @@ final public class Prism {
                 result = handler;
             }
         }
-        return Optional.fromNullable(result);
+
+        return Optional.of(result);
     }
 
     /**
@@ -268,10 +272,16 @@ final public class Prism {
         // Block events
         eventManager.registerListeners(this, new ChangeBlockListener());
 
+        // Entity events
+        if (config.getNode("events", "entity", "death").getBoolean()) {
+            eventManager.registerListeners(this, new DeathListener());
+        }
+
         // Player events
         if (config.getNode("events", "player", "join").getBoolean()) {
             eventManager.registerListeners(this, new JoinListener());
         }
+
         if (config.getNode("events", "player", "quit").getBoolean()) {
             eventManager.registerListeners(this, new QuitListener());
         }

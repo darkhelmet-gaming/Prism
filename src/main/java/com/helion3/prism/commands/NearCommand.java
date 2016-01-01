@@ -24,16 +24,15 @@
 package com.helion3.prism.commands;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandCallable;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.command.CommandCallable;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
 
-import com.google.common.base.Optional;
 import com.helion3.prism.api.query.Conditions;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.utils.AsyncUtils;
@@ -65,17 +64,17 @@ public class NearCommand implements CommandCallable {
 
     @Override
     public Optional<Text> getShortDescription(CommandSource source) {
-        return Optional.of(Texts.of("Search nearby events."));
+        return Optional.of(Text.of("Search nearby events."));
     }
 
     @Override
     public Optional<Text> getHelp(CommandSource source) {
-        return Optional.of(Texts.of("Alias of /pr l r:(default radius)"));
+        return Optional.of(Text.of("Alias of /pr l r:(default radius)"));
     }
 
     @Override
     public Text getUsage(CommandSource source) {
-        return Texts.of("/pr near");
+        return Text.of("/pr near");
     }
 }
 

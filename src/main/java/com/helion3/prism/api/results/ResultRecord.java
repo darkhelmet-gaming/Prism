@@ -23,9 +23,10 @@
  */
 package com.helion3.prism.api.results;
 
+import java.util.Optional;
+
 import org.spongepowered.api.data.DataContainer;
 
-import com.google.common.base.Optional;
 import com.helion3.prism.utils.DataQueries;
 import com.helion3.prism.utils.TypeUtils;
 
@@ -95,13 +96,12 @@ abstract public class ResultRecord {
      * @return String target name.
      */
     public String getTargetName() {
-        String value = "unknown";
+        String value = "";
 
         String eventName = data.getString(DataQueries.EventName).get();
 
         // @todo probably should be used differently. Like ResultRecord<Block> or something.
         if (eventName.contains("block")) {
-
             Optional<String> optionalBlockType = data.getString(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
             if (optionalBlockType.isPresent()) {
                 value = optionalBlockType.get();

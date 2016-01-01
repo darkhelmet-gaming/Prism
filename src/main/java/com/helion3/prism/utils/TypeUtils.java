@@ -53,6 +53,7 @@ public class TypeUtils {
      *
      * @param word String event name group.
      * @return String past-tense verb.
+     * @todo move this to lang file
      */
     public static String translateToPastTense(String word) {
         String verb;
@@ -66,6 +67,9 @@ public class TypeUtils {
                 break;
             case "grow":
                 verb = "grew";
+                break;
+            case "join":
+                verb = "joined";
                 break;
             case "place":
                 verb = "placed";

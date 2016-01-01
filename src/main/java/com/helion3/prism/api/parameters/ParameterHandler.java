@@ -25,7 +25,7 @@ package com.helion3.prism.api.parameters;
 
 import javax.annotation.Nullable;
 
-import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.command.CommandSource;
 
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;

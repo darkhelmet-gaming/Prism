@@ -23,12 +23,15 @@
  */
 package com.helion3.prism.api.results;
 
+import java.util.Optional;
+
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.MemoryDataView;
+import org.spongepowered.api.block.BlockState.Builder;
 
-import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
 import com.helion3.prism.utils.DataQueries;
 import com.helion3.prism.utils.DataUtils;
@@ -75,14 +78,13 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
 
         Prism.getLogger().debug(DataUtils.jsonFromDataView(restoration).toString());
 
-        // DataContainer -> BlockSnapshot
-        Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBlockSnapshotBuilder().build(restoration);
-        if (!optionalSnapshot.isPresent()) {
+        Optional<BlockState> optionalState = Prism.getGame().getRegistry().createBuilder(Builder.class).build(restoration);
+        if (!optionalState.isPresent()) {
             // @todo error/skip
         }
 
         // Actually restore!
-        if (!optionalSnapshot.get().restore(true, true)) {
+        if (!optionalState.get().restore(true, true)) {
             // @todo error/skip
         }
 

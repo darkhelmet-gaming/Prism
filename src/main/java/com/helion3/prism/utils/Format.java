@@ -26,7 +26,6 @@ package com.helion3.prism.utils;
 import static com.google.common.base.Preconditions.*;
 
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 
 public class Format {
@@ -41,7 +40,7 @@ public class Format {
      * @return Text Formatted content.
      */
     public static Text error(Object...objects) {
-        return error(Texts.of(objects));
+        return error(Text.of(objects));
     }
 
     /**
@@ -51,7 +50,7 @@ public class Format {
      */
     public static Text error(Text content) {
         checkNotNull(content);
-        return Texts.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.RED, content);
+        return Text.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.RED, content);
     }
 
     /**
@@ -60,7 +59,7 @@ public class Format {
      * @return Text Formatted content.
      */
     public static Text heading(Object...objects) {
-        return heading(Texts.of(objects));
+        return heading(Text.of(objects));
     }
 
     /**
@@ -70,7 +69,7 @@ public class Format {
      */
     public static Text heading(Text content) {
         checkNotNull(content);
-        return Texts.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.WHITE, content);
+        return Text.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.WHITE, content);
     }
 
     /**
@@ -79,7 +78,7 @@ public class Format {
      * @return Text Formatted content.
      */
     public static Text message(Object...objects) {
-        return message(Texts.of(objects));
+        return message(Text.of(objects));
     }
 
     /**
@@ -89,7 +88,7 @@ public class Format {
      */
     public static Text message(Text content) {
         checkNotNull(content);
-        return Texts.of(TextColors.WHITE, content);
+        return Text.of(TextColors.WHITE, content);
     }
 
     /**
@@ -98,7 +97,7 @@ public class Format {
      * @return Text Formatted content.
      */
     public static Text subduedHeading(Object...objects) {
-        return subduedHeading(Texts.of(objects));
+        return subduedHeading(Text.of(objects));
     }
 
     /**
@@ -108,7 +107,7 @@ public class Format {
      */
     public static Text subduedHeading(Text content) {
         checkNotNull(content);
-        return Texts.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.GRAY, content);
+        return Text.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.GRAY, content);
     }
 
     /**
@@ -117,7 +116,7 @@ public class Format {
      * @return Text Formatted content.
      */
     public static Text success(Object...objects) {
-        return success(Texts.of(objects));
+        return success(Text.of(objects));
     }
 
     /**
@@ -127,7 +126,7 @@ public class Format {
      */
     public static Text success(Text content) {
         checkNotNull(content);
-        return Texts.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.GREEN, content);
+        return Text.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.GREEN, content);
     }
 
     /**
@@ -136,7 +135,7 @@ public class Format {
      * @return Text Formatted content.
      */
     public static Text bonus(Object...objects) {
-        return bonus(Texts.of(objects));
+        return bonus(Text.of(objects));
     }
 
     /**
@@ -147,6 +146,6 @@ public class Format {
      */
     public static Text bonus(Text content) {
         checkNotNull(content);
-        return Texts.of(TextColors.GRAY, content);
+        return Text.of(TextColors.GRAY, content);
     }
 }

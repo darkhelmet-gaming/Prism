@@ -24,15 +24,14 @@
 package com.helion3.prism.commands;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandCallable;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.command.CommandCallable;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
 
-import com.google.common.base.Optional;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.utils.AsyncUtils;
 
@@ -62,16 +61,16 @@ public class LookupCommand implements CommandCallable {
 
     @Override
     public Optional<Text> getShortDescription(CommandSource source) {
-        return Optional.of(Texts.of("Search event records."));
+        return Optional.of(Text.of("Search event records."));
     }
 
     @Override
     public Optional<Text> getHelp(CommandSource source) {
-        return Optional.of(Texts.of("See /pr ? for help with search parameters."));
+        return Optional.of(Text.of("See /pr ? for help with search parameters."));
     }
 
     @Override
     public Text getUsage(CommandSource source) {
-        return Texts.of("/pr l (parameters)");
+        return Text.of("/pr l (parameters)");
     }
 }

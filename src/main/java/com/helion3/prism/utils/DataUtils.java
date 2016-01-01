@@ -25,12 +25,12 @@ package com.helion3.prism.utils;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 
-import com.google.common.base.Optional;
 import com.google.gson.JsonObject;
 import com.helion3.prism.Prism;
 

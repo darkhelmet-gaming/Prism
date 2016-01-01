@@ -94,6 +94,11 @@ public class Configuration {
                 eventBlockPlace.setValue(true);
             }
 
+            ConfigurationNode eventEntityDeath = rootNode.getNode("events", "entity", "death");
+            if (eventEntityDeath.isVirtual()) {
+                eventEntityDeath.setValue(true);
+            }
+
             ConfigurationNode eventPlayerJoin = rootNode.getNode("events", "player", "join");
             if (eventPlayerJoin.isVirtual()) {
                 eventPlayerJoin.setValue(false);

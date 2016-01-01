@@ -25,15 +25,15 @@ package com.helion3.prism.commands;
 
 import java.util.List;
 
-import org.spongepowered.api.util.command.CommandCallable;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
-import org.spongepowered.api.util.command.spec.CommandSpec;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.command.CommandCallable;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.args.CommandContext;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.args.CommandContext;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -51,7 +51,7 @@ public class PrismCommands {
                 .executor(new CommandExecutor() {
                     @Override
                     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-                        src.sendMessage(Texts.of(
+                        src.sendMessage(Text.of(
                             Format.heading(TextColors.GRAY, "By ", TextColors.GOLD, "viveleroi.\n"),
                             TextColors.DARK_AQUA, "Tracking so good the NSA stole our name.\n",
                             TextColors.GRAY, "Help: ", TextColors.WHITE, "/pr ?\n",

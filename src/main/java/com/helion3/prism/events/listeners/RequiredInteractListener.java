@@ -23,6 +23,8 @@
  */
 package com.helion3.prism.events.listeners;
 
+import java.util.Optional;
+
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.InteractEvent;
@@ -31,7 +33,6 @@ import org.spongepowered.api.event.block.InteractBlockEvent.Secondary;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Conditions;
 import com.helion3.prism.api.query.Query;

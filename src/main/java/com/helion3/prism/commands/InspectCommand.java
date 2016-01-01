@@ -24,16 +24,15 @@
 package com.helion3.prism.commands;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandCallable;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.command.CommandCallable;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
 
-import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
 import com.helion3.prism.utils.Format;
 
@@ -69,17 +68,17 @@ public class InspectCommand implements CommandCallable {
 
     @Override
     public Optional<Text> getShortDescription(CommandSource source) {
-        return Optional.of(Texts.of("Toggle inspection wand."));
+        return Optional.of(Text.of("Toggle inspection wand."));
     }
 
     @Override
     public Optional<Text> getHelp(CommandSource source) {
-        return Optional.of(Texts.of("Left or right-click a location to inspect it."));
+        return Optional.of(Text.of("Left or right-click a location to inspect it."));
     }
 
     @Override
     public Text getUsage(CommandSource source) {
-        return Texts.of("/pr i");
+        return Text.of("/pr i");
     }
 }
 

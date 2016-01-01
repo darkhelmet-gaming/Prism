@@ -21,42 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.utils;
+package com.helion3.prism.events.listeners;
 
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Text.Builder;
-import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.entity.DestructEntityEvent.Death;
 
-import com.helion3.prism.api.results.ResultRecord;
-import com.helion3.prism.api.results.ResultRecordAggregate;
+import com.helion3.prism.api.records.PrismRecord;
 
-public class Messages {
-    private Messages() {}
-
-    /**
-     * Generates Text output from a ResultRecord.
-     *
-     * @param result ResultRecord
-     * @return Text
-     */
-    public static Text from(ResultRecord result) {
-        Builder builder = Text.builder().append(Text.of(
-            TextColors.DARK_AQUA, result.getSourceName(), " ",
-            TextColors.WHITE, result.getEventVerb(), " "
-        ));
-
-        String target = result.getTargetName();
-        if (!target.isEmpty()) {
-            builder.append(Text.of(TextColors.DARK_AQUA, target, " "));
-        }
-
-        if (result instanceof ResultRecordAggregate) {
-            int count = result.data.getInt(DataQueries.Count).get();
-            builder.append(Text.of(TextColors.GREEN, "x" + count, " "));
-        }
-
-        builder.append(Text.of(TextColors.WHITE, result.getRelativeTime()));
-
-        return builder.build();
+public class DeathListener {
+    @Listener
+    public void onDeath(final Death event) {
+        new PrismRecord().entity(event.getTargetEntity()).died().causedBy(event.getCause()).save();
     }
 }

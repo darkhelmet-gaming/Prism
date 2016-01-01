@@ -36,6 +36,7 @@ public class DataQueries {
     public static final DataQuery Count = of("Count");
     public static final DataQuery Created = of("Created");
     public static final DataQuery Data = of("Data");
+    public static final DataQuery Entity = of("Entity");
     public static final DataQuery EventName = of("EventName");
     public static final DataQuery ExtraData = of("ExtraData");
     public static final DataQuery id = of("Id");

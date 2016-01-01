@@ -24,20 +24,20 @@
 package com.helion3.prism.api.records;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.World;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
 import com.helion3.prism.queues.RecordingQueue;
 import com.helion3.prism.utils.DataQueries;
@@ -83,6 +83,11 @@ public class PrismRecord {
             this.cause = world.get();
         }
 
+        // Default to something!
+        if (this.cause == null) {
+            this.cause = cause.all().get(0).getClass().getSimpleName();
+        }
+
         return this;
     }
 
@@ -94,6 +99,17 @@ public class PrismRecord {
      */
     public PrismRecord player(Player player){
         this.cause = player;
+        return this;
+    }
+
+    /**
+     * Sets the target entity for this event.
+     *
+     * @param entity Entity target for this event
+     * @return PrismRecord
+     */
+    public PrismRecord entity(Entity entity){
+        data.set(DataQueries.Entity, entity.toContainer());
         return this;
     }
 
@@ -147,7 +163,8 @@ public class PrismRecord {
 
     /**
      * Describes a player join.
-     * @return
+     *
+     * @return PrismRecord
      */
     public PrismRecord joined() {
         this.eventName = "player-join";
@@ -156,10 +173,21 @@ public class PrismRecord {
 
     /**
      * Describes a player quit.
-     * @return
+     *
+     * @return PrismRecord
      */
     public PrismRecord quit() {
         this.eventName = "player-quit";
+        return this;
+    }
+
+    /**
+     * Describes an entity death.
+     *
+     * @return PrismRecord
+     */
+    public PrismRecord died() {
+        this.eventName = "entity-death";
         return this;
     }
 

@@ -28,6 +28,7 @@ import static com.mongodb.client.model.Filters.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.bson.Document;
@@ -36,7 +37,6 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Condition;
@@ -115,7 +115,7 @@ public class MongoRecords implements StorageAdapterRecords {
         DataContainer result = new MemoryDataContainer();
 
         for (String key : document.keySet()) {
-            DataQuery keyQuery = new DataQuery(key);
+            DataQuery keyQuery = DataQuery.of(key);
             Object object = document.get(key);
 
             if (object instanceof Document) {

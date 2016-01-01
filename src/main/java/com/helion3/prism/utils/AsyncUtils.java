@@ -25,7 +25,8 @@ package com.helion3.prism.utils;
 
 import java.util.List;
 
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.CommandSource;
 
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.QuerySession;
@@ -45,24 +46,28 @@ public class AsyncUtils {
             // @todo handle this. would be best with a callback system
         }
 
+        CommandSource source = session.getCommandSource().get();
+
         async(session, new AsyncCallback() {
             @Override
             public void success(List<ResultRecord> results) {
+                source.sendMessage(Format.heading("Showing " + results.size() + " results."));
+
                 for (ResultRecord result : results) {
-                    session.getCommandSource().get().sendMessage(Messages.from(result));
+                    source.sendMessage(Messages.from(result));
                 }
             }
 
             @Override
             public void empty() {
                 // @todo move to language files
-                session.getCommandSource().get().sendMessage(Format.error(Texts.of("Nothing found. See /pr ? for help.")));
+                source.sendMessage(Format.error(Text.of("Nothing found. See /pr ? for help.")));
             }
 
             @Override
             public void error(Exception e) {
                 // @todo move to language files
-                session.getCommandSource().get().sendMessage(Format.error(Texts.of("An error occurred. Please see the console.")));
+                source.sendMessage(Format.error(Text.of("An error occurred. Please see the console.")));
             }
         });
     }

@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
-import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.command.CommandSource;
 
 import com.google.common.collect.ImmutableList;
 import com.helion3.prism.api.query.Condition;

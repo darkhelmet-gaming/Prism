@@ -27,15 +27,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandCallable;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.command.CommandCallable;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
 
-import com.google.common.base.Optional;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.results.Actionable;
@@ -93,7 +92,7 @@ public class RollbackCommand implements CommandCallable {
                     }
 
                     source.sendMessage(Format.heading(
-                        Texts.of(Template.parseTemplate(messageTemplate, tokens)),
+                        Text.of(Template.parseTemplate(messageTemplate, tokens)),
                         " ", Format.bonus(Translation.from("rollback.success.bonus"))
                     ));
                 }

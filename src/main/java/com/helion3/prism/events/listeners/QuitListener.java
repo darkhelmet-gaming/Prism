@@ -36,6 +36,6 @@ public class QuitListener {
      */
     @Listener
     public void onQuit(final Disconnect event) {
-        new PrismRecord().player(event.getTargetEntity()).quit().save();
+        PrismRecord.create().player(event.getTargetEntity()).quit().save();
     }
 }

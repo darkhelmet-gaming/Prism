@@ -26,7 +26,6 @@ package com.helion3.prism.api.storage;
 import org.spongepowered.api.entity.living.player.Player;
 
 public interface StorageAdapterPlayers {
-
     /**
      * Creates or updates a player identification record.
      *
@@ -35,5 +34,4 @@ public interface StorageAdapterPlayers {
      * @throws Exception
      */
     public StorageWriteResult save(Player player) throws Exception;
-
 }

@@ -50,6 +50,7 @@ import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
 import com.helion3.prism.utils.DataQueries;
+import com.helion3.prism.utils.DataUtils;
 import com.mongodb.DBRef;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
@@ -84,7 +85,12 @@ public class MongoRecords implements StorageAdapterRecords {
                         if (object instanceof DataView) {
                             DataView subView = (DataView) object;
                             document.append(key, documentFromView(subView));
-                        } else {
+                        }
+                        else if (DataUtils.isPrimitiveType(object)) {
+                            document.append(key, optional.get());
+                            break;
+                        }
+                        else {
                             Prism.getLogger().error("Unsupported list data type: " + object.getClass().getName());
                         }
                     }

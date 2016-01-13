@@ -34,7 +34,6 @@ import com.mongodb.client.model.UpdateOptions;
 public class MongoPlayers implements StorageAdapterPlayers {
     @Override
     public StorageWriteResult save(Player player) throws Exception {
-
         MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionPlayersName);
 
         // Upsert

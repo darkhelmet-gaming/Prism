@@ -53,18 +53,20 @@ import com.helion3.prism.api.results.BlockChangeResultRecord;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
-import com.helion3.prism.events.listeners.ChangeBlockListener;
 import com.helion3.prism.events.listeners.DeathListener;
 import com.helion3.prism.events.listeners.RequiredInteractListener;
 import com.helion3.prism.events.listeners.JoinListener;
 import com.helion3.prism.events.listeners.QuitListener;
 import com.helion3.prism.events.listeners.RequiredJoinListener;
+import com.helion3.prism.events.listeners.block.ChangeBlockBreakListener;
+import com.helion3.prism.events.listeners.block.ChangeBlockDecayListener;
+import com.helion3.prism.events.listeners.block.ChangeBlockGrowListener;
+import com.helion3.prism.events.listeners.block.ChangeBlockPlaceListener;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 
 /**
- * Prism is an event logging + rollback/restore engine for Minecraft
- * servers.
+ * Prism is an event logging + rollback/restore engine for Minecraft servers.
  *
  * @author viveleroi
  *
@@ -87,11 +89,6 @@ final public class Prism {
     @Inject
     @DefaultConfig(sharedRoot = false)
     private ConfigurationLoader<CommentedConfigurationNode> configManager;
-
-    @Inject
-    public void setGame(Game injectGame) {
-        game = injectGame;
-    }
 
     /**
      * Performs bootstrapping of Prism resources/objects.
@@ -184,6 +181,15 @@ final public class Prism {
     }
 
     /**
+     * Injected Game instance.
+     * @param injectGame Game
+     */
+    @Inject
+    public void setGame(Game injectGame) {
+        game = injectGame;
+    }
+
+    /**
      * Returns the Logger instance for this plugin.
      * @return Logger instance
      */
@@ -269,15 +275,28 @@ final public class Prism {
      * Register all event listeners.
      */
     private void registerSpongeEventListeners(EventManager eventManager) {
-        // Block events
-        eventManager.registerListeners(this, new ChangeBlockListener());
+        eventManager.unregisterPluginListeners(this);
 
-        // Entity events
+        if (config.getNode("events", "block", "break").getBoolean()) {
+            eventManager.registerListeners(this, new ChangeBlockBreakListener());
+        }
+
+        if (config.getNode("events", "block", "decay").getBoolean()) {
+            eventManager.registerListeners(this, new ChangeBlockDecayListener());
+        }
+
+        if (config.getNode("events", "block", "grow").getBoolean()) {
+            eventManager.registerListeners(this, new ChangeBlockGrowListener());
+        }
+
+        if (config.getNode("events", "block", "place").getBoolean()) {
+            eventManager.registerListeners(this, new ChangeBlockPlaceListener());
+        }
+
         if (config.getNode("events", "entity", "death").getBoolean()) {
             eventManager.registerListeners(this, new DeathListener());
         }
 
-        // Player events
         if (config.getNode("events", "player", "join").getBoolean()) {
             eventManager.registerListeners(this, new JoinListener());
         }

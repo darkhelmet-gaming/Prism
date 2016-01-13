@@ -31,11 +31,32 @@ import java.util.Set;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.helion3.prism.Prism;
 
 public class DataUtils {
     private DataUtils() {}
+
+    /**
+     * Checks an object against known primitive object types.
+     *
+     * @param object
+     * @return boolean If object is a primitive type
+     */
+    public static boolean isPrimitiveType(Object object) {
+        return (object instanceof Boolean ||
+                object instanceof Byte ||
+                object instanceof Character ||
+                object instanceof Double ||
+                object instanceof Float ||
+                object instanceof Integer ||
+                object instanceof Long ||
+                object instanceof Short ||
+                object instanceof String);
+    }
 
     /**
      * Converts a DataView object into a JsonObject.
@@ -60,7 +81,14 @@ public class DataUtils {
 
                         if (object instanceof DataView) {
                             json.add(key, jsonFromDataView((DataView) object));
-                        } else {
+                        }
+                        else if (DataUtils.isPrimitiveType(object)) {
+                            Gson gson = new GsonBuilder().create();
+                            JsonArray array = gson.toJsonTree(optional.get()).getAsJsonArray();
+                            json.add(key, array);
+                            break;
+                        }
+                        else {
                             Prism.getLogger().error("Unsupported list data type: " + object.getClass().getName());
                         }
                     }

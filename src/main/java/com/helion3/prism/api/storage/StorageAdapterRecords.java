@@ -32,7 +32,6 @@ import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.results.ResultRecord;
 
 public interface StorageAdapterRecords {
-
     /**
      * Writes a collection of events to storage
      *

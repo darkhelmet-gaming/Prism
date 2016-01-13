@@ -23,7 +23,6 @@
  */
 package com.helion3.prism.api.parameters;
 
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -50,9 +49,7 @@ public class ParameterRadius extends SimpleParameterHandler {
 
     @Override
     public boolean acceptsSource(@Nullable CommandSource source) {
-        Optional<CommandSource> optional = Optional.ofNullable(source);
-
-        return (optional.isPresent() && optional.get() instanceof Player);
+        return (source instanceof Player);
     }
 
     @Override

@@ -31,6 +31,6 @@ import com.helion3.prism.api.records.PrismRecord;
 public class DeathListener {
     @Listener
     public void onDeath(final Death event) {
-        new PrismRecord().entity(event.getTargetEntity()).died().causedBy(event.getCause()).save();
+        PrismRecord.create().source(event.getCause()).killed(event.getTargetEntity()).save();
     }
 }

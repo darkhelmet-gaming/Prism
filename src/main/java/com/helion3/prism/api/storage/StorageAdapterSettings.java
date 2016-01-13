@@ -26,7 +26,6 @@ package com.helion3.prism.api.storage;
 import java.util.UUID;
 
 public interface StorageAdapterSettings {
-
     /**
      * Remove a meta setting by its key
      *
@@ -75,5 +74,4 @@ public interface StorageAdapterSettings {
      * @return String setting value
      */
     String getSetting(String key, UUID owner);
-
 }

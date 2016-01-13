@@ -25,6 +25,7 @@ package com.helion3.prism.commands;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.CommandCallable;
@@ -32,6 +33,7 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 
+import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.utils.AsyncUtils;
 
@@ -40,10 +42,11 @@ public class LookupCommand implements CommandCallable {
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
         // Create a new query session
         final QuerySession session = new QuerySession(source);
-        session.newQueryFromParameters(arguments);
-
-        // Pass off to an async lookup helper
-        AsyncUtils.lookup(session);
+        CompletableFuture<Query> future = session.newQueryFromParameters(arguments);
+        future.thenAccept(query -> {
+         // Pass off to an async lookup helper
+            AsyncUtils.lookup(session);
+        });
 
         return CommandResult.success();
     }

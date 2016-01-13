@@ -33,6 +33,7 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 
+import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Conditions;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.utils.AsyncUtils;
@@ -40,10 +41,11 @@ import com.helion3.prism.utils.AsyncUtils;
 public class NearCommand implements CommandCallable {
     @Override
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
+        int radius = Prism.getConfig().getNode("commands", "near", "defaultRadius").getInt();
+
         // Create a new query session
-        // @todo config this default
         final QuerySession session = new QuerySession(source);
-        session.newQuery().addConditions(Conditions.from(((Player) source).getLocation(), 5));
+        session.newQuery().addConditions(Conditions.from(((Player) source).getLocation(), radius));
 
         // Pass off to an async lookup helper
         AsyncUtils.lookup(session);

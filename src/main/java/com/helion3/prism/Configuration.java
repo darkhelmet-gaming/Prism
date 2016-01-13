@@ -109,6 +109,12 @@ public class Configuration {
                 eventPlayerQuit.setValue(false);
             }
 
+            // Commands
+            ConfigurationNode nearRadius = rootNode.getNode("commands", "near", "defaultRadius");
+            if (nearRadius.isVirtual()) {
+                nearRadius.setValue(5);
+            }
+
             // Save
             try {
                 configManager.save(rootNode);

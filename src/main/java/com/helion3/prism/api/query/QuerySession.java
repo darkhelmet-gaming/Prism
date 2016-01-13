@@ -26,6 +26,7 @@ package com.helion3.prism.api.query;
 import org.spongepowered.api.command.CommandSource;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Represents a record query session, which includes the actual
@@ -87,10 +88,14 @@ public class QuerySession {
      * Create a new Query from the given parameters.
      *
      * @param parameters String parameters
-     * @return Query
+     * @return CompletableFuture<Query>
      */
-    public Query newQueryFromParameters(String parameters) {
-        this.query = Query.fromParameters(this, parameters);
-        return query;
+    public CompletableFuture<Query> newQueryFromParameters(String parameters) {
+        CompletableFuture<Query> future = Query.fromParameters(this, parameters);
+        future.thenAccept(query -> {
+            this.query = query;
+        });
+
+        return future;
     }
 }

@@ -25,12 +25,26 @@ package com.helion3.prism.api.query;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.spongepowered.api.data.DataQuery;
+
 import com.google.common.collect.Range;
 
 final public class Condition {
     private final String field;
     private final MatchRule matchRule;
     private final Object value;
+
+    /**
+     * Statically build a new condition.
+     *
+     * @param dataQuery DataQuery matching the field name.
+     * @param rule MatchRule describing comparison of values.
+     * @param value List, String or Number value.
+     * @return Condition
+     */
+    public static Condition of(DataQuery query, MatchRule matchRule, Object value) {
+        return new Condition(query.toString(), matchRule, value);
+    }
 
     /**
      * Statically build a new condition.

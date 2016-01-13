@@ -28,7 +28,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.parameters.ParameterHandler;
 
@@ -43,7 +47,7 @@ final public class Query {
      * @param parameters String Parameter: value string
      * @return {@link Query} Database query object
      */
-    public static Query fromParameters(QuerySession session, String parameters) {
+    public static CompletableFuture<Query> fromParameters(QuerySession session, String parameters) {
         return fromParameters(session, parameters.split(" "));
     }
 
@@ -54,13 +58,15 @@ final public class Query {
      * @param parameters String[] Parameter:value list
      * @return {@link Query} Database query object
      */
-    public static Query fromParameters(QuerySession session, String[] parameters) {
+    public static CompletableFuture<Query> fromParameters(QuerySession session, String[] parameters) {
         checkNotNull(parameters);
         checkNotNull(session);
 
         Query query = new Query();
+        CompletableFuture<Query> future = new CompletableFuture<Query>();
 
         if (parameters.length > 0) {
+            List<ListenableFuture<?>> futures = new ArrayList<ListenableFuture<?>>();
             for (String parameter : parameters) {
                 // Determine the true alias and value
                 String alias;
@@ -71,8 +77,7 @@ final public class Query {
                     alias = split[0];
                     value = split[1];
                 } else {
-                    // Any value with a defined parameter is assumed to be a
-                    // player username.
+                    // Any value with a defined parameter is assumed to be a player username.
                     alias = "p";
                     value = parameter;
                 }
@@ -104,11 +109,29 @@ final public class Query {
                     break;
                 }
 
-                handler.process(session, alias, value, query);
+                Optional<ListenableFuture<?>> listenable = handler.process(session, alias, value, query);
+
+                if (listenable.isPresent()) {
+                    futures.add(listenable.get());
+                }
             }
+
+            if (!futures.isEmpty()) {
+                ListenableFuture<List<Object>> combinedFuture = Futures.allAsList(futures);
+                combinedFuture.addListener(new Runnable() {
+                    @Override
+                    public void run() {
+                        future.complete(query);
+                    }
+                }, MoreExecutors.sameThreadExecutor());
+            } else {
+                future.complete(query);
+            }
+        } else {
+            future.cancel(false);
         }
 
-        return query;
+        return future;
     }
 
     /**

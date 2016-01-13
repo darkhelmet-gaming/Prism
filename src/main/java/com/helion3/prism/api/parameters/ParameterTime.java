@@ -24,6 +24,7 @@
 package com.helion3.prism.api.parameters;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -31,6 +32,7 @@ import javax.annotation.Nullable;
 import org.spongepowered.api.command.CommandSource;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.helion3.prism.api.query.Condition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
@@ -69,7 +71,7 @@ public class ParameterTime extends SimpleParameterHandler {
     }
 
     @Override
-    public void process(QuerySession session, String parameter, String value, Query query) {
+    public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
         Date date = DateUtils.parseTimeStringToDate(value);
 
         // Determine match rule based on before/since
@@ -79,5 +81,7 @@ public class ParameterTime extends SimpleParameterHandler {
         }
 
         query.addCondition(Condition.of(DataQueries.Created.toString(), rule, date));
+
+        return Optional.empty();
     }
 }

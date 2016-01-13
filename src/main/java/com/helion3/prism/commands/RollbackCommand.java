@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.CommandCallable;
@@ -36,6 +37,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 
 import com.helion3.prism.Prism;
+import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.results.Actionable;
 import com.helion3.prism.api.results.ActionableResult;
@@ -50,57 +52,60 @@ public class RollbackCommand implements CommandCallable {
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
         // Create a new query session
         final QuerySession session = new QuerySession(source);
-        session.newQueryFromParameters(arguments).setAggregate(false);
+        CompletableFuture<Query> future = session.newQueryFromParameters(arguments);
+        future.thenAccept(query -> {
+            query.setAggregate(false);
 
-        try {
-            List<ActionableResult> actionResults = new ArrayList<ActionableResult>();
-            // Iterate query results
-            List<ResultRecord> results = Prism.getStorageAdapter().records().query(session);
-            if (results.isEmpty()) {
-                source.sendMessage(Format.error("No results."));
-            } else {
-                // Iterate record results
-                for (ResultRecord result : results) {
-                    if(result instanceof Actionable) {
-                        Actionable actionable = (Actionable) result;
-                        actionResults.add(actionable.undo());
-                    }
-                }
-
-                // Iterate results from actionables
-                if (!actionResults.isEmpty()) {
-                    int appliedCount = 0;
-                    int skippedCount = 0;
-
-                    for (ActionableResult result : actionResults) {
-                        if (result.applied()) {
-                            appliedCount++;
-                        } else {
-                            skippedCount++;
+            try {
+                List<ActionableResult> actionResults = new ArrayList<ActionableResult>();
+                // Iterate query results
+                List<ResultRecord> results = Prism.getStorageAdapter().records().query(session);
+                if (results.isEmpty()) {
+                    source.sendMessage(Format.error("No results."));
+                } else {
+                    // Iterate record results
+                    for (ResultRecord result : results) {
+                        if(result instanceof Actionable) {
+                            Actionable actionable = (Actionable) result;
+                            actionResults.add(actionable.undo());
                         }
                     }
 
-                    Map<String,String> tokens = new HashMap<String, String>();
-                    tokens.put("appliedCount", ""+appliedCount);
-                    tokens.put("skippedCount", ""+skippedCount);
+                    // Iterate results from actionables
+                    if (!actionResults.isEmpty()) {
+                        int appliedCount = 0;
+                        int skippedCount = 0;
 
-                    String messageTemplate = null;
-                    if (skippedCount > 0) {
-                        messageTemplate = Translation.from("rollback.success.withskipped");
-                    } else {
-                        messageTemplate = Translation.from("rollback.success");
+                        for (ActionableResult result : actionResults) {
+                            if (result.applied()) {
+                                appliedCount++;
+                            } else {
+                                skippedCount++;
+                            }
+                        }
+
+                        Map<String,String> tokens = new HashMap<String, String>();
+                        tokens.put("appliedCount", ""+appliedCount);
+                        tokens.put("skippedCount", ""+skippedCount);
+
+                        String messageTemplate = null;
+                        if (skippedCount > 0) {
+                            messageTemplate = Translation.from("rollback.success.withskipped");
+                        } else {
+                            messageTemplate = Translation.from("rollback.success");
+                        }
+
+                        source.sendMessage(Format.heading(
+                            Text.of(Template.parseTemplate(messageTemplate, tokens)),
+                            " ", Format.bonus(Translation.from("rollback.success.bonus"))
+                        ));
                     }
-
-                    source.sendMessage(Format.heading(
-                        Text.of(Template.parseTemplate(messageTemplate, tokens)),
-                        " ", Format.bonus(Translation.from("rollback.success.bonus"))
-                    ));
                 }
+            } catch (Exception e) {
+                // @todo handle
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            // @todo handle
-            e.printStackTrace();
-        }
+        });
 
         return CommandResult.success();
     }

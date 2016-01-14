@@ -46,7 +46,7 @@ public class LookupCommand implements CommandCallable {
         final QuerySession session = new QuerySession(source);
 
         try {
-            CompletableFuture<Query> future = session.newQueryFromParameters(arguments);
+            CompletableFuture<Query> future = session.newQueryFromArguments(arguments);
             future.thenAccept(query -> {
                 // Pass off to an async lookup helper
                 AsyncUtils.lookup(session);

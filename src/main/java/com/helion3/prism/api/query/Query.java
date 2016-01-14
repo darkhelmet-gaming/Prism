@@ -23,113 +23,12 @@
  */
 package com.helion3.prism.api.query;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.parameters.ParameterException;
-import com.helion3.prism.api.parameters.ParameterHandler;
 
 final public class Query {
     private boolean isAggregate = true;
     private List<Condition> conditions = new ArrayList<Condition>();
-
-    /**
-     * Builds a {@link Query} by parsing a string of parameters
-     * and their values.
-     *
-     * @param parameters String Parameter: value string
-     * @return {@link Query} Database query object
-     */
-    public static CompletableFuture<Query> fromParameters(QuerySession session, String parameters) throws ParameterException {
-        return fromParameters(session, parameters.split(" "));
-    }
-
-    /**
-     * Builds a {@link Query} by parsing an array of parameters
-     * and their values.
-     *
-     * @param parameters String[] Parameter:value list
-     * @return {@link Query} Database query object
-     */
-    public static CompletableFuture<Query> fromParameters(QuerySession session, String[] parameters) throws ParameterException {
-        checkNotNull(parameters);
-        checkNotNull(session);
-
-        Query query = new Query();
-        CompletableFuture<Query> future = new CompletableFuture<Query>();
-
-        if (parameters.length > 0) {
-            List<ListenableFuture<?>> futures = new ArrayList<ListenableFuture<?>>();
-            for (String parameter : parameters) {
-                // Determine the true alias and value
-                String alias;
-                String value;
-                if (parameter.contains(":")) {
-                    // Split the parameter: values
-                    String[] split = parameter.split( ":", 2 );
-                    alias = split[0];
-                    value = split[1];
-                } else {
-                    // Any value with a defined parameter is assumed to be a player username.
-                    alias = "p";
-                    value = parameter;
-                }
-
-                // Simple validation
-                if (alias.length() <= 0 || value.length() <= 0) {
-                    throw new ParameterException("Invalid empty value for parameter \"" + alias + "\".");
-                }
-
-                // Find a handler
-                Optional<ParameterHandler> optionalHandler = Prism.getHandlerForParameter(alias);
-                if (!optionalHandler.isPresent()) {
-                    throw new ParameterException("\"" + alias + "\" is not a valid parameter. No handler found.");
-                }
-
-                ParameterHandler handler = optionalHandler.get();
-
-                // Allows this command source?
-                if (!handler.acceptsSource(session.getCommandSource().get())) {
-                    throw new ParameterException("This command source may not use the \"" + alias + "\" parameter.");
-                }
-
-                // Validate value
-                if (!handler.acceptsValue(value)) {
-                    throw new ParameterException("Invalid value \"" + value + "\" for parameter \"" + alias + "\".");
-                }
-
-                Optional<ListenableFuture<?>> listenable = handler.process(session, alias, value, query);
-
-                if (listenable.isPresent()) {
-                    futures.add(listenable.get());
-                }
-            }
-
-            if (!futures.isEmpty()) {
-                ListenableFuture<List<Object>> combinedFuture = Futures.allAsList(futures);
-                combinedFuture.addListener(new Runnable() {
-                    @Override
-                    public void run() {
-                        future.complete(query);
-                    }
-                }, MoreExecutors.sameThreadExecutor());
-            } else {
-                future.complete(query);
-            }
-        } else {
-            future.cancel(false);
-        }
-
-        return future;
-    }
 
     /**
      * Add a condition.

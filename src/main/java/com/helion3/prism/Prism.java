@@ -45,6 +45,8 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.config.DefaultConfig;
 
 import com.google.inject.Inject;
+import com.helion3.prism.api.flags.FlagHandler;
+import com.helion3.prism.api.flags.FlagNoGroup;
 import com.helion3.prism.api.parameters.ParameterBlock;
 import com.helion3.prism.api.parameters.ParameterEventName;
 import com.helion3.prism.api.parameters.ParameterHandler;
@@ -80,6 +82,7 @@ final public class Prism {
     private static Configuration config;
     private static Game game;
     private static List<ParameterHandler> handlers = new ArrayList<ParameterHandler>();
+    private static List<FlagHandler> flagHandlers = new ArrayList<FlagHandler>();
     private static Map<Player, List<ActionableResult>> lastActionResults = new HashMap<Player, List<ActionableResult>>();
     private static Logger logger;
     private static Map<String,Class<? extends ResultRecord>> resultRecords = new HashMap<String,Class<? extends ResultRecord>>();
@@ -110,6 +113,7 @@ final public class Prism {
         registerEventResultRecords();
 
         // Register handlers
+        registerFlagHandlers();
         registerParameterHandlers();
 
         // Listen to events
@@ -134,16 +138,6 @@ final public class Prism {
     }
 
     /**
-     *
-     * @param handler
-     */
-    public void registerParameterHandler(ParameterHandler handler) {
-        checkNotNull(handler);
-        // @todo validate alias doesn't exist
-        handlers.add(handler);
-    }
-
-    /**
      * Returns a list of players who have active inspection wands.
      *
      * @return List of Players.
@@ -158,22 +152,6 @@ final public class Prism {
      */
     public static Configuration getConfig() {
         return config;
-    }
-
-    /**
-     * Returns a specific handler for a given parameter
-     * @param parameter String parameter name
-     * @return
-     */
-    public static Optional<ParameterHandler> getHandlerForParameter(String parameter) {
-        ParameterHandler result = null;
-        for(ParameterHandler handler : Prism.getParameterHandlers()) {
-            if (handler.handles(parameter)) {
-                result = handler;
-            }
-        }
-
-        return Optional.ofNullable(result);
     }
 
     /**
@@ -207,6 +185,46 @@ final public class Prism {
      */
     public static Logger getLogger() {
         return logger;
+    }
+
+    /**
+     * Returns a specific handler for a given parameter
+     * @param parameter String parameter name
+     * @return
+     */
+    public static Optional<FlagHandler> getFlagHandler(String flag) {
+        FlagHandler result = null;
+        for(FlagHandler handler : Prism.getFlagHandlers()) {
+            if (handler.handles(flag)) {
+                result = handler;
+            }
+        }
+
+        return Optional.ofNullable(result);
+    }
+
+    /**
+     * Returns all currently registered flag handlers.
+     * @return List of {@link FlagHandler}
+     */
+    public static List<FlagHandler> getFlagHandlers() {
+        return flagHandlers;
+    }
+
+    /**
+     * Returns a specific handler for a given parameter
+     * @param parameter String parameter name
+     * @return
+     */
+    public static Optional<ParameterHandler> getParameterHandler(String parameter) {
+        ParameterHandler result = null;
+        for(ParameterHandler handler : Prism.getParameterHandlers()) {
+            if (handler.handles(parameter)) {
+                result = handler;
+            }
+        }
+
+        return Optional.ofNullable(result);
     }
 
     /**
@@ -259,6 +277,33 @@ final public class Prism {
         registerResultRecord("block-decay", BlockChangeResultRecord.class);
         registerResultRecord("block-grow", BlockChangeResultRecord.class);
         registerResultRecord("block-place", BlockChangeResultRecord.class);
+    }
+
+    /**
+     * Register a flag handler.
+     * @param handler
+     */
+    private void registerFlagHandler(FlagHandler handler) {
+        checkNotNull(handler);
+        // @todo validate flag doesn't exist
+        flagHandlers.add(handler);
+    }
+
+    /**
+     * Registers all default flag handlers
+     */
+    private void registerFlagHandlers() {
+        registerFlagHandler(new FlagNoGroup());
+    }
+
+    /**
+     *
+     * @param handler
+     */
+    public void registerParameterHandler(ParameterHandler handler) {
+        checkNotNull(handler);
+        // @todo validate alias doesn't exist
+        handlers.add(handler);
     }
 
     /**

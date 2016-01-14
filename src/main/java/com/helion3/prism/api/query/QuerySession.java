@@ -92,8 +92,8 @@ public class QuerySession {
      * @param parameters String parameters
      * @return CompletableFuture<Query>
      */
-    public CompletableFuture<Query> newQueryFromParameters(String parameters) throws ParameterException {
-        CompletableFuture<Query> future = Query.fromParameters(this, parameters);
+    public CompletableFuture<Query> newQueryFromArguments(String arguments) throws ParameterException {
+        CompletableFuture<Query> future = QueryBuilder.fromArguments(this, arguments);
         future.thenAccept(query -> {
             this.query = query;
         });

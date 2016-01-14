@@ -23,30 +23,61 @@
  */
 package com.helion3.prism.api.results;
 
-public class ActionableResult {
+import java.util.Optional;
 
+import javax.annotation.Nullable;
+
+import org.spongepowered.api.data.Transaction;
+
+public class ActionableResult {
     private final boolean changeWasApplied;
     private final SkipReason skipReason;
+    private final Optional<Transaction<?>> transaction;
 
     /**
-     * Construct an ActionableResult for a successful change.
+     * Build a skipped actionable result.
+     * @param skipReason Reason for skip.
+     * @return ActionableResult
      */
-    public ActionableResult() {
+    public static ActionableResult skipped(SkipReason skipReason) {
+        return new ActionableResult(skipReason);
+    }
+
+    /**
+     * Build a successful actionable result.
+     * @param transaction
+     * @return
+     */
+    public static ActionableResult success(@Nullable Transaction<?> transaction) {
+        return new ActionableResult(transaction);
+    }
+
+    private ActionableResult(@Nullable Transaction<?> transaction) {
+        this.transaction = Optional.ofNullable(transaction);
         this.changeWasApplied = true;
         this.skipReason = null;
     }
 
-    public ActionableResult(SkipReason skipReason) {
+    private ActionableResult(SkipReason skipReason) {
+        this.transaction = Optional.empty();
         this.changeWasApplied = false;
         this.skipReason = skipReason;
     }
 
     /**
-     * Returns whether or not a change was successfully applied.
-     * @return Whether or not a change was successfully applied.
+     * Get if actionable was applied.
+     * @return If actionable was applied.
      */
     public boolean applied() {
         return changeWasApplied;
+    }
+
+    /**
+     * Get any resulting transaction, useful for reversals.
+     * @return Optional transaction.
+     */
+    public Optional<Transaction<?>> getTransaction() {
+        return transaction;
     }
 
     /**

@@ -24,7 +24,6 @@
 package com.helion3.prism.api.results;
 
 public interface Actionable {
-
     /**
      * Reverses the result of this event on a subject
      * unless the state of the subject has changed since
@@ -46,5 +45,4 @@ public interface Actionable {
      * @return ActionableResult Results of applier action
      */
     public ActionableResult redo();
-
 }

@@ -65,7 +65,8 @@ public class PrismCommands {
                     ImmutableList.of("i", "wand"), new InspectCommand(),
                     ImmutableList.of("l", "lookup"), new LookupCommand(),
                     ImmutableList.of("near"), new NearCommand(),
-                    ImmutableList.of("rb", "rollback"), new RollbackCommand()
+                    ImmutableList.of("rb", "rollback"), new RollbackCommand(),
+                    ImmutableList.of("undo"), new UndoCommand()
                 )).build();
     }
 }

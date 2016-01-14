@@ -35,6 +35,7 @@ import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Query;
@@ -47,7 +48,6 @@ import com.helion3.prism.utils.Template;
 import com.helion3.prism.utils.Translation;
 
 public class RollbackCommand implements CommandCallable {
-
     @Override
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
         // Create a new query session
@@ -71,34 +71,35 @@ public class RollbackCommand implements CommandCallable {
                         }
                     }
 
-                    // Iterate results from actionables
-                    if (!actionResults.isEmpty()) {
-                        int appliedCount = 0;
-                        int skippedCount = 0;
+                    int appliedCount = 0;
+                    int skippedCount = 0;
 
-                        for (ActionableResult result : actionResults) {
-                            if (result.applied()) {
-                                appliedCount++;
-                            } else {
-                                skippedCount++;
-                            }
-                        }
-
-                        Map<String,String> tokens = new HashMap<String, String>();
-                        tokens.put("appliedCount", ""+appliedCount);
-                        tokens.put("skippedCount", ""+skippedCount);
-
-                        String messageTemplate = null;
-                        if (skippedCount > 0) {
-                            messageTemplate = Translation.from("rollback.success.withskipped");
+                    for (ActionableResult result : actionResults) {
+                        if (result.applied()) {
+                            appliedCount++;
                         } else {
-                            messageTemplate = Translation.from("rollback.success");
+                            skippedCount++;
                         }
+                    }
 
-                        source.sendMessage(Format.heading(
-                            Text.of(Template.parseTemplate(messageTemplate, tokens)),
-                            " ", Format.bonus(Translation.from("rollback.success.bonus"))
-                        ));
+                    Map<String,String> tokens = new HashMap<String, String>();
+                    tokens.put("appliedCount", "" + appliedCount);
+                    tokens.put("skippedCount", "" + skippedCount);
+
+                    String messageTemplate = null;
+                    if (skippedCount > 0) {
+                        messageTemplate = Translation.from("rollback.success.withskipped");
+                    } else {
+                        messageTemplate = Translation.from("rollback.success");
+                    }
+
+                    source.sendMessage(Format.heading(
+                        Text.of(Template.parseTemplate(messageTemplate, tokens)),
+                        " ", Format.bonus(Translation.from("rollback.success.bonus"))
+                    ));
+
+                    if (source instanceof Player) {
+                        Prism.getLastActionResults().put((Player) source, actionResults);
                     }
                 }
             } catch (Exception e) {
@@ -112,13 +113,12 @@ public class RollbackCommand implements CommandCallable {
 
     @Override
     public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public boolean testPermission(CommandSource source) {
-        return true;
+        return source.hasPermission("prism.rollback");
     }
 
     @Override

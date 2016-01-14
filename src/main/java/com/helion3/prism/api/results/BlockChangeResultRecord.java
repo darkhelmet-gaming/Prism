@@ -29,6 +29,7 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.MemoryDataView;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.block.BlockSnapshot.Builder;
 
 import com.helion3.prism.Prism;
@@ -82,16 +83,24 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
             // @todo error/skip
         }
 
+        BlockSnapshot snapshot = optionalSnapshot.get();
+
+        // Current block in this space.
+        BlockSnapshot original = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+
         // Actually restore!
         if (!optionalSnapshot.get().restore(true, true)) {
             // @todo error/skip
         }
 
-        return new ActionableResult();
+        // Final block in this space.
+        BlockSnapshot finalBlock = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+
+        return ActionableResult.success(new Transaction<BlockSnapshot>(original, finalBlock));
     }
 
     @Override
     public ActionableResult redo() {
-        return new ActionableResult();
+        return ActionableResult.skipped(SkipReason.INVALID_LOCATION);
     }
 }

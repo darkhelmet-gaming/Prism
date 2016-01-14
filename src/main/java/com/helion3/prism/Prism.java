@@ -50,6 +50,7 @@ import com.helion3.prism.api.parameters.ParameterHandler;
 import com.helion3.prism.api.parameters.ParameterPlayer;
 import com.helion3.prism.api.parameters.ParameterRadius;
 import com.helion3.prism.api.parameters.ParameterTime;
+import com.helion3.prism.api.results.ActionableResult;
 import com.helion3.prism.api.results.BlockChangeResultRecord;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.storage.StorageAdapter;
@@ -78,6 +79,7 @@ final public class Prism {
     private static Configuration config;
     private static Game game;
     private static List<ParameterHandler> handlers = new ArrayList<ParameterHandler>();
+    private static Map<Player, List<ActionableResult>> lastActionResults = new HashMap<Player, List<ActionableResult>>();
     private static Logger logger;
     private static Map<String,Class<? extends ResultRecord>> resultRecords = new HashMap<String,Class<? extends ResultRecord>>();
     private static Object plugin;
@@ -188,6 +190,14 @@ final public class Prism {
     @Inject
     public void setGame(Game injectGame) {
         game = injectGame;
+    }
+
+    /**
+     * Get a map of players and their last available actionable results.
+     * @return
+     */
+    public static Map<Player, List<ActionableResult>> getLastActionResults() {
+        return lastActionResults;
     }
 
     /**

@@ -26,7 +26,9 @@ package com.helion3.prism.api.results;
 import java.util.Optional;
 
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
 
+import com.helion3.prism.Prism;
 import com.helion3.prism.utils.DataQueries;
 import com.helion3.prism.utils.TypeUtils;
 
@@ -97,18 +99,25 @@ abstract public class ResultRecord {
      */
     public String getTargetName() {
         String value = "";
-
         String eventName = data.getString(DataQueries.EventName).get();
 
-        // @todo probably should be used differently. Like ResultRecord<Block> or something.
         if (eventName.contains("block")) {
-            Optional<String> optionalBlockType = data.getString(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
+            // Determine which block state we're using
+            DataQuery path = DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
+            if (eventName.equals("block-place")) {
+                path = DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
+            }
+
+            // Use value
+            Optional<String> optionalBlockType = data.getString(path);
             if (optionalBlockType.isPresent()) {
                 value = optionalBlockType.get();
 
                 if (value.contains(":")) {
                     value = value.split(":")[1];
                 }
+            } else {
+                Prism.getLogger().debug("No value at path: " + path);
             }
         }
 

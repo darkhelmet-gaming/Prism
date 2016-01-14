@@ -47,7 +47,7 @@ public class ParameterTime extends SimpleParameterHandler {
      * Handler for time-related parameters.
      */
     public ParameterTime() {
-        super(ImmutableList.of("b", "before", "s", "since"));
+        super(ImmutableList.of("before", "since"));
     }
 
     @Override

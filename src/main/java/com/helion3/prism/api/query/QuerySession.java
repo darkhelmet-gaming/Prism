@@ -25,6 +25,8 @@ package com.helion3.prism.api.query;
 
 import org.spongepowered.api.command.CommandSource;
 
+import com.helion3.prism.api.parameters.ParameterException;
+
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -90,7 +92,7 @@ public class QuerySession {
      * @param parameters String parameters
      * @return CompletableFuture<Query>
      */
-    public CompletableFuture<Query> newQueryFromParameters(String parameters) {
+    public CompletableFuture<Query> newQueryFromParameters(String parameters) throws ParameterException {
         CompletableFuture<Query> future = Query.fromParameters(this, parameters);
         future.thenAccept(query -> {
             this.query = query;

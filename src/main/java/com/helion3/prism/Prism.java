@@ -45,6 +45,7 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.config.DefaultConfig;
 
 import com.google.inject.Inject;
+import com.helion3.prism.api.parameters.ParameterBlock;
 import com.helion3.prism.api.parameters.ParameterEventName;
 import com.helion3.prism.api.parameters.ParameterHandler;
 import com.helion3.prism.api.parameters.ParameterPlayer;
@@ -172,7 +173,7 @@ final public class Prism {
             }
         }
 
-        return Optional.of(result);
+        return Optional.ofNullable(result);
     }
 
     /**
@@ -264,6 +265,7 @@ final public class Prism {
      * Registers all default parameter handlers
      */
     private void registerParameterHandlers() {
+        registerParameterHandler(new ParameterBlock());
         registerParameterHandler(new ParameterEventName());
         registerParameterHandler(new ParameterPlayer());
         registerParameterHandler(new ParameterRadius());

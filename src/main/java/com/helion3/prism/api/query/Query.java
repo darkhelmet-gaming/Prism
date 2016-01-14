@@ -34,6 +34,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.helion3.prism.Prism;
+import com.helion3.prism.api.parameters.ParameterException;
 import com.helion3.prism.api.parameters.ParameterHandler;
 
 final public class Query {
@@ -47,7 +48,7 @@ final public class Query {
      * @param parameters String Parameter: value string
      * @return {@link Query} Database query object
      */
-    public static CompletableFuture<Query> fromParameters(QuerySession session, String parameters) {
+    public static CompletableFuture<Query> fromParameters(QuerySession session, String parameters) throws ParameterException {
         return fromParameters(session, parameters.split(" "));
     }
 
@@ -58,7 +59,7 @@ final public class Query {
      * @param parameters String[] Parameter:value list
      * @return {@link Query} Database query object
      */
-    public static CompletableFuture<Query> fromParameters(QuerySession session, String[] parameters) {
+    public static CompletableFuture<Query> fromParameters(QuerySession session, String[] parameters) throws ParameterException {
         checkNotNull(parameters);
         checkNotNull(session);
 
@@ -84,29 +85,25 @@ final public class Query {
 
                 // Simple validation
                 if (alias.length() <= 0 || value.length() <= 0) {
-                    // @todo throw invalid syntax error
-                    break;
+                    throw new ParameterException("Invalid empty value for parameter \"" + alias + "\".");
                 }
 
                 // Find a handler
                 Optional<ParameterHandler> optionalHandler = Prism.getHandlerForParameter(alias);
                 if (!optionalHandler.isPresent()) {
-                    // @todo throw invalid alias error
-                    break;
+                    throw new ParameterException("\"" + alias + "\" is not a valid parameter. No handler found.");
                 }
 
                 ParameterHandler handler = optionalHandler.get();
 
                 // Allows this command source?
                 if (!handler.acceptsSource(session.getCommandSource().get())) {
-                    // @todo throw error
-                    break;
+                    throw new ParameterException("This command source may not use the \"" + alias + "\" parameter.");
                 }
 
                 // Validate value
                 if (!handler.acceptsValue(value)) {
-                    // @todo throw syntax error
-                    break;
+                    throw new ParameterException("Invalid value \"" + value + "\" for parameter \"" + alias + "\".");
                 }
 
                 Optional<ListenableFuture<?>> listenable = handler.process(session, alias, value, query);

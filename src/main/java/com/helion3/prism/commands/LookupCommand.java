@@ -33,20 +33,27 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 
+import com.helion3.prism.api.parameters.ParameterException;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.utils.AsyncUtils;
+import com.helion3.prism.utils.Format;
 
 public class LookupCommand implements CommandCallable {
     @Override
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
         // Create a new query session
         final QuerySession session = new QuerySession(source);
-        CompletableFuture<Query> future = session.newQueryFromParameters(arguments);
-        future.thenAccept(query -> {
-         // Pass off to an async lookup helper
-            AsyncUtils.lookup(session);
-        });
+
+        try {
+            CompletableFuture<Query> future = session.newQueryFromParameters(arguments);
+            future.thenAccept(query -> {
+                // Pass off to an async lookup helper
+                AsyncUtils.lookup(session);
+            });
+        } catch(ParameterException e) {
+            source.sendMessage(Format.error(Text.of(e.getMessage())));
+        }
 
         return CommandResult.success();
     }

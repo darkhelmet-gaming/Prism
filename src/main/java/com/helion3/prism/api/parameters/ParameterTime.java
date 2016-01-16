@@ -61,7 +61,7 @@ public class ParameterTime extends SimpleParameterHandler {
 
         if (matches) {
             try {
-                DateUtils.parseTimeStringToDate(value);
+                DateUtils.parseTimeStringToDate(value, false);
             } catch(Exception e) {
                 matches = false;
             }
@@ -72,7 +72,7 @@ public class ParameterTime extends SimpleParameterHandler {
 
     @Override
     public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
-        Date date = DateUtils.parseTimeStringToDate(value);
+        Date date = DateUtils.parseTimeStringToDate(value, false);
 
         // Determine match rule based on before/since
         MatchRule rule = MatchRule.LESS_THAN_EQUAL;

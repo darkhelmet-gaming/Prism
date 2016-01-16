@@ -79,7 +79,7 @@ public class DateUtils {
      * @param shorthand String shorthand value.
      * @return Date final object.
      */
-    public static Date parseTimeStringToDate(String shorthand) {
+    public static Date parseTimeStringToDate(String shorthand, boolean future) {
         final Calendar calendar = Calendar.getInstance();
 
         final String[] matches = TypeUtils.pregMatchAll(relativeTimeDeclaration, shorthand);
@@ -95,19 +95,19 @@ public class DateUtils {
                     final String tfFormat = m.group(2);
 
                     if (tfFormat.equals("w")) {
-                        calendar.add(Calendar.WEEK_OF_YEAR, -1 * tfValue);
+                        calendar.add(Calendar.WEEK_OF_YEAR, (future ? 1 : -1) * tfValue);
                     }
                     else if( tfFormat.equals( "d" ) ) {
-                        calendar.add(Calendar.DAY_OF_MONTH, -1 * tfValue);
+                        calendar.add(Calendar.DAY_OF_MONTH, (future ? 1 : -1) * tfValue);
                     }
                     else if (tfFormat.equals( "h" ) ) {
-                        calendar.add(Calendar.HOUR, -1 * tfValue);
+                        calendar.add(Calendar.HOUR, (future ? 1 : -1) * tfValue);
                     }
                     else if (tfFormat.equals( "m" )) {
-                        calendar.add(Calendar.MINUTE, -1 * tfValue);
+                        calendar.add(Calendar.MINUTE, (future ? 1 : -1) * tfValue);
                     }
                     else if (tfFormat.equals("s")) {
-                        calendar.add(Calendar.SECOND, -1 * tfValue);
+                        calendar.add(Calendar.SECOND, (future ? 1 : -1) * tfValue);
                     } else {
                         return null;
                     }

@@ -51,6 +51,7 @@ import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
 import com.helion3.prism.utils.DataQueries;
 import com.helion3.prism.utils.DataUtils;
+import com.helion3.prism.utils.DateUtils;
 import com.mongodb.DBRef;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
@@ -61,6 +62,7 @@ import com.mongodb.client.model.WriteModel;
 
 public class MongoRecords implements StorageAdapterRecords {
     private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
+    private final String expiration = Prism.getConfig().getNode("db", "mongo", "expiration").getString();
 
     /**
      * Converts a DataView to a Document, recursively if needed.
@@ -145,6 +147,9 @@ public class MongoRecords implements StorageAdapterRecords {
        List<WriteModel<Document>> documents = new ArrayList<WriteModel<Document>>();
        for (DataContainer container : containers) {
            Document document = documentFromView(container);
+
+           // TTL
+           document.append("Expires", DateUtils.parseTimeStringToDate(expiration, true));
 
            // Insert
            documents.add(new InsertOneModel<Document>(document));

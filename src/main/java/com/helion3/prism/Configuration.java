@@ -73,6 +73,11 @@ public class Configuration {
                 dbMongoPort.setValue(27017);
             }
 
+            ConfigurationNode dbMongoExpires = rootNode.getNode("db", "mongo", "expiration");
+            if (dbMongoExpires.isVirtual()) {
+                dbMongoExpires.setValue("8w");
+            }
+
             // Events
             ConfigurationNode eventBlockBreak = rootNode.getNode("events", "block", "break");
             if (eventBlockBreak.isVirtual()) {

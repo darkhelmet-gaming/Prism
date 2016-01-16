@@ -30,6 +30,9 @@ import com.helion3.prism.api.storage.StorageAdapterSettings;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
+
+import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
 
@@ -48,7 +51,6 @@ public class MongoStorageAdapter implements StorageAdapter {
      *
      */
     public MongoStorageAdapter() {
-
         databaseName = Prism.getConfig().getNode("db", "name").getString();
 
         // Collections
@@ -58,7 +60,6 @@ public class MongoStorageAdapter implements StorageAdapter {
 
         players = new MongoPlayers();
         records = new MongoRecords();
-
     }
 
     /**
@@ -68,14 +69,12 @@ public class MongoStorageAdapter implements StorageAdapter {
      */
     @Override
     public boolean connect() throws Exception {
-
         String host = Prism.getConfig().getNode("db", "mongo", "host").getString();
         int port = Prism.getConfig().getNode("db", "mongo", "port").getInt();
 
         mongoClient = new MongoClient(host, port);
 
-        // @todo support auth: boolean auth = db.authenticate(myUserName,
-        // myPassword);
+        // @todo support auth: boolean auth = db.authenticate(myUserName, myPassword);
 
         // Connect to the database
         database = mongoClient.getDatabase(databaseName);
@@ -83,15 +82,18 @@ public class MongoStorageAdapter implements StorageAdapter {
         // Create indexes
         try {
             getCollection(collectionEventRecordsName).createIndex(
-                    new Document("x", 1).append("z", 1).append("y", 1).append("created", -1));
-            getCollection(collectionEventRecordsName).createIndex(new Document("created", -1).append("action", 1));
+                    new Document("Location.X", 1).append("Location.Z", 1).append("Location.Y", 1).append("Created", -1));
+            getCollection(collectionEventRecordsName).createIndex(new Document("Created", -1).append("EventName", 1));
+
+            // TTL
+            IndexOptions options = new IndexOptions().expireAfter(0L, TimeUnit.SECONDS);
+            getCollection(collectionEventRecordsName).createIndex(new Document("Expires", 1), options);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
 
         return false;
-
     }
 
     @Override
@@ -106,7 +108,6 @@ public class MongoStorageAdapter implements StorageAdapter {
 
     @Override
     public StorageAdapterSettings settings() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -127,10 +128,9 @@ public class MongoStorageAdapter implements StorageAdapter {
     /**
      * Close connections.
      */
-    // @todo implement
     @Override
     public void close() {
-
+        mongoClient.close();
     }
 
     /**

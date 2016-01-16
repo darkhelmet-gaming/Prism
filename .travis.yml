@@ -1,8 +1,7 @@
-language: java
-notifications:
-  email: false
+dist: trusty
 install: true
-matrix:
-  include:
-  - jdk: openjdk8
-    script: gradle build
+language: java
+jdk:
+  - openjdk8
+  - oraclejdk8
+script: gradle build

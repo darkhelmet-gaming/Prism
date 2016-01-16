@@ -40,6 +40,7 @@ import org.spongepowered.api.world.World;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.helion3.prism.Prism;
 import com.helion3.prism.queues.RecordingQueue;
 import com.helion3.prism.utils.DataQueries;
 
@@ -84,6 +85,23 @@ public class PrismRecord {
         }
 
         event.getData().set(causeKey, causeIdentifier);
+
+        // Original block blacklisted?
+        Optional<Object> optionalOriginalBlock = event.getData().get(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
+        if (optionalOriginalBlock.isPresent() && Prism.getBlacklist().containsBlock((String) optionalOriginalBlock.get())) {
+            return;
+        }
+
+        // Replacement block blacklisted?
+        Optional<Object> optionalReplacementBlock = event.getData().get(DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
+        if (optionalReplacementBlock.isPresent() && Prism.getBlacklist().containsBlock((String) optionalReplacementBlock.get())) {
+            return;
+        }
+
+        // Source blacklisted?
+        if (Prism.getBlacklist().contains(source.getSource())) {
+            return;
+        }
 
         // Queue the finished record for saving
         RecordingQueue.add(event.getData());

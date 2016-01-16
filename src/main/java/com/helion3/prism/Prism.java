@@ -58,15 +58,12 @@ import com.helion3.prism.api.results.BlockChangeResultRecord;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
+import com.helion3.prism.events.listeners.ChangeBlockListener;
 import com.helion3.prism.events.listeners.DeathListener;
 import com.helion3.prism.events.listeners.RequiredInteractListener;
 import com.helion3.prism.events.listeners.JoinListener;
 import com.helion3.prism.events.listeners.QuitListener;
 import com.helion3.prism.events.listeners.RequiredJoinListener;
-import com.helion3.prism.events.listeners.block.ChangeBlockBreakListener;
-import com.helion3.prism.events.listeners.block.ChangeBlockDecayListener;
-import com.helion3.prism.events.listeners.block.ChangeBlockGrowListener;
-import com.helion3.prism.events.listeners.block.ChangeBlockPlaceListener;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 
@@ -336,21 +333,7 @@ final public class Prism {
     private void registerSpongeEventListeners(EventManager eventManager) {
         eventManager.unregisterPluginListeners(this);
 
-        if (config.getNode("events", "block", "break").getBoolean()) {
-            eventManager.registerListeners(this, new ChangeBlockBreakListener());
-        }
-
-        if (config.getNode("events", "block", "decay").getBoolean()) {
-            eventManager.registerListeners(this, new ChangeBlockDecayListener());
-        }
-
-        if (config.getNode("events", "block", "grow").getBoolean()) {
-            eventManager.registerListeners(this, new ChangeBlockGrowListener());
-        }
-
-        if (config.getNode("events", "block", "place").getBoolean()) {
-            eventManager.registerListeners(this, new ChangeBlockPlaceListener());
-        }
+        eventManager.registerListeners(this, new ChangeBlockListener());
 
         if (config.getNode("events", "entity", "death").getBoolean()) {
             eventManager.registerListeners(this, new DeathListener());

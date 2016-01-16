@@ -62,48 +62,50 @@ public class RestoreCommand implements CommandCallable {
                 try {
                     List<ActionableResult> actionResults = new ArrayList<ActionableResult>();
                     // Iterate query results
-                    List<ResultRecord> results = Prism.getStorageAdapter().records().query(session);
-                    if (results.isEmpty()) {
-                        source.sendMessage(Format.error("No results."));
-                    } else {
-                        // Iterate record results
-                        for (ResultRecord result : results) {
-                            if(result instanceof Actionable) {
-                                Actionable actionable = (Actionable) result;
-                                actionResults.add(actionable.redo());
-                            }
-                        }
-
-                        // Iterate results from actionables
-                        if (!actionResults.isEmpty()) {
-                            int appliedCount = 0;
-                            int skippedCount = 0;
-
-                            for (ActionableResult result : actionResults) {
-                                if (result.applied()) {
-                                    appliedCount++;
-                                } else {
-                                    skippedCount++;
+                    CompletableFuture<List<ResultRecord>> futureResults = Prism.getStorageAdapter().records().query(session);
+                    futureResults.thenAccept(results -> {
+                        if (results.isEmpty()) {
+                            source.sendMessage(Format.error("No results."));
+                        } else {
+                            // Iterate record results
+                            for (ResultRecord result : results) {
+                                if(result instanceof Actionable) {
+                                    Actionable actionable = (Actionable) result;
+                                    actionResults.add(actionable.redo());
                                 }
                             }
 
-                            Map<String,String> tokens = new HashMap<String, String>();
-                            tokens.put("appliedCount", ""+appliedCount);
-                            tokens.put("skippedCount", ""+skippedCount);
+                            // Iterate results from actionables
+                            if (!actionResults.isEmpty()) {
+                                int appliedCount = 0;
+                                int skippedCount = 0;
 
-                            String messageTemplate = null;
-                            if (skippedCount > 0) {
-                                messageTemplate = Translation.from("rollback.success.withskipped");
-                            } else {
-                                messageTemplate = Translation.from("rollback.success");
+                                for (ActionableResult result : actionResults) {
+                                    if (result.applied()) {
+                                        appliedCount++;
+                                    } else {
+                                        skippedCount++;
+                                    }
+                                }
+
+                                Map<String,String> tokens = new HashMap<String, String>();
+                                tokens.put("appliedCount", ""+appliedCount);
+                                tokens.put("skippedCount", ""+skippedCount);
+
+                                String messageTemplate = null;
+                                if (skippedCount > 0) {
+                                    messageTemplate = Translation.from("rollback.success.withskipped");
+                                } else {
+                                    messageTemplate = Translation.from("rollback.success");
+                                }
+
+                                source.sendMessage(Format.heading(
+                                    Text.of(Template.parseTemplate(messageTemplate, tokens)),
+                                    " ", Format.bonus(Translation.from("rollback.success.bonus"))
+                                ));
                             }
-
-                            source.sendMessage(Format.heading(
-                                Text.of(Template.parseTemplate(messageTemplate, tokens)),
-                                " ", Format.bonus(Translation.from("rollback.success.bonus"))
-                            ));
                         }
-                    }
+                    });
                 } catch (Exception e) {
                     // @todo handle
                     e.printStackTrace();

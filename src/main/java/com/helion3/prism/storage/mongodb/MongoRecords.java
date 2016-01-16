@@ -23,21 +23,26 @@
  */
 package com.helion3.prism.storage.mongodb;
 
-import static com.mongodb.client.model.Filters.*;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.bson.Document;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.profile.GameProfile;
 
 import com.google.common.collect.Range;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Condition;
 import com.helion3.prism.api.query.MatchRule;
@@ -52,7 +57,6 @@ import com.helion3.prism.api.storage.StorageWriteResult;
 import com.helion3.prism.utils.DataQueries;
 import com.helion3.prism.utils.DataUtils;
 import com.helion3.prism.utils.DateUtils;
-import com.mongodb.DBRef;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -103,7 +107,7 @@ public class MongoRecords implements StorageAdapterRecords {
                 }
                 else {
                     if (key.equals(DataQueries.Player.toString())) {
-                        document.append(DataQueries.Player.toString(), new DBRef(MongoStorageAdapter.collectionPlayersName, optional.get()));
+                        document.append(DataQueries.Player.toString(), optional.get());
                     } else {
                         document.append(key, optional.get());
                     }
@@ -170,11 +174,12 @@ public class MongoRecords implements StorageAdapterRecords {
     * @return List of {@link com.helion3.prism.api.actions.ActionHandler}
     */
    @Override
-   public List<ResultRecord> query(QuerySession session) throws Exception {
+   public CompletableFuture<List<ResultRecord>> query(QuerySession session) throws Exception {
        Query query = session.getQuery();
 
        // Prepare results
        List<ResultRecord> results = new ArrayList<ResultRecord>();
+       CompletableFuture<List<ResultRecord>> future = new CompletableFuture<List<ResultRecord>>();
 
        // Get collection
        MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
@@ -278,7 +283,7 @@ public class MongoRecords implements StorageAdapterRecords {
        // Iterate results and build our event record list
        MongoCursor<Document> cursor = aggregated.iterator();
        try {
-           MongoCollection<Document> players = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionPlayersName);
+           List<UUID> uuidsPendingLookup = new ArrayList<UUID>();
 
            while (cursor.hasNext()) {
                // Mongo document
@@ -307,27 +312,47 @@ public class MongoRecords implements StorageAdapterRecords {
                }
 
                // Determine the final name of the event source
-               String source;
                if (document.containsKey(DataQueries.Player.toString())) {
-                   DBRef ref = (DBRef) document.get(DataQueries.Player.toString());
-                   // @todo Isn't there an easier way to pull refs in v3?
-                   Document player = players.find(eq("_id", ref.getId())).first();
-                   source = player.getString("name");
-
+                   String uuid = document.getString(DataQueries.Player.toString());
+                   uuidsPendingLookup.add(UUID.fromString(uuid));
+                   data.set(DataQueries.Cause, uuid);
                } else {
-                   source = document.getString(DataQueries.Cause.toString());
+                   data.set(DataQueries.Cause, document.getString(DataQueries.Cause.toString()));
                }
-
-               data.set(DataQueries.Cause, source);
 
                result.data = data;
                results.add(result);
+           }
+
+           if (!uuidsPendingLookup.isEmpty()) {
+               ListenableFuture<Collection<GameProfile>> profiles = Prism.getGame().getServer().getGameProfileManager().getAllById(uuidsPendingLookup, true);
+               profiles.addListener(new Runnable() {
+                   @Override
+                   public void run() {
+                       try {
+                           for (GameProfile profile : profiles.get()) {
+                               for (ResultRecord r : results) {
+                                   Optional<Object> cause = r.data.get(DataQueries.Cause);
+                                   if (cause.isPresent() && ((String) cause.get()).equals(profile.getUniqueId().toString())) {
+                                       r.data.set(DataQueries.Cause, profile.getName());
+                                   }
+                               }
+                           }
+                       } catch (InterruptedException | ExecutionException e) {
+                           e.printStackTrace();
+                       }
+
+                       future.complete(results);
+                   }
+               }, MoreExecutors.sameThreadExecutor());
+           } else {
+               future.complete(results);
            }
        } finally {
            cursor.close();
        }
 
-       return results;
+       return future;
    }
 
    /**

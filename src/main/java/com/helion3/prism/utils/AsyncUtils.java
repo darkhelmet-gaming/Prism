@@ -24,6 +24,7 @@
 package com.helion3.prism.utils;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.CommandSource;
@@ -83,12 +84,14 @@ public class AsyncUtils {
             @Override
             public void run(){
                 try {
-                    List<ResultRecord> results = Prism.getStorageAdapter().records().query(session);
-                    if (results.isEmpty()) {
-                        callback.empty();
-                    } else {
-                        callback.success(results);
-                    }
+                    CompletableFuture<List<ResultRecord>> future = Prism.getStorageAdapter().records().query(session);
+                    future.thenAccept(results -> {
+                        if (results.isEmpty()) {
+                            callback.empty();
+                        } else {
+                            callback.success(results);
+                        }
+                    });
                 } catch (Exception e) {
                     callback.error(e);
                     e.printStackTrace();

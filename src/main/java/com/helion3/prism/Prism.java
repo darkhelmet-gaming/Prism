@@ -64,7 +64,6 @@ import com.helion3.prism.events.listeners.DeathListener;
 import com.helion3.prism.events.listeners.RequiredInteractListener;
 import com.helion3.prism.events.listeners.JoinListener;
 import com.helion3.prism.events.listeners.QuitListener;
-import com.helion3.prism.events.listeners.RequiredJoinListener;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 
@@ -366,7 +365,6 @@ final public class Prism {
         }
 
         // Events required for internal operation
-        eventManager.registerListeners(this, new RequiredJoinListener());
         eventManager.registerListeners(this, new RequiredInteractListener());
     }
 }

@@ -24,6 +24,7 @@
 package com.helion3.prism.api.storage;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.data.DataContainer;
 
@@ -48,7 +49,7 @@ public interface StorageAdapterRecords {
      * @return List of {@link ResultRecord}
      * @throws Exception Abstract DB or query/handler exceptions
      */
-    List<ResultRecord> query(QuerySession session) throws Exception;
+    CompletableFuture<List<ResultRecord>> query(QuerySession session) throws Exception;
 
     /**
      * Given a {@link Query} this will remove all matching records.

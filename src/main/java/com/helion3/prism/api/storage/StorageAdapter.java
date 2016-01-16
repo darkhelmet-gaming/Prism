@@ -42,13 +42,6 @@ public interface StorageAdapter {
 
     /**
      * Holder for the storage adapter handling
-     * player ID records.
-     * @return StorageAdapterPlayers Storage adapter for player records
-     */
-    StorageAdapterPlayers players();
-
-    /**
-     * Holder for the storage adapter handling
      * per-player settings.
      * @return StorageAdapterSettings Storage adapter for settings
      */

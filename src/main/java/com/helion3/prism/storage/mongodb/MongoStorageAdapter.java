@@ -40,12 +40,10 @@ public class MongoStorageAdapter implements StorageAdapter {
 
     private static MongoClient mongoClient = null;
     private static MongoDatabase database;
-    private final MongoPlayers players;
     private final MongoRecords records;
     private final String databaseName;
 
     protected static String collectionEventRecordsName;
-    protected static String collectionPlayersName;
 
     /**
      *
@@ -56,9 +54,7 @@ public class MongoStorageAdapter implements StorageAdapter {
         // Collections
         String tablePrefix = Prism.getConfig().getNode("db", "tablePrefix").getString();
         collectionEventRecordsName = tablePrefix + "EventRecord";
-        collectionPlayersName = tablePrefix + "Players";
 
-        players = new MongoPlayers();
         records = new MongoRecords();
     }
 
@@ -99,11 +95,6 @@ public class MongoStorageAdapter implements StorageAdapter {
     @Override
     public StorageAdapterRecords records() {
         return records;
-    }
-
-    @Override
-    public MongoPlayers players() {
-        return players;
     }
 
     @Override

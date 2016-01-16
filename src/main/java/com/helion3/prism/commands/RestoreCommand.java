@@ -57,6 +57,7 @@ public class RestoreCommand implements CommandCallable {
             CompletableFuture<Query> future = session.newQueryFromArguments(arguments);
             future.thenAccept(query -> {
                 query.setAggregate(false);
+                query.setLimit(Prism.getConfig().getNode("query", "actionable", "limit").getInt());
 
                 try {
                     List<ActionableResult> actionResults = new ArrayList<ActionableResult>();

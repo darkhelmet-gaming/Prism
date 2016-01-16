@@ -29,6 +29,7 @@ import java.util.List;
 final public class Query {
     private boolean isAggregate = true;
     private List<Condition> conditions = new ArrayList<Condition>();
+    private int limit = 5;
 
     /**
      * Add a condition.
@@ -71,5 +72,23 @@ final public class Query {
      */
     public void setAggregate(boolean isAggregate) {
         this.isAggregate = isAggregate;
+    }
+
+    /**
+     * Get the record limit.
+     *
+     * @return Record limit.
+     */
+    public int getLimit() {
+        return limit;
+    }
+
+    /**
+     * Set the record limit.
+     *
+     * @param limit int Record limit
+     */
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 }

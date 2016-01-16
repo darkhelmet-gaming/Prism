@@ -115,6 +115,12 @@ public class Configuration {
                 nearRadius.setValue(5);
             }
 
+            // Queries
+            ConfigurationNode rbQueryMaxLimit = rootNode.getNode("query", "actionable", "limit");
+            if (rbQueryMaxLimit.isVirtual()) {
+                rbQueryMaxLimit.setValue(10000);
+            }
+
             // Save
             try {
                 configManager.save(rootNode);

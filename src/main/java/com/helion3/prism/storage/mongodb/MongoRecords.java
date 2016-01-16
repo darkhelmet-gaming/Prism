@@ -214,7 +214,6 @@ public class MongoRecords implements StorageAdapterRecords {
 
        // Session configs
        int sortDir = 1; // @todo needs implementation
-       int rowLimit = 5; // @todo needs implementation
        boolean shouldGroup = query.isAggregate();
 
        // Sorting
@@ -226,7 +225,7 @@ public class MongoRecords implements StorageAdapterRecords {
        Document sorter = new Document("$sort", sortFields);
 
        // Offset/Limit
-       Document limit = new Document("$limit", rowLimit);
+       Document limit = new Document("$limit", query.getLimit());
 
        // Build aggregators
        AggregateIterable<Document> aggregated = null;

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism;
+package com.helion3.prism.api.filters;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +29,47 @@ import java.util.List;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.living.player.Player;
 
-public class Blacklist {
+public class FilterList {
     private final List<String> blocks = new ArrayList<String>();
     private final List<String> players = new ArrayList<String>();
+    private final FilterMode mode;
+
+    private final List<Class<?>> sources = new ArrayList<Class<?>>();
+
+    public FilterList(FilterMode mode) {
+        this.mode = mode;
+    }
 
     /**
-     * A block type to the black list.
+     * Adds a specific source class to the list.
+     *
+     * @param sourceType Class
+     */
+    public void addSource(Class<?> sourceType) {
+        sources.add(sourceType);
+    }
+
+    /**
+     * Check if this list will allow a given source.
+     *
+     * @param object Object source;
+     * @return If list allows this source.
+     */
+    public boolean allowsSource(Object object) {
+        boolean contains = false;
+
+        for (Class<?> c : sources) {
+            if (c.isInstance(object)) {
+                contains = true;
+                break;
+            }
+        }
+
+        return mode.equals(FilterMode.BLACKLIST) ? !contains : contains;
+    }
+
+    /**
+     * A block type to the list.
      *
      * @param block BlockType
      */
@@ -43,7 +78,7 @@ public class Blacklist {
     }
 
     /**
-     * Add a block type string to the black list.
+     * Add a block type string to the list.
      *
      * @param block String Block type string.
      */
@@ -52,39 +87,39 @@ public class Blacklist {
     }
 
     /**
-     * Add a player uuid string to the black list.
+     * Add a player uuid string to the list.
      *
      * @param block String Player uuid string.
      */
     public void addPlayer(String uuid) {
-        blocks.add(uuid);
+        players.add(uuid);
     }
 
     /**
-     * Get if blacklist contains a given BlockType.
+     * Get if list contains a given BlockType.
      *
      * @param blockType BlockType
-     * @return boolean If blacklist contains block type.
+     * @return boolean If list contains block type.
      */
-    public boolean contains(BlockType blockType) {
-        return containsBlock(blockType.toString());
+    public boolean allows(BlockType blockType) {
+        return allowsBlock(blockType.toString());
     }
 
     /**
-     * Check if the blacklist contains an object. Checks for
+     * Check if the list contains an object. Checks for
      * accepted types and passes of to their proper handlers.
      *
      * @param object Object
-     * @return boolean If object is a known type and in the blacklist
+     * @return boolean If object is a known type and in the list
      */
-    public boolean contains(Object object) {
+    public boolean allows(Object object) {
         boolean contains = false;
 
         if (object instanceof Player) {
-            contains = contains((Player) object);
+            contains = allows((Player) object);
         }
         else if (object instanceof BlockType) {
-            contains = contains((BlockType) object);
+            contains = allows((BlockType) object);
         }
         else if (object instanceof String) {
 
@@ -94,22 +129,24 @@ public class Blacklist {
     }
 
     /**
-     * Get if blacklist contains a player's UUID.
+     * Get if list contains a player's UUID.
      *
      * @param player
-     * @return boolean If blacklist contains player uuid.
+     * @return boolean If list contains player uuid.
      */
-    public boolean contains(Player player) {
-        return players.contains(player.getUniqueId().toString());
+    public boolean allows(Player player) {
+        boolean contains = players.size() == 0 || players.contains(player.getUniqueId().toString());
+        return mode.equals(FilterMode.BLACKLIST) ? !contains : contains;
     }
 
     /**
-     * Get if blacklist contains a given block type.
+     * Get if list contains a given block type.
      *
      * @param blockType String block type string
-     * @return boolean If blacklist contains block type.
+     * @return boolean If list contains block type.
      */
-    public boolean containsBlock(String blockType) {
-        return blocks.contains(blockType);
+    public boolean allowsBlock(String blockType) {
+        boolean contains = blocks.size() == 0 || blocks.contains(blockType);
+        return mode.equals(FilterMode.BLACKLIST) ? !contains : contains;
     }
 }

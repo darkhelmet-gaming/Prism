@@ -37,7 +37,6 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
@@ -46,6 +45,8 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.config.DefaultConfig;
 
 import com.google.inject.Inject;
+import com.helion3.prism.api.filters.FilterList;
+import com.helion3.prism.api.filters.FilterMode;
 import com.helion3.prism.api.flags.FlagHandler;
 import com.helion3.prism.api.flags.FlagNoGroup;
 import com.helion3.prism.api.parameters.ParameterBlock;
@@ -76,7 +77,7 @@ import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
 final public class Prism {
     private static List<Player> activeWands = new ArrayList<Player>();
-    private static final Blacklist blacklist = new Blacklist();
+    private static final FilterList filterlist = new FilterList(FilterMode.WHITELIST);
     private static Configuration config;
     private static Game game;
     private static List<ParameterHandler> handlers = new ArrayList<ParameterHandler>();
@@ -107,13 +108,8 @@ final public class Prism {
         // Load configuration file
         config = new Configuration(defaultConfig, configManager);
 
-        // Temporarily black list specific blocks, pending SpongeCommon issues #425, #426
-        blacklist.add(BlockTypes.LAVA);
-        blacklist.add(BlockTypes.FLOWING_LAVA);
-        blacklist.add(BlockTypes.WATER);
-        blacklist.add(BlockTypes.FLOWING_WATER);
-        blacklist.add(BlockTypes.LEAVES);
-        blacklist.add(BlockTypes.LEAVES2);
+        // Temporary filtering pending sponge improvements
+        filterlist.addSource(Player.class);
 
         // Register all result record classes
         registerEventResultRecords();
@@ -156,8 +152,8 @@ final public class Prism {
      * Returns the blacklist manager.
      * @return Blacklist
      */
-    public static Blacklist getBlacklist() {
-        return blacklist;
+    public static FilterList getFilterList() {
+        return filterlist;
     }
 
     /**

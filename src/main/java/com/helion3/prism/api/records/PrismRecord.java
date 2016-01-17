@@ -83,23 +83,28 @@ public class PrismRecord {
         if (source.getSource() instanceof Player) {
             causeIdentifier = ((Player) source.getSource()).getUniqueId().toString();
         }
+        else if(source.getSource() instanceof Entity) {
+            causeIdentifier = ((Entity) source.getSource()).getType().getName();
+        }
 
         event.getData().set(causeKey, causeIdentifier);
 
+        // Source allowed?
+        if (!Prism.getFilterList().allowsSource(source.getSource())) {
+            return;
+        } else {
+            Prism.getLogger().info("Allowing source: " + source.getSource().getClass().getName());
+        }
+
         // Original block blacklisted?
         Optional<Object> optionalOriginalBlock = event.getData().get(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
-        if (optionalOriginalBlock.isPresent() && Prism.getBlacklist().containsBlock((String) optionalOriginalBlock.get())) {
+        if (optionalOriginalBlock.isPresent() && !Prism.getFilterList().allowsBlock((String) optionalOriginalBlock.get())) {
             return;
         }
 
         // Replacement block blacklisted?
         Optional<Object> optionalReplacementBlock = event.getData().get(DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
-        if (optionalReplacementBlock.isPresent() && Prism.getBlacklist().containsBlock((String) optionalReplacementBlock.get())) {
-            return;
-        }
-
-        // Source blacklisted?
-        if (Prism.getBlacklist().contains(source.getSource())) {
+        if (optionalReplacementBlock.isPresent() && !Prism.getFilterList().allowsBlock((String) optionalReplacementBlock.get())) {
             return;
         }
 
@@ -314,7 +319,7 @@ public class PrismRecord {
 
             // Default to something!
             if (source == null) {
-                source = cause.all().get(0).getClass().getSimpleName();
+                source = cause.all().get(0);
             }
 
             return new PrismRecordEventBuilder(new PrismRecordSourceBuilder(source));

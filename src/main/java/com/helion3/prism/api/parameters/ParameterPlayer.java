@@ -70,7 +70,7 @@ public class ParameterPlayer extends SimpleParameterHandler {
             @Override
             public void run() {
                 try {
-                    query.addCondition(Condition.of(DataQueries.Player.toString() + ".$id", MatchRule.EQUALS, profile.get().getUniqueId().toString()));
+                    query.addCondition(Condition.of(DataQueries.Player.toString(), MatchRule.EQUALS, profile.get().getUniqueId().toString()));
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }

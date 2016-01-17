@@ -32,9 +32,8 @@ import org.spongepowered.api.entity.living.player.Player;
 public class FilterList {
     private final List<String> blocks = new ArrayList<String>();
     private final List<String> players = new ArrayList<String>();
-    private final FilterMode mode;
-
     private final List<Class<?>> sources = new ArrayList<Class<?>>();
+    private final FilterMode mode;
 
     public FilterList(FilterMode mode) {
         this.mode = mode;

@@ -92,8 +92,6 @@ public class PrismRecord {
         // Source allowed?
         if (!Prism.getFilterList().allowsSource(source.getSource())) {
             return;
-        } else {
-            Prism.getLogger().info("Allowing source: " + source.getSource().getClass().getName());
         }
 
         // Original block blacklisted?

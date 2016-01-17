@@ -47,6 +47,15 @@ public class PrismCommands {
      * @return
      */
     public static CommandSpec getCommand() {
+        // Build child commands
+        ImmutableMap.Builder<List<String>, CommandCallable> builder = ImmutableMap.builder();
+        builder.put(ImmutableList.of("i", "wand"), new InspectCommand());
+        builder.put(ImmutableList.of("l", "lookup"), new LookupCommand());
+        builder.put(ImmutableList.of("near"), new NearCommand());
+        builder.put(ImmutableList.of("rb", "rollback"), new RollbackCommand());
+        builder.put(ImmutableList.of("rs", "restore"), new RestoreCommand());
+        builder.put(ImmutableList.of("undo"), new UndoCommand());
+
         return CommandSpec.builder()
                 .executor(new CommandExecutor() {
                     @Override
@@ -61,12 +70,6 @@ public class PrismCommands {
                         return CommandResult.empty();
                     }
                 })
-                .children(ImmutableMap.<List<String>, CommandCallable>of(
-                    ImmutableList.of("i", "wand"), new InspectCommand(),
-                    ImmutableList.of("l", "lookup"), new LookupCommand(),
-                    ImmutableList.of("near"), new NearCommand(),
-                    ImmutableList.of("rb", "rollback"), new RollbackCommand(),
-                    ImmutableList.of("undo"), new UndoCommand()
-                )).build();
+                .children(builder.build()).build();
     }
 }

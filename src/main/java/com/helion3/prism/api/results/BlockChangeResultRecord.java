@@ -34,7 +34,6 @@ import org.spongepowered.api.block.BlockSnapshot.Builder;
 
 import com.helion3.prism.Prism;
 import com.helion3.prism.utils.DataQueries;
-import com.helion3.prism.utils.DataUtils;
 
 /**
  * Represents a block change event record.
@@ -50,37 +49,20 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
 
         // Our data is stored with a different structure, so we'll need
         // a little manual effort to reformat it.
-        DataView restoration = ((DataView) optionalOriginal.get()).copy();
+        DataView finalBlock = ((DataView) optionalOriginal.get()).copy();
 
         // Build World UUID / Vec3 data BlockSnapshot expects
         Optional<Object> optionalLocation = data.get(DataQueries.Location);
         if (!optionalLocation.isPresent()) {
-            // @todo error/skip
+            return ActionableResult.skipped(SkipReason.INVALID_LOCATION);
         }
 
-        DataView location = (MemoryDataView) optionalLocation.get();
-        DataView position = new MemoryDataContainer();
-        position.set(DataQueries.X, location.get(DataQueries.X).get());
-        position.set(DataQueries.Y, location.get(DataQueries.Y).get());
-        position.set(DataQueries.Z, location.get(DataQueries.Z).get());
-        restoration.set(DataQueries.Position, position);
-        restoration.set(DataQueries.WorldUuid, location.get(DataQueries.WorldUuid).get());
+        // Format
+        finalBlock = formatBlockData(finalBlock, optionalLocation);
 
-        // Unsafe data includes coordinates
-        Optional<Object> optionalUnsafeData = restoration.get(DataQueries.UnsafeData);
-        if (optionalUnsafeData.isPresent()) {
-            DataView unsafeData = (DataView) optionalUnsafeData.get();
-            unsafeData.set(DataQueries.X, location.get(DataQueries.X).get());
-            unsafeData.set(DataQueries.Y, location.get(DataQueries.Y).get());
-            unsafeData.set(DataQueries.Z, location.get(DataQueries.Z).get());
-            restoration.set(DataQueries.UnsafeData, unsafeData);
-        }
-
-        Prism.getLogger().debug(DataUtils.jsonFromDataView(restoration).toString());
-
-        Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(restoration);
+        Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(finalBlock);
         if (!optionalSnapshot.isPresent()) {
-            // @todo error/skip
+            return ActionableResult.skipped(SkipReason.INVALID_BLOCK);
         }
 
         BlockSnapshot snapshot = optionalSnapshot.get();
@@ -90,17 +72,75 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
 
         // Actually restore!
         if (!optionalSnapshot.get().restore(true, true)) {
-            // @todo error/skip
+            return ActionableResult.skipped(SkipReason.UNKNOWN);
         }
 
         // Final block in this space.
-        BlockSnapshot finalBlock = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+        BlockSnapshot resultingBlock = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
 
-        return ActionableResult.success(new Transaction<BlockSnapshot>(original, finalBlock));
+        return ActionableResult.success(new Transaction<BlockSnapshot>(original, resultingBlock));
+    }
+
+    public DataView formatBlockData(DataView finalBlock, Optional<Object> optionalLocation) {
+        DataView location = (MemoryDataView) optionalLocation.get();
+        DataView position = new MemoryDataContainer();
+        position.set(DataQueries.X, location.get(DataQueries.X).get());
+        position.set(DataQueries.Y, location.get(DataQueries.Y).get());
+        position.set(DataQueries.Z, location.get(DataQueries.Z).get());
+        finalBlock.set(DataQueries.Position, position);
+        finalBlock.set(DataQueries.WorldUuid, location.get(DataQueries.WorldUuid).get());
+
+        // Unsafe data includes coordinates
+        Optional<Object> optionalUnsafeData = finalBlock.get(DataQueries.UnsafeData);
+        if (optionalUnsafeData.isPresent()) {
+            DataView unsafeData = (DataView) optionalUnsafeData.get();
+            unsafeData.set(DataQueries.X, location.get(DataQueries.X).get());
+            unsafeData.set(DataQueries.Y, location.get(DataQueries.Y).get());
+            unsafeData.set(DataQueries.Z, location.get(DataQueries.Z).get());
+            finalBlock.set(DataQueries.UnsafeData, unsafeData);
+        }
+
+        return finalBlock;
     }
 
     @Override
     public ActionableResult redo() {
-        return ActionableResult.skipped(SkipReason.INVALID_LOCATION);
+        Optional<Object> optionalFinal = data.get(DataQueries.ReplacementBlock);
+        if (!optionalFinal.isPresent()) {
+            return ActionableResult.skipped(SkipReason.INVALID_BLOCK);
+        }
+
+        // Our data is stored with a different structure, so we'll need
+        // a little manual effort to reformat it.
+        DataView finalBlock = ((DataView) optionalFinal.get()).copy();
+
+        // Build World UUID / Vec3 data BlockSnapshot expects
+        Optional<Object> optionalLocation = data.get(DataQueries.Location);
+        if (!optionalLocation.isPresent()) {
+            return ActionableResult.skipped(SkipReason.INVALID_LOCATION);
+        }
+
+        // Format
+        finalBlock = formatBlockData(finalBlock, optionalLocation);
+
+        Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(finalBlock);
+        if (!optionalSnapshot.isPresent()) {
+            return ActionableResult.skipped(SkipReason.INVALID_BLOCK);
+        }
+
+        BlockSnapshot snapshot = optionalSnapshot.get();
+
+        // Current block in this space.
+        BlockSnapshot original = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+
+        // Actually restore!
+        if (!optionalSnapshot.get().restore(true, true)) {
+            return ActionableResult.skipped(SkipReason.UNKNOWN);
+        }
+
+        // Final block in this space.
+        BlockSnapshot resultingBlock = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+
+        return ActionableResult.success(new Transaction<BlockSnapshot>(original, resultingBlock));
     }
 }

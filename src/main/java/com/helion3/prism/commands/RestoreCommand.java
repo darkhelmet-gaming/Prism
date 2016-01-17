@@ -47,7 +47,6 @@ import com.helion3.prism.utils.Template;
 import com.helion3.prism.utils.Translation;
 
 public class RestoreCommand implements CommandCallable {
-
     @Override
     public CommandResult process(CommandSource source, String arguments) throws CommandException {
         // Create a new query session

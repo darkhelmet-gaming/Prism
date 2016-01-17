@@ -43,5 +43,10 @@ public enum SkipReason {
      * a block but someone has already placed a new block in that
      * spot.
      */
-    OCCUPIED
+    OCCUPIED,
+
+    /**
+     * An unknown error occurred.
+     */
+    UNKNOWN
 }

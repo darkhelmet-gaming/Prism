@@ -283,10 +283,10 @@ final public class Prism {
      * Registers all default event names and their handling classes
      */
     private void registerEventResultRecords() {
-        registerResultRecord("block-break", BlockChangeResultRecord.class);
-        registerResultRecord("block-decay", BlockChangeResultRecord.class);
-        registerResultRecord("block-grow", BlockChangeResultRecord.class);
-        registerResultRecord("block-place", BlockChangeResultRecord.class);
+        registerResultRecord("break", BlockChangeResultRecord.class);
+        registerResultRecord("decay", BlockChangeResultRecord.class);
+        registerResultRecord("grow", BlockChangeResultRecord.class);
+        registerResultRecord("place", BlockChangeResultRecord.class);
     }
 
     /**

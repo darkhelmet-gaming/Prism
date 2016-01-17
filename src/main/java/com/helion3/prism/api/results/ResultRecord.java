@@ -104,7 +104,7 @@ abstract public class ResultRecord {
         if (eventName.contains("block")) {
             // Determine which block state we're using
             DataQuery path = DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
-            if (eventName.equals("block-place")) {
+            if (eventName.equals("place")) {
                 path = DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
             }
 

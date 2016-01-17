@@ -161,7 +161,7 @@ public class PrismRecord {
          * @return PrismRecord
          */
         public PrismRecord brokeBlock(Transaction<BlockSnapshot> transaction) {
-            this.eventName = "block-break";
+            this.eventName = "break";
             writeBlockTransaction(transaction);
             return new PrismRecord(source, this);
         }
@@ -173,7 +173,7 @@ public class PrismRecord {
          * @return PrismRecord
          */
         public PrismRecord decayedBlock(Transaction<BlockSnapshot> transaction){
-            this.eventName = "block-decay";
+            this.eventName = "decay";
             writeBlockTransaction(transaction);
             return new PrismRecord(source, this);
         }
@@ -185,7 +185,7 @@ public class PrismRecord {
          * @return PrismRecord
          */
         public PrismRecord grewBlock(Transaction<BlockSnapshot> transaction){
-            this.eventName = "block-grow";
+            this.eventName = "grow";
             writeBlockTransaction(transaction);
             return new PrismRecord(source, this);
         }
@@ -197,7 +197,7 @@ public class PrismRecord {
          * @return PrismRecord
          */
         public PrismRecord placedBlock(Transaction<BlockSnapshot> transaction){
-            this.eventName = "block-place";
+            this.eventName = "place";
             writeBlockTransaction(transaction);
             return new PrismRecord(source, this);
         }
@@ -209,7 +209,7 @@ public class PrismRecord {
          * @return PrismRecord
          */
         public PrismRecord killed(Living entity){
-            this.eventName = "entity-death";
+            this.eventName = "death";
             return new PrismRecord(source, this);
         }
 

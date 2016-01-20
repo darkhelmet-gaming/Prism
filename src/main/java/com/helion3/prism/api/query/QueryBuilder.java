@@ -31,6 +31,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
+
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -44,13 +46,28 @@ public class QueryBuilder {
     private static final Pattern flagPattern = Pattern.compile("(-)([^\\s]+)?");
 
     /**
+     * Return an empty query.
+     * @return
+     */
+    public static Query empty() {
+        return new Query();
+    }
+
+    /**
      * Builds a {@link Query} by parsing a string of arguments.
      *
      * @param parameters String Parameter: value string
      * @return {@link Query} Database query object
      */
-    public static CompletableFuture<Query> fromArguments(QuerySession session, String arguments) throws ParameterException {
-        return fromArguments(session, arguments.split(" "));
+    public static CompletableFuture<Query> fromArguments(QuerySession session, @Nullable String arguments) throws ParameterException {
+        if (arguments == null) {
+            CompletableFuture<Query> future = new CompletableFuture<Query>();
+            future.complete(empty());
+
+            return future;
+        } else {
+            return fromArguments(session, arguments.split(" "));
+        }
     }
 
     /**
@@ -59,8 +76,7 @@ public class QueryBuilder {
      * @param parameters String[] Parameter:value list
      * @return {@link Query} Database query object
      */
-    public static CompletableFuture<Query> fromArguments(QuerySession session, String[] arguments) throws ParameterException {
-        checkNotNull(arguments);
+    public static CompletableFuture<Query> fromArguments(QuerySession session, @Nullable String[] arguments) throws ParameterException {
         checkNotNull(session);
 
         Query query = new Query();

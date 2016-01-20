@@ -23,15 +23,16 @@
  */
 package com.helion3.prism.commands;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 
 import com.helion3.prism.api.parameters.ParameterException;
 import com.helion3.prism.api.query.Query;
@@ -39,48 +40,37 @@ import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.utils.AsyncUtils;
 import com.helion3.prism.utils.Format;
 
-public class LookupCommand implements CommandCallable {
-    @Override
-    public CommandResult process(CommandSource source, String arguments) throws CommandException {
-        // Create a new query session
-        final QuerySession session = new QuerySession(source);
+public class LookupCommand {
+    private LookupCommand() {}
 
-        try {
-            CompletableFuture<Query> future = session.newQueryFromArguments(arguments);
-            future.thenAccept(query -> {
-                // Pass off to an async lookup helper
-                AsyncUtils.lookup(session);
-            });
-        } catch(ParameterException e) {
-            source.sendMessage(Format.error(Text.of(e.getMessage())));
-        }
+    public static CommandSpec getCommand() {
+        return CommandSpec.builder()
+            .description(Text.of("Search event records."))
+            .permission("prism.lookup")
+            .arguments(GenericArguments.remainingJoinedStrings(Text.of("arguments")))
+            .executor(new CommandExecutor() {
+                @Override
+                public CommandResult execute(CommandSource source, CommandContext args) throws CommandException {
+                    // Create a new query session
+                    final QuerySession session = new QuerySession(source);
 
-        return CommandResult.success();
-    }
+                    String arguments = null;
+                    if (args.<String>getOne("arguments").isPresent()) {
+                        arguments = args.<String>getOne("arguments").get();
+                    }
 
-    @Override
-    public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+                    try {
+                        CompletableFuture<Query> future = session.newQueryFromArguments(arguments);
+                        future.thenAccept(query -> {
+                            // Pass off to an async lookup helper
+                            AsyncUtils.lookup(session);
+                        });
+                    } catch(ParameterException e) {
+                        source.sendMessage(Format.error(Text.of(e.getMessage())));
+                    }
 
-    @Override
-    public boolean testPermission(CommandSource source) {
-        return source.hasPermission("prism.lookup");
-    }
-
-    @Override
-    public Optional<Text> getShortDescription(CommandSource source) {
-        return Optional.of(Text.of("Search event records."));
-    }
-
-    @Override
-    public Optional<Text> getHelp(CommandSource source) {
-        return Optional.of(Text.of("See /pr ? for help with search parameters."));
-    }
-
-    @Override
-    public Text getUsage(CommandSource source) {
-        return Text.of("/pr l (parameters)");
+                    return CommandResult.success();
+                }
+            }).build();
     }
 }

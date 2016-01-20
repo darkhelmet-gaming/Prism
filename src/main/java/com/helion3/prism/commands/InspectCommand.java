@@ -81,4 +81,3 @@ public class InspectCommand implements CommandCallable {
         return Text.of("/pr i");
     }
 }
-

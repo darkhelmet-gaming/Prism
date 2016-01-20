@@ -30,6 +30,8 @@ import com.helion3.prism.api.parameters.ParameterException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nullable;
+
 /**
  * Represents a record query session, which includes the actual
  * {@link Query} as well as the source, and result set meta data.
@@ -92,7 +94,7 @@ public class QuerySession {
      * @param parameters String parameters
      * @return CompletableFuture<Query>
      */
-    public CompletableFuture<Query> newQueryFromArguments(String arguments) throws ParameterException {
+    public CompletableFuture<Query> newQueryFromArguments(@Nullable String arguments) throws ParameterException {
         CompletableFuture<Query> future = QueryBuilder.fromArguments(this, arguments);
         future.thenAccept(query -> {
             this.query = query;

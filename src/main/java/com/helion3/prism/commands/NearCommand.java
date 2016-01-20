@@ -23,60 +23,41 @@
  */
 package com.helion3.prism.commands;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Conditions;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.utils.AsyncUtils;
 
-public class NearCommand implements CommandCallable {
-    @Override
-    public CommandResult process(CommandSource source, String arguments) throws CommandException {
-        int radius = Prism.getConfig().getNode("commands", "near", "defaultRadius").getInt();
+public class NearCommand {
+    private NearCommand() {}
 
-        // Create a new query session
-        final QuerySession session = new QuerySession(source);
-        session.newQuery().addConditions(Conditions.from(((Player) source).getLocation(), radius));
+    public static CommandSpec getCommand() {
+        return CommandSpec.builder()
+            .description(Text.of("Alias of /pr l r:(default radius)"))
+            .permission("prism.lookup")
+            .executor(new CommandExecutor() {
+                @Override
+                public CommandResult execute(CommandSource source, CommandContext args) throws CommandException {
+                    int radius = Prism.getConfig().getNode("commands", "near", "defaultRadius").getInt();
 
-        // Pass off to an async lookup helper
-        AsyncUtils.lookup(session);
+                    // Create a new query session
+                    final QuerySession session = new QuerySession(source);
+                    session.newQuery().addConditions(Conditions.from(((Player) source).getLocation(), radius));
 
-        return CommandResult.success();
-    }
+                    // Pass off to an async lookup helper
+                    AsyncUtils.lookup(session);
 
-    @Override
-    public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean testPermission(CommandSource source) {
-        return source.hasPermission("prism.lookup");
-    }
-
-    @Override
-    public Optional<Text> getShortDescription(CommandSource source) {
-        return Optional.of(Text.of("Search nearby events."));
-    }
-
-    @Override
-    public Optional<Text> getHelp(CommandSource source) {
-        return Optional.of(Text.of("Alias of /pr l r:(default radius)"));
-    }
-
-    @Override
-    public Text getUsage(CommandSource source) {
-        return Text.of("/pr near");
+                    return CommandResult.success();
+                }
+            }).build();
     }
 }
-

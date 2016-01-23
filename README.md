@@ -8,7 +8,7 @@ Prism is a rollback/restore grief-prevention plugin for Sponge-based Minecraft s
 
 Prism 3.x has been completely rewritten for Sponge. It's still very early in the development process but we're working hard to exceed even our own standards.
 
-Because of this, our feature set is growing. File and issue or let us know in IRC what's important to you.
+Because of this, our feature set is growing. File an issue or let us know in IRC what's important to you.
 
 ## Installation
 

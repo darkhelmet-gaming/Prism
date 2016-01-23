@@ -26,12 +26,17 @@ package com.helion3.prism.api.query;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.spongepowered.api.text.Text;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -40,6 +45,7 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.api.flags.FlagHandler;
 import com.helion3.prism.api.parameters.ParameterException;
 import com.helion3.prism.api.parameters.ParameterHandler;
+import com.helion3.prism.utils.Format;
 
 public class QueryBuilder {
     private QueryBuilder() {}
@@ -60,14 +66,7 @@ public class QueryBuilder {
      * @return {@link Query} Database query object
      */
     public static CompletableFuture<Query> fromArguments(QuerySession session, @Nullable String arguments) throws ParameterException {
-        if (arguments == null) {
-            CompletableFuture<Query> future = new CompletableFuture<Query>();
-            future.complete(empty());
-
-            return future;
-        } else {
-            return fromArguments(session, arguments.split(" "));
-        }
+        return fromArguments(session, (arguments != null ? arguments.split(" ") : new String[]{}));
     }
 
     /**
@@ -82,6 +81,9 @@ public class QueryBuilder {
         Query query = new Query();
         CompletableFuture<Query> future = new CompletableFuture<Query>();
 
+        // Track all parameter pairs
+        Map<String, String> definedParameters = new HashMap<String, String>();
+
         if (arguments.length > 0) {
             List<ListenableFuture<?>> futures = new ArrayList<ListenableFuture<?>>();
             for (String arg : arguments) {
@@ -90,7 +92,14 @@ public class QueryBuilder {
                 if (flagPattern.matcher(arg).matches()) {
                     listenable = parseFlagFromArgument(session, query, arg);
                 } else {
-                    listenable = parseParameterFromArgument(session, query, arg);
+                    // Get alias/value pair
+                    Pair<String, String> pair = getParameterKeyValue(arg);
+
+                    // Parse for handler
+                    listenable = parseParameterFromArgument(session, query, pair);
+
+                    // Add to list of defined
+                    definedParameters.put(pair.getKey(), pair.getValue());
                 }
 
                 if (listenable.isPresent()) {
@@ -110,7 +119,34 @@ public class QueryBuilder {
                 future.complete(query);
             }
         } else {
-            future.cancel(false);
+            future.complete(query);
+        }
+
+        if (Prism.getConfig().getNode("defaults", "enabled").getBoolean()) {
+            // Require any parameter defaults
+            String defaultsUsed = "";
+            for (ParameterHandler handler : Prism.getParameterHandlers()) {
+                boolean aliasFound = false;
+
+                for (String alias : handler.getAliases()) {
+                    if (definedParameters.containsKey(alias)) {
+                        aliasFound = true;
+                        break;
+                    }
+                }
+
+                if (!aliasFound) {
+                    Optional<Pair<String, String>> pair = handler.processDefault(session, query);
+                    if (pair.isPresent()) {
+                        defaultsUsed += pair.get().getKey() + ":" + pair.get().getValue() + " ";
+                    }
+                }
+            }
+
+            // @todo should move this
+            if (!defaultsUsed.isEmpty()) {
+                session.getCommandSource().get().sendMessage(Format.subduedHeading(Text.of(String.format("Defaults used: %s", defaultsUsed))));
+            }
         }
 
         return future;
@@ -160,16 +196,9 @@ public class QueryBuilder {
     }
 
     /**
-     * Parses a parameter argument.
-     *
-     * @param session QuerySession current session.
-     * @param query Query query being built.
-     * @param parameter String argument which should be a parameter
-     * @return Optional<ListenableFuture<?>>
-     * @throws ParameterException
+     * Returns a key/value pair parsed from a parameter string.
      */
-    private static Optional<ListenableFuture<?>> parseParameterFromArgument(QuerySession session, Query query, String parameter) throws ParameterException {
-        // Determine the true alias and value
+    private static Pair<String, String> getParameterKeyValue(String parameter) {
         String alias;
         String value;
         if (parameter.contains(":")) {
@@ -183,29 +212,42 @@ public class QueryBuilder {
             value = parameter;
         }
 
+        return Pair.of(alias, value);
+    }
+
+    /**
+     * Parses a parameter argument.
+     *
+     * @param session QuerySession current session.
+     * @param query Query query being built.
+     * @param parameter String argument which should be a parameter
+     * @return Optional<ListenableFuture<?>>
+     * @throws ParameterException
+     */
+    private static Optional<ListenableFuture<?>> parseParameterFromArgument(QuerySession session, Query query, Pair<String, String> parameter) throws ParameterException {
         // Simple validation
-        if (alias.length() <= 0 || value.length() <= 0) {
-            throw new ParameterException("Invalid empty value for parameter \"" + alias + "\".");
+        if (parameter.getKey().length() <= 0 || parameter.getValue().length() <= 0) {
+            throw new ParameterException("Invalid empty value for parameter \"" + parameter.getKey() + "\".");
         }
 
         // Find a handler
-        Optional<ParameterHandler> optionalHandler = Prism.getParameterHandler(alias);
+        Optional<ParameterHandler> optionalHandler = Prism.getParameterHandler(parameter.getKey());
         if (!optionalHandler.isPresent()) {
-            throw new ParameterException("\"" + alias + "\" is not a valid parameter. No handler found.");
+            throw new ParameterException("\"" + parameter.getKey() + "\" is not a valid parameter. No handler found.");
         }
 
         ParameterHandler handler = optionalHandler.get();
 
         // Allows this command source?
         if (!handler.acceptsSource(session.getCommandSource().get())) {
-            throw new ParameterException("This command source may not use the \"" + alias + "\" parameter.");
+            throw new ParameterException("This command source may not use the \"" + parameter.getKey() + "\" parameter.");
         }
 
         // Validate value
-        if (!handler.acceptsValue(value)) {
-            throw new ParameterException("Invalid value \"" + value + "\" for parameter \"" + alias + "\".");
+        if (!handler.acceptsValue(parameter.getValue())) {
+            throw new ParameterException("Invalid value \"" + parameter.getValue() + "\" for parameter \"" + parameter.getKey() + "\".");
         }
 
-        return handler.process(session, alias, value, query);
+        return handler.process(session, parameter.getKey(), parameter.getValue(), query);
     }
 }

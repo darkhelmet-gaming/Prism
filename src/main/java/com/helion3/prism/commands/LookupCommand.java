@@ -34,7 +34,6 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 
-import com.helion3.prism.Prism;
 import com.helion3.prism.api.parameters.ParameterException;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
@@ -59,6 +58,8 @@ public class LookupCommand {
                     if (args.<String>getOne("arguments").isPresent()) {
                         arguments = args.<String>getOne("arguments").get();
                     }
+
+                    source.sendMessage(Format.heading("Querying records..."));
 
                     try {
                         CompletableFuture<Query> future = session.newQueryFromArguments(arguments);

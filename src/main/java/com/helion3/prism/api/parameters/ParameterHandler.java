@@ -27,8 +27,10 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.command.CommandSource;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
@@ -53,6 +55,13 @@ public interface ParameterHandler {
     boolean acceptsValue(String value);
 
     /**
+     * Get all parameter aliases this handler applies to.
+     *
+     * @return List of aliases.
+     */
+    ImmutableList<String> getAliases();
+
+    /**
      * Returns whether this handler responds to the given alias.
      *
      * @param alias String Alias to check against
@@ -70,4 +79,13 @@ public interface ParameterHandler {
      * @param query Query Current query object
      */
     Optional<ListenableFuture<?>> process(QuerySession session, String parameter, String value, Query query);
+
+    /**
+     * Called when this handler's aliases were not defined.
+     *
+     * @param session QuerySession
+     */
+    default Optional<Pair<String, String>> processDefault(QuerySession session, Query query) {
+        return Optional.empty();
+    }
 }

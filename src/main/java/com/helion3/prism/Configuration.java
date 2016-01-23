@@ -114,6 +114,17 @@ public class Configuration {
                 eventPlayerQuit.setValue(false);
             }
 
+            // Default parameters
+            ConfigurationNode defaults = rootNode.getNode("defaults", "enabled");
+            if (defaults.isVirtual()) {
+                defaults.setValue(true);
+            }
+
+            ConfigurationNode defaultRadius = rootNode.getNode("defaults", "radius");
+            if (defaultRadius.isVirtual()) {
+                defaultRadius.setValue(5);
+            }
+
             // Commands
             ConfigurationNode nearRadius = rootNode.getNode("commands", "near", "defaultRadius");
             if (nearRadius.isVirtual()) {

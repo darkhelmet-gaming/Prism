@@ -36,6 +36,7 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Conditions;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.utils.AsyncUtils;
+import com.helion3.prism.utils.Format;
 
 public class NearCommand {
     private NearCommand() {}
@@ -48,6 +49,8 @@ public class NearCommand {
                 @Override
                 public CommandResult execute(CommandSource source, CommandContext args) throws CommandException {
                     int radius = Prism.getConfig().getNode("commands", "near", "defaultRadius").getInt();
+
+                    source.sendMessage(Format.heading("Querying records..."));
 
                     // Create a new query session
                     final QuerySession session = new QuerySession(source);

@@ -54,6 +54,8 @@ public class RollbackCommand implements CommandCallable {
         final QuerySession session = new QuerySession(source);
 
         try {
+            source.sendMessage(Format.heading("Querying records..."));
+
             CompletableFuture<Query> future = session.newQueryFromArguments(arguments);
             future.thenAccept(query -> {
                 query.setAggregate(false);

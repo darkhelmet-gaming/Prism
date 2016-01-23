@@ -29,12 +29,14 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import org.spongepowered.api.entity.living.player.Player;
+import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Conditions;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
@@ -64,6 +66,23 @@ public class ParameterRadius extends SimpleParameterHandler {
         if (session.getCommandSource().get() instanceof Player) {
             Location<World> location = ((Player) session.getCommandSource().get()).getLocation();
             query.addConditions(Conditions.from(location, Integer.parseInt(value)));
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Pair<String, String>> processDefault(QuerySession session, Query query) {
+        if (session.getCommandSource().get() instanceof Player) {
+            // Default radius from config
+            int defaultRadius = Prism.getConfig().getNode("defaults", "radius").getInt();
+
+            // Player location
+            Location<World> location = ((Player) session.getCommandSource().get()).getLocation();
+
+            query.addConditions(Conditions.from(location, defaultRadius));
+
+            return Optional.of(Pair.of(aliases.get(0), "" + defaultRadius));
         }
 
         return Optional.empty();

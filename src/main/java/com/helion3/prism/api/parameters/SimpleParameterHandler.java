@@ -26,7 +26,7 @@ package com.helion3.prism.api.parameters;
 import com.google.common.collect.ImmutableList;
 
 public abstract class SimpleParameterHandler implements ParameterHandler {
-    private final ImmutableList<String> aliases;
+    protected final ImmutableList<String> aliases;
 
     /**
      * Super constructor for most parameter handlers.
@@ -36,10 +36,11 @@ public abstract class SimpleParameterHandler implements ParameterHandler {
         this.aliases = aliases;
     }
 
-    /**
-     * Returns whether this handler applies to the given
-     * parameter string.
-     */
+    @Override
+    public ImmutableList<String> getAliases() {
+        return aliases;
+    }
+
     @Override
     public boolean handles(String alias) {
         return aliases.contains(alias);

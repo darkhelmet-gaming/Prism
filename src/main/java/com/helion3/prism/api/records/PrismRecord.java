@@ -89,18 +89,18 @@ public class PrismRecord {
 
         event.getData().set(causeKey, causeIdentifier);
 
-        // Source allowed?
+        // Source filtered?
         if (!Prism.getFilterList().allowsSource(source.getSource())) {
             return;
         }
 
-        // Original block blacklisted?
+        // Original block filtered?
         Optional<Object> optionalOriginalBlock = event.getData().get(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
         if (optionalOriginalBlock.isPresent() && !Prism.getFilterList().allowsBlock((String) optionalOriginalBlock.get())) {
             return;
         }
 
-        // Replacement block blacklisted?
+        // Replacement block filtered?
         Optional<Object> optionalReplacementBlock = event.getData().get(DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
         if (optionalReplacementBlock.isPresent() && !Prism.getFilterList().allowsBlock((String) optionalReplacementBlock.get())) {
             return;

@@ -41,6 +41,8 @@ public class BlockUtil {
         return (
                 // Just basic state changes
                 a.equals(BlockTypes.LIT_FURNACE) || b.equals(BlockTypes.LIT_FURNACE) ||
+                a.equals(BlockTypes.LIT_REDSTONE_LAMP) || b.equals(BlockTypes.LIT_REDSTONE_LAMP) ||
+                a.equals(BlockTypes.LIT_REDSTONE_ORE) || b.equals(BlockTypes.LIT_REDSTONE_ORE) ||
 
                 // It's all water...
                 (a.equals(BlockTypes.WATER) && b.equals(BlockTypes.FLOWING_WATER)) ||
@@ -57,8 +59,8 @@ public class BlockUtil {
                 (a.equals(BlockTypes.FLOWING_LAVA) && b.equals(BlockTypes.SAND)) ||
 
                 // It's fire...
-                a.equals(BlockTypes.AIR) || b.equals(BlockTypes.FIRE) ||
-                a.equals(BlockTypes.FIRE) || b.equals(BlockTypes.AIR)
+                (a.equals(BlockTypes.AIR) && b.equals(BlockTypes.FIRE)) ||
+                (a.equals(BlockTypes.FIRE) && b.equals(BlockTypes.AIR))
         );
     }
 

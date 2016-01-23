@@ -105,37 +105,17 @@ public class FilterList {
     }
 
     /**
-     * Check if the list contains an object. Checks for
-     * accepted types and passes of to their proper handlers.
-     *
-     * @param object Object
-     * @return boolean If object is a known type and in the list
-     */
-    public boolean allows(Object object) {
-        boolean contains = false;
-
-        if (object instanceof Player) {
-            contains = allows((Player) object);
-        }
-        else if (object instanceof BlockType) {
-            contains = allows((BlockType) object);
-        }
-        else if (object instanceof String) {
-
-        }
-
-        return contains;
-    }
-
-    /**
      * Get if list contains a player's UUID.
      *
      * @param player
      * @return boolean If list contains player uuid.
      */
     public boolean allows(Player player) {
-        boolean contains = players.size() == 0 || players.contains(player.getUniqueId().toString());
-        return mode.equals(FilterMode.BLACKLIST) ? !contains : contains;
+        if (mode.equals(FilterMode.WHITELIST)) {
+            return players.contains(player.getUniqueId().toString());
+        } else {
+            return players.isEmpty() || !players.contains(player.getUniqueId().toString());
+        }
     }
 
     /**
@@ -145,7 +125,10 @@ public class FilterList {
      * @return boolean If list contains block type.
      */
     public boolean allowsBlock(String blockType) {
-        boolean contains = blocks.size() == 0 || blocks.contains(blockType);
-        return mode.equals(FilterMode.BLACKLIST) ? !contains : contains;
+        if (mode.equals(FilterMode.WHITELIST)) {
+            return blocks.contains(blockType);
+        } else {
+            return blocks.isEmpty() || !blocks.contains(blockType);
+        }
     }
 }

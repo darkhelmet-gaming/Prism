@@ -24,6 +24,7 @@
 package com.helion3.prism.events.listeners;
 
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
@@ -34,6 +35,7 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.api.records.PrismRecord.PrismRecordEventBuilder;
 import com.helion3.prism.util.BlockUtil;
+import com.helion3.prism.util.EventUtil;
 
 public class ChangeBlockListener {
     /**
@@ -46,13 +48,18 @@ public class ChangeBlockListener {
         for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
             PrismRecordEventBuilder record = PrismRecord.create().source(event.getCause());
 
+            BlockType original = transaction.getOriginal().getState().getType();
+            BlockType finalBlock = transaction.getFinal().getState().getType();
+
             if (event instanceof ChangeBlockEvent.Break || event instanceof Detonate) {
-                if (Prism.listening.BREAK && !BlockUtil.rejectPlaceCombination(transaction.getOriginal().getState().getType(), transaction.getFinal().getState().getType())) {
+                if (Prism.listening.BREAK && !BlockUtil.rejectPlaceCombination(original, finalBlock)) {
                     record.brokeBlock(transaction).save();
                 }
             }
             else if (event instanceof ChangeBlockEvent.Place) {
-                if (Prism.listening.PLACE && !BlockUtil.rejectPlaceCombination(transaction.getOriginal().getState().getType(), transaction.getFinal().getState().getType())) {
+                if (Prism.listening.PLACE &&
+                        !BlockUtil.rejectPlaceCombination(original, finalBlock) &&
+                        !EventUtil.rejectEventIdentity(original, finalBlock, event.getCause())) {
                     record.placedBlock(transaction).save();
                 }
             }

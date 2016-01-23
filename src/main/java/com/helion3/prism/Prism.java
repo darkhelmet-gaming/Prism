@@ -76,7 +76,7 @@ import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
 final public class Prism {
     private static List<Player> activeWands = new ArrayList<Player>();
-    private static final FilterList filterlist = new FilterList(FilterMode.WHITELIST);
+    private static final FilterList filterlist = new FilterList(FilterMode.BLACKLIST);
     private static Configuration config;
     private static Game game;
     private static List<ParameterHandler> handlers = new ArrayList<ParameterHandler>();
@@ -109,9 +109,6 @@ final public class Prism {
         // Load configuration data
         config = new Configuration(defaultConfig, configManager);
         listening = new Listening();
-
-        // Temporary filtering pending sponge improvements
-        filterlist.addSource(Player.class);
 
         // Register all result record classes
         registerEventResultRecords();

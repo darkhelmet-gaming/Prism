@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.utils;
+package com.helion3.prism.util;
 
 import java.util.HashMap;
 import java.util.Map;

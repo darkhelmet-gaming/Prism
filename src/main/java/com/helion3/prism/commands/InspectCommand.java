@@ -34,7 +34,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 
 import com.helion3.prism.Prism;
-import com.helion3.prism.utils.Format;
+import com.helion3.prism.util.Format;
 
 public class InspectCommand implements CommandCallable {
     @Override

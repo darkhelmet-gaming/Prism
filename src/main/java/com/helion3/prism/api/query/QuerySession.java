@@ -40,6 +40,7 @@ import javax.annotation.Nullable;
 public class QuerySession {
     protected Query query;
     protected final CommandSource commandSource;
+    private int radius;
 
     /**
      * Constructs a new session without any command source.
@@ -86,6 +87,25 @@ public class QuerySession {
     public Query newQuery() {
         query = new Query();
         return query;
+    }
+
+    /**
+     * For reference reasons, we need to know whether this was
+     * limited to a radius around the player (if any).
+     *
+     * @return int Radius
+     */
+    public int getRadius() {
+        return radius;
+    }
+
+    /**
+     * Set the radius used for the query.
+     *
+     * @param radius
+     */
+    public void setRadius(int radius) {
+        this.radius = radius;
     }
 
     /**

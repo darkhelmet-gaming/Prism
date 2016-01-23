@@ -24,7 +24,6 @@
 package com.helion3.prism.events.listeners;
 
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
@@ -34,14 +33,9 @@ import org.spongepowered.api.event.world.ExplosionEvent.Detonate;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.records.PrismRecord;
 import com.helion3.prism.api.records.PrismRecord.PrismRecordEventBuilder;
+import com.helion3.prism.util.BlockUtil;
 
 public class ChangeBlockListener {
-    // @todo move these to ignore
-    private final boolean hearBreak = Prism.getConfig().getNode("events", "block", "break").getBoolean();
-    private final boolean hearDecay = Prism.getConfig().getNode("events", "block", "decay").getBoolean();
-    private final boolean hearGrow = Prism.getConfig().getNode("events", "block", "grow").getBoolean();
-    private final boolean hearPlace = Prism.getConfig().getNode("events", "block", "place").getBoolean();
-
     /**
      * Listens to the base change block event.
      *
@@ -53,23 +47,22 @@ public class ChangeBlockListener {
             PrismRecordEventBuilder record = PrismRecord.create().source(event.getCause());
 
             if (event instanceof ChangeBlockEvent.Break || event instanceof Detonate) {
-                // Air blocks are listed in Detonate events
-                if (hearBreak && !transaction.getOriginal().getState().getType().equals(BlockTypes.AIR)) {
+                if (Prism.listening.BREAK && !BlockUtil.rejectPlaceCombination(transaction.getOriginal().getState().getType(), transaction.getFinal().getState().getType())) {
                     record.brokeBlock(transaction).save();
                 }
             }
             else if (event instanceof ChangeBlockEvent.Place) {
-                if (hearPlace) {
+                if (Prism.listening.PLACE && !BlockUtil.rejectPlaceCombination(transaction.getOriginal().getState().getType(), transaction.getFinal().getState().getType())) {
                     record.placedBlock(transaction).save();
                 }
             }
             else if (event instanceof ChangeBlockEvent.Decay) {
-                if (hearDecay) {
+                if (Prism.listening.DECAY) {
                     record.decayedBlock(transaction).save();
                 }
             }
             else if (event instanceof GrowBlockEvent) {
-                if (hearGrow) {
+                if (Prism.listening.GROW) {
                     record.grewBlock(transaction).save();
                 }
             }

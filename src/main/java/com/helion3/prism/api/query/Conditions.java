@@ -29,7 +29,7 @@ import java.util.List;
 import org.spongepowered.api.world.Location;
 
 import com.google.common.collect.Range;
-import com.helion3.prism.utils.DataQueries;
+import com.helion3.prism.util.DataQueries;
 
 public class Conditions {
     private Conditions() {}

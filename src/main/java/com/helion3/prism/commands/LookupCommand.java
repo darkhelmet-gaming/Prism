@@ -37,8 +37,8 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import com.helion3.prism.api.parameters.ParameterException;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.utils.AsyncUtils;
-import com.helion3.prism.utils.Format;
+import com.helion3.prism.util.AsyncUtil;
+import com.helion3.prism.util.Format;
 
 public class LookupCommand {
     private LookupCommand() {}
@@ -65,7 +65,7 @@ public class LookupCommand {
                         CompletableFuture<Query> future = session.newQueryFromArguments(arguments);
                         future.thenAccept(query -> {
                             // Pass off to an async lookup helper
-                            AsyncUtils.lookup(session);
+                            AsyncUtil.lookup(session);
                         });
                     } catch(ParameterException e) {
                         source.sendMessage(Format.error(Text.of(e.getMessage())));

@@ -45,7 +45,7 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.api.flags.FlagHandler;
 import com.helion3.prism.api.parameters.ParameterException;
 import com.helion3.prism.api.parameters.ParameterHandler;
-import com.helion3.prism.utils.Format;
+import com.helion3.prism.util.Format;
 
 public class QueryBuilder {
     private QueryBuilder() {}

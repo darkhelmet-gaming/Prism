@@ -37,7 +37,7 @@ import org.spongepowered.api.command.args.CommandContext;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.helion3.prism.utils.Format;
+import com.helion3.prism.util.Format;
 
 public class PrismCommands {
     private PrismCommands(){}
@@ -55,6 +55,7 @@ public class PrismCommands {
         builder.put(ImmutableList.of("rb", "rollback"), new RollbackCommand());
         builder.put(ImmutableList.of("rs", "restore"), new RestoreCommand());
         builder.put(ImmutableList.of("undo"), UndoCommand.getCommand());
+        builder.put(ImmutableList.of("ext"), ExtinguishCommand.getCommand());
 
         return CommandSpec.builder()
             .executor(new CommandExecutor() {

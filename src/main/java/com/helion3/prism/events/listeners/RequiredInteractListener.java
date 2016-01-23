@@ -37,7 +37,7 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Conditions;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.utils.AsyncUtils;
+import com.helion3.prism.util.AsyncUtil;
 
 public class RequiredInteractListener {
     /**
@@ -69,7 +69,7 @@ public class RequiredInteractListener {
                 query.addConditions(Conditions.from(location));
 
                 // Pass off to an async lookup helper
-                AsyncUtils.lookup(session);
+                AsyncUtil.lookup(session);
             }
         }
     }

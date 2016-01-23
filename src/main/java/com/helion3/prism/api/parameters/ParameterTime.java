@@ -37,8 +37,8 @@ import com.helion3.prism.api.query.Condition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.utils.DataQueries;
-import com.helion3.prism.utils.DateUtils;
+import com.helion3.prism.util.DataQueries;
+import com.helion3.prism.util.DateUtil;
 
 public class ParameterTime extends SimpleParameterHandler {
     private final Pattern pattern = Pattern.compile("[\\w,:-]+");
@@ -61,7 +61,7 @@ public class ParameterTime extends SimpleParameterHandler {
 
         if (matches) {
             try {
-                DateUtils.parseTimeStringToDate(value, false);
+                DateUtil.parseTimeStringToDate(value, false);
             } catch(Exception e) {
                 matches = false;
             }
@@ -72,7 +72,7 @@ public class ParameterTime extends SimpleParameterHandler {
 
     @Override
     public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
-        Date date = DateUtils.parseTimeStringToDate(value, false);
+        Date date = DateUtil.parseTimeStringToDate(value, false);
 
         // Determine match rule based on before/since
         MatchRule rule = MatchRule.LESS_THAN_EQUAL;

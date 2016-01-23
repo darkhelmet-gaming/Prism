@@ -21,15 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.utils;
+package com.helion3.prism.util;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DateUtils {
-    private DateUtils() {}
+public class DateUtil {
+    private DateUtil() {}
 
     private static final Pattern relativeTimeDeclaration = Pattern.compile("([0-9]+)(s|h|m|d|w)");
 
@@ -82,7 +82,7 @@ public class DateUtils {
     public static Date parseTimeStringToDate(String shorthand, boolean future) {
         final Calendar calendar = Calendar.getInstance();
 
-        final String[] matches = TypeUtils.pregMatchAll(relativeTimeDeclaration, shorthand);
+        final String[] matches = TypeUtil.pregMatchAll(relativeTimeDeclaration, shorthand);
         if (matches.length == 0) {
             throw new IllegalArgumentException("Invalid date shorthand.");
         }

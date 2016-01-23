@@ -35,8 +35,8 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Conditions;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.utils.AsyncUtils;
-import com.helion3.prism.utils.Format;
+import com.helion3.prism.util.AsyncUtil;
+import com.helion3.prism.util.Format;
 
 public class NearCommand {
     private NearCommand() {}
@@ -57,7 +57,7 @@ public class NearCommand {
                     session.newQuery().addConditions(Conditions.from(((Player) source).getLocation(), radius));
 
                     // Pass off to an async lookup helper
-                    AsyncUtils.lookup(session);
+                    AsyncUtil.lookup(session);
 
                     return CommandResult.success();
                 }

@@ -21,28 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.results;
+package com.helion3.prism;
 
-import java.util.Date;
+public class Listening {
+    public final boolean BREAK;
+    public final boolean DEATH;
+    public final boolean DECAY;
+    public final boolean GROW;
+    public final boolean JOIN;
+    public final boolean PLACE;
+    public final boolean QUIT;
 
-import com.helion3.prism.util.DataQueries;
-import com.helion3.prism.util.DateUtil;
-
-/**
- * Represents a complete copy of event record data from
- * a query result. Used for displaying individual entries
- * or for non-lookup actions.
- *
- */
-public class ResultRecordComplete extends ResultRecord {
-    /**
-     * Returns a user-friendly relative "time since" value.
-     *
-     * @return String "time since" value.
-     */
-    @Override
-    public String getRelativeTime() {
-        Date created = (Date) data.get(DataQueries.Created).get();
-        return DateUtil.getTimeSince(created);
+    public Listening() {
+        BREAK = Prism.getConfig().getNode("events", "break").getBoolean();
+        DEATH = Prism.getConfig().getNode("events", "death").getBoolean();
+        DECAY = Prism.getConfig().getNode("events", "decay").getBoolean();
+        GROW = Prism.getConfig().getNode("events", "grow").getBoolean();
+        JOIN = Prism.getConfig().getNode("events", "join").getBoolean();
+        PLACE = Prism.getConfig().getNode("events", "place").getBoolean();
+        QUIT = Prism.getConfig().getNode("events", "quit").getBoolean();
     }
 }

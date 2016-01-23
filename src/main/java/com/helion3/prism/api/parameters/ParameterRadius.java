@@ -40,7 +40,7 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Conditions;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.utils.Format;
+import com.helion3.prism.util.Format;
 
 public class ParameterRadius extends SimpleParameterHandler {
     private final Pattern pattern = Pattern.compile("[\\w,:-]+");
@@ -77,6 +77,8 @@ public class ParameterRadius extends SimpleParameterHandler {
                 radius = maxRadius;
             }
 
+            session.setRadius(radius);
+
             query.addConditions(Conditions.from(location, radius));
         }
 
@@ -93,6 +95,8 @@ public class ParameterRadius extends SimpleParameterHandler {
             Location<World> location = ((Player) session.getCommandSource().get()).getLocation();
 
             query.addConditions(Conditions.from(location, defaultRadius));
+
+            session.setRadius(defaultRadius);
 
             return Optional.of(Pair.of(aliases.get(0), "" + defaultRadius));
         }

@@ -79,37 +79,37 @@ public class Configuration {
             }
 
             // Events
-            ConfigurationNode eventBlockBreak = rootNode.getNode("events", "block", "break");
+            ConfigurationNode eventBlockBreak = rootNode.getNode("events", "break");
             if (eventBlockBreak.isVirtual()) {
                 eventBlockBreak.setValue(true);
             }
 
-            ConfigurationNode eventBlockDecay = rootNode.getNode("events", "block", "decay");
+            ConfigurationNode eventBlockDecay = rootNode.getNode("events", "decay");
             if (eventBlockDecay.isVirtual()) {
                 eventBlockDecay.setValue(true);
             }
 
-            ConfigurationNode eventBlockGrow = rootNode.getNode("events", "block", "grow");
+            ConfigurationNode eventBlockGrow = rootNode.getNode("events", "grow");
             if (eventBlockGrow.isVirtual()) {
                 eventBlockGrow.setValue(true);
             }
 
-            ConfigurationNode eventBlockPlace = rootNode.getNode("events", "block", "place");
+            ConfigurationNode eventBlockPlace = rootNode.getNode("events", "place");
             if (eventBlockPlace.isVirtual()) {
                 eventBlockPlace.setValue(true);
             }
 
-            ConfigurationNode eventEntityDeath = rootNode.getNode("events", "entity", "death");
+            ConfigurationNode eventEntityDeath = rootNode.getNode("events", "death");
             if (eventEntityDeath.isVirtual()) {
                 eventEntityDeath.setValue(true);
             }
 
-            ConfigurationNode eventPlayerJoin = rootNode.getNode("events", "player", "join");
+            ConfigurationNode eventPlayerJoin = rootNode.getNode("events", "join");
             if (eventPlayerJoin.isVirtual()) {
                 eventPlayerJoin.setValue(false);
             }
 
-            ConfigurationNode eventPlayerQuit = rootNode.getNode("events", "player", "quit");
+            ConfigurationNode eventPlayerQuit = rootNode.getNode("events", "quit");
             if (eventPlayerQuit.isVirtual()) {
                 eventPlayerQuit.setValue(false);
             }

@@ -72,7 +72,6 @@ import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
  * Prism is an event logging + rollback/restore engine for Minecraft servers.
  *
  * @author viveleroi
- *
  */
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
 final public class Prism {
@@ -87,6 +86,8 @@ final public class Prism {
     private static Map<String,Class<? extends ResultRecord>> resultRecords = new HashMap<String,Class<? extends ResultRecord>>();
     private static Object plugin;
     private static StorageAdapter storageAdapter;
+
+    public static Listening listening;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
@@ -105,8 +106,9 @@ final public class Prism {
     public void onServerStart(GameStartedServerEvent event) {
         plugin = this;
 
-        // Load configuration file
+        // Load configuration data
         config = new Configuration(defaultConfig, configManager);
+        listening = new Listening();
 
         // Temporary filtering pending sponge improvements
         filterlist.addSource(Player.class);
@@ -348,15 +350,15 @@ final public class Prism {
 
         eventManager.registerListeners(this, new ChangeBlockListener());
 
-        if (config.getNode("events", "entity", "death").getBoolean()) {
+        if (listening.DEATH) {
             eventManager.registerListeners(this, new DeathListener());
         }
 
-        if (config.getNode("events", "player", "join").getBoolean()) {
+        if (listening.JOIN) {
             eventManager.registerListeners(this, new JoinListener());
         }
 
-        if (config.getNode("events", "player", "quit").getBoolean()) {
+        if (listening.QUIT) {
             eventManager.registerListeners(this, new QuitListener());
         }
 

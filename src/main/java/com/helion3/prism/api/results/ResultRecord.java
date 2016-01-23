@@ -28,9 +28,8 @@ import java.util.Optional;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 
-import com.helion3.prism.Prism;
-import com.helion3.prism.utils.DataQueries;
-import com.helion3.prism.utils.TypeUtils;
+import com.helion3.prism.util.DataQueries;
+import com.helion3.prism.util.TypeUtil;
 
 abstract public class ResultRecord {
     public DataContainer data;
@@ -41,7 +40,7 @@ abstract public class ResultRecord {
      * @return String verb variant of event group.
      */
     public String getEventVerb() {
-        return TypeUtils.translateToPastTense(getEventGroupName());
+        return TypeUtil.translateToPastTense(getEventGroupName());
     }
 
     /**

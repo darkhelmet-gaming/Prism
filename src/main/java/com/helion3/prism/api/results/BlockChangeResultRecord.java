@@ -33,7 +33,7 @@ import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.block.BlockSnapshot.Builder;
 
 import com.helion3.prism.Prism;
-import com.helion3.prism.utils.DataQueries;
+import com.helion3.prism.util.DataQueries;
 
 /**
  * Represents a block change event record.
@@ -44,7 +44,7 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
         Optional<Object> optionalOriginal = data.get(DataQueries.OriginalBlock);
 
         if (!optionalOriginal.isPresent()) {
-            // @todo error/skip
+            return ActionableResult.skipped(SkipReason.INVALID_BLOCK);
         }
 
         // Our data is stored with a different structure, so we'll need

@@ -54,9 +54,9 @@ import com.helion3.prism.api.results.ResultRecordComplete;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
-import com.helion3.prism.utils.DataQueries;
-import com.helion3.prism.utils.DataUtils;
-import com.helion3.prism.utils.DateUtils;
+import com.helion3.prism.util.DataQueries;
+import com.helion3.prism.util.DataUtil;
+import com.helion3.prism.util.DateUtil;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -92,7 +92,7 @@ public class MongoRecords implements StorageAdapterRecords {
                             DataView subView = (DataView) object;
                             document.append(key, documentFromView(subView));
                         }
-                        else if (DataUtils.isPrimitiveType(object)) {
+                        else if (DataUtil.isPrimitiveType(object)) {
                             document.append(key, optional.get());
                             break;
                         }
@@ -153,7 +153,7 @@ public class MongoRecords implements StorageAdapterRecords {
            Document document = documentFromView(container);
 
            // TTL
-           document.append("Expires", DateUtils.parseTimeStringToDate(expiration, true));
+           document.append("Expires", DateUtil.parseTimeStringToDate(expiration, true));
 
            // Insert
            documents.add(new InsertOneModel<Document>(document));
@@ -229,9 +229,9 @@ public class MongoRecords implements StorageAdapterRecords {
        // Sorting
        Document sortFields = new Document();
        sortFields.put(DataQueries.Created.toString(), sortDir);
+       sortFields.put(DataQueries.Y.toString(), 1);
        sortFields.put(DataQueries.X.toString(), 1);
        sortFields.put(DataQueries.Z.toString(), 1);
-       sortFields.put(DataQueries.Y.toString(), 1);
        Document sorter = new Document("$sort", sortFields);
 
        // Offset/Limit

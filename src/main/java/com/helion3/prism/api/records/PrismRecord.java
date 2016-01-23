@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.helion3.prism.Prism;
 import com.helion3.prism.queues.RecordingQueue;
-import com.helion3.prism.utils.DataQueries;
+import com.helion3.prism.util.DataQueries;
 
 /**
  * An easy-to-understand factory class for Prism {@link EventRecord}s.

@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -43,9 +44,10 @@ import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.results.Actionable;
 import com.helion3.prism.api.results.ActionableResult;
 import com.helion3.prism.api.results.ResultRecord;
-import com.helion3.prism.utils.Format;
-import com.helion3.prism.utils.Template;
-import com.helion3.prism.utils.Translation;
+import com.helion3.prism.util.Format;
+import com.helion3.prism.util.Template;
+import com.helion3.prism.util.Translation;
+import com.helion3.prism.util.WorldUtil;
 
 public class RollbackCommand implements CommandCallable {
     @Override
@@ -74,6 +76,15 @@ public class RollbackCommand implements CommandCallable {
                                 if(result instanceof Actionable) {
                                     Actionable actionable = (Actionable) result;
                                     actionResults.add(actionable.undo());
+                                }
+                            }
+
+                            if (source instanceof Player) {
+                                int fire = WorldUtil.removeAroundFromLocation(BlockTypes.FIRE, ((Player) source).getLocation(), session.getRadius());
+                                int items = WorldUtil.removeItemEntitiesAroundLocation(((Player) source).getLocation(), session.getRadius());
+
+                                if (fire + items > 0) {
+                                    source.sendMessage(Format.bonus("Cleaning area..."));
                                 }
                             }
 

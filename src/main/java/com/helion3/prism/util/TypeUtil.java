@@ -21,13 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.utils;
+package com.helion3.prism.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TypeUtils {
-    private TypeUtils() {}
+public class TypeUtil {
+    private TypeUtil() {}
 
     /**
      * Java implementation of preg_match_all by https://github.com/raimonbosch.

@@ -21,38 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.utils;
+package com.helion3.prism.util;
 
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
 
-public class Template {
+import com.helion3.prism.api.results.ResultRecord;
 
-    private Template() {}
+public class AsyncCallback {
+    public void success(List<ResultRecord> results) {}
 
-    /**
-     * Replaces named tokens in a string with their final value.
-     *
-     * @param text String template with placeholder tokens
-     * @param replacements Map of named tokens and their values
-     * @return String Final result
-     */
-    public static String parseTemplate( String text, Map<String,String> replacements ) {
-        Pattern pattern = Pattern.compile("\\{(.+?)\\}");
-        Matcher matcher = pattern.matcher(text);
-        StringBuilder builder = new StringBuilder();
-        int i = 0;
-        while (matcher.find()) {
-            String replacement = replacements.get(matcher.group(1));
-            builder.append(text.substring(i, matcher.start()));
-            if (replacement == null)
-                builder.append(matcher.group(0));
-            else
-                builder.append(replacement);
-            i = matcher.end();
-        }
-        builder.append(text.substring(i, text.length()));
-        return builder.toString();
-    }
+    public void empty() {}
+
+    public void error(Exception e) {}
 }

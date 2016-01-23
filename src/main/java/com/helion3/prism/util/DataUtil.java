@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.utils;
+package com.helion3.prism.util;
 
 import java.util.Iterator;
 import java.util.List;
@@ -37,8 +37,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.helion3.prism.Prism;
 
-public class DataUtils {
-    private DataUtils() {}
+public class DataUtil {
+    private DataUtil() {}
 
     /**
      * Checks an object against known primitive object types.
@@ -82,7 +82,7 @@ public class DataUtils {
                         if (object instanceof DataView) {
                             json.add(key, jsonFromDataView((DataView) object));
                         }
-                        else if (DataUtils.isPrimitiveType(object)) {
+                        else if (DataUtil.isPrimitiveType(object)) {
                             Gson gson = new GsonBuilder().create();
                             JsonArray array = gson.toJsonTree(optional.get()).getAsJsonArray();
                             json.add(key, array);

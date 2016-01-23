@@ -21,42 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.utils;
+package com.helion3.prism.util;
 
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Text.Builder;
-import org.spongepowered.api.text.format.TextColors;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import com.helion3.prism.api.results.ResultRecord;
-import com.helion3.prism.api.results.ResultRecordAggregate;
+public class Template {
 
-public class Messages {
-    private Messages() {}
+    private Template() {}
 
     /**
-     * Generates Text output from a ResultRecord.
+     * Replaces named tokens in a string with their final value.
      *
-     * @param result ResultRecord
-     * @return Text
+     * @param text String template with placeholder tokens
+     * @param replacements Map of named tokens and their values
+     * @return String Final result
      */
-    public static Text from(ResultRecord result) {
-        Builder builder = Text.builder().append(Text.of(
-            TextColors.DARK_AQUA, result.getSourceName(), " ",
-            TextColors.WHITE, result.getEventVerb(), " "
-        ));
-
-        String target = result.getTargetName();
-        if (!target.isEmpty()) {
-            builder.append(Text.of(TextColors.DARK_AQUA, target, " "));
+    public static String parseTemplate( String text, Map<String,String> replacements ) {
+        Pattern pattern = Pattern.compile("\\{(.+?)\\}");
+        Matcher matcher = pattern.matcher(text);
+        StringBuilder builder = new StringBuilder();
+        int i = 0;
+        while (matcher.find()) {
+            String replacement = replacements.get(matcher.group(1));
+            builder.append(text.substring(i, matcher.start()));
+            if (replacement == null)
+                builder.append(matcher.group(0));
+            else
+                builder.append(replacement);
+            i = matcher.end();
         }
-
-        if (result instanceof ResultRecordAggregate) {
-            int count = result.data.getInt(DataQueries.Count).get();
-            builder.append(Text.of(TextColors.GREEN, "x" + count, " "));
-        }
-
-        builder.append(Text.of(TextColors.WHITE, result.getRelativeTime()));
-
-        return builder.build();
+        builder.append(text.substring(i, text.length()));
+        return builder.toString();
     }
 }

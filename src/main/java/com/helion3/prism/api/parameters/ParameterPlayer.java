@@ -40,7 +40,7 @@ import com.helion3.prism.api.query.Condition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.utils.DataQueries;
+import com.helion3.prism.util.DataQueries;
 
 public class ParameterPlayer extends SimpleParameterHandler {
     private final Pattern pattern = Pattern.compile("[\\w,:-]+");

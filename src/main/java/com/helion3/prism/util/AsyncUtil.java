@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.utils;
+package com.helion3.prism.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,8 +37,8 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.results.ResultRecord;
 
-public class AsyncUtils {
-    private AsyncUtils() {}
+public class AsyncUtil {
+    private AsyncUtil() {}
 
     /**
      * Helper utility for running a lookup asynchronously.

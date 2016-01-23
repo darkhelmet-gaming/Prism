@@ -125,6 +125,12 @@ public class Configuration {
                 defaultRadius.setValue(5);
             }
 
+            // Limits
+            ConfigurationNode limitRadiusMax = rootNode.getNode("limits", "radius", "max");
+            if (limitRadiusMax.isVirtual()) {
+                limitRadiusMax.setValue(100);
+            }
+
             // Commands
             ConfigurationNode nearRadius = rootNode.getNode("commands", "near", "defaultRadius");
             if (nearRadius.isVirtual()) {

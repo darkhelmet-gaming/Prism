@@ -40,6 +40,7 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Conditions;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
+import com.helion3.prism.utils.Format;
 
 public class ParameterRadius extends SimpleParameterHandler {
     private final Pattern pattern = Pattern.compile("[\\w,:-]+");
@@ -65,7 +66,18 @@ public class ParameterRadius extends SimpleParameterHandler {
     public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
         if (session.getCommandSource().get() instanceof Player) {
             Location<World> location = ((Player) session.getCommandSource().get()).getLocation();
-            query.addConditions(Conditions.from(location, Integer.parseInt(value)));
+
+            int radius = Integer.parseInt(value);
+            int maxRadius = Prism.getConfig().getNode("limits", "radius", "max").getInt();
+
+            // Enforce max radius unless player has override perms
+            if (radius > maxRadius && !session.getCommandSource().get().hasPermission("prism.override.radius")) {
+                // @todo move this
+                session.getCommandSource().get().sendMessage(Format.subduedHeading(String.format("Limiting radius to maximum of %d", maxRadius)));
+                radius = maxRadius;
+            }
+
+            query.addConditions(Conditions.from(location, radius));
         }
 
         return Optional.empty();

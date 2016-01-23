@@ -83,22 +83,31 @@ public class MongoRecords implements StorageAdapterRecords {
                 String key = query.asString(".");
 
                 if (optional.get() instanceof List) {
+                    List<Object> convertedList = new ArrayList<Object>();
                     List<?> list = (List<?>) optional.get();
                     Iterator<?> iterator = list.iterator();
+
                     while (iterator.hasNext()) {
                         Object object = iterator.next();
 
                         if (object instanceof DataView) {
-                            DataView subView = (DataView) object;
-                            document.append(key, documentFromView(subView));
+                            convertedList.add(documentFromView((DataView) object));
+                        }
+                        else if (object.getClass().isEnum()) {
+                            // Ignoring, this data should exist elsewhere in the document
+                            //convertedList.add(object.toString());
                         }
                         else if (DataUtil.isPrimitiveType(object)) {
-                            document.append(key, optional.get());
+                            convertedList.add(optional.get());
                             break;
                         }
                         else {
                             Prism.getLogger().error("Unsupported list data type: " + object.getClass().getName());
                         }
+                    }
+
+                    if (!convertedList.isEmpty()) {
+                        document.append(key, convertedList);
                     }
                 }
                 else if (optional.get() instanceof DataView) {
@@ -151,6 +160,8 @@ public class MongoRecords implements StorageAdapterRecords {
        List<WriteModel<Document>> documents = new ArrayList<WriteModel<Document>>();
        for (DataContainer container : containers) {
            Document document = documentFromView(container);
+
+           //Prism.getLogger().debug(DataUtil.jsonFromDataView(container).toString());
 
            // TTL
            document.append("Expires", DateUtil.parseTimeStringToDate(expiration, true));

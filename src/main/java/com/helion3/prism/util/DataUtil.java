@@ -23,6 +23,7 @@
  */
 package com.helion3.prism.util;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -66,12 +67,14 @@ public class DataUtil {
      */
     public static JsonObject jsonFromDataView(DataView view) {
         JsonObject json = new JsonObject();
+        Gson gson = new GsonBuilder().create();
 
         Set<DataQuery> keys = view.getKeys(false);
         for (DataQuery query : keys) {
             Optional<Object> optional = view.get(query);
             if (optional.isPresent()) {
                 String key = query.asString(".");
+                List<Object> convertedList = new ArrayList<Object>();
 
                 if (optional.get() instanceof List) {
                     List<?> list = (List<?>) optional.get();
@@ -80,17 +83,24 @@ public class DataUtil {
                         Object object = iterator.next();
 
                         if (object instanceof DataView) {
-                            json.add(key, jsonFromDataView((DataView) object));
+                            convertedList.add(jsonFromDataView((DataView) object));
+                        }
+                        else if (object.getClass().isEnum()) {
+                            //convertedList.add(object.toString());
                         }
                         else if (DataUtil.isPrimitiveType(object)) {
-                            Gson gson = new GsonBuilder().create();
                             JsonArray array = gson.toJsonTree(optional.get()).getAsJsonArray();
-                            json.add(key, array);
+                            convertedList.add(array);
                             break;
                         }
                         else {
-                            Prism.getLogger().error("Unsupported list data type: " + object.getClass().getName());
+                            Prism.getLogger().error("Unsupported json list data type: " + object.getClass().getName());
                         }
+                    }
+
+                    if (!convertedList.isEmpty()) {
+                        JsonArray array = gson.toJsonTree(convertedList).getAsJsonArray();
+                        json.add(key, array);
                     }
                 }
                 else if (optional.get() instanceof DataView) {

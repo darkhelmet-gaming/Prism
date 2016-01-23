@@ -126,6 +126,11 @@ public class Configuration {
                 rbQueryMaxLimit.setValue(10000);
             }
 
+            ConfigurationNode lQueryMaxLimit = rootNode.getNode("query", "lookup", "limit");
+            if (lQueryMaxLimit.isVirtual()) {
+                lQueryMaxLimit.setValue(1000);
+            }
+
             // Save
             try {
                 configManager.save(rootNode);

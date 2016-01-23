@@ -23,11 +23,15 @@
  */
 package com.helion3.prism.utils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.pagination.PaginationBuilder;
+import org.spongepowered.api.service.pagination.PaginationService;
 
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.QuerySession;
@@ -44,18 +48,29 @@ public class AsyncUtils {
      */
     public static void lookup(final QuerySession session) {
         if (!session.getCommandSource().isPresent()) {
-            // @todo handle this. would be best with a callback system
+            // @todo handle this.
+            return;
         }
 
         CommandSource source = session.getCommandSource().get();
 
+        // Enforce lookup limits
+        session.getQuery().setLimit(Prism.getConfig().getNode("query", "lookup", "limit").getInt());
+
         async(session, new AsyncCallback() {
             @Override
             public void success(List<ResultRecord> results) {
-                source.sendMessage(Format.heading("Showing " + results.size() + " results."));
-
+                List<Text> messages = new ArrayList<Text>();
                 for (ResultRecord result : results) {
-                    source.sendMessage(Messages.from(result));
+                    messages.add(Messages.from(result));
+                }
+
+                Optional<PaginationService> service = Prism.getGame().getServiceManager().provide(PaginationService.class);
+                if (service.isPresent()) {
+                    // Build paginated content
+                    PaginationBuilder builder = service.get().builder();
+                    builder.contents(messages);
+                    builder.sendTo(session.getCommandSource().get());
                 }
             }
 

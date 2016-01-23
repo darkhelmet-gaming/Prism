@@ -34,6 +34,7 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 
+import com.helion3.prism.Prism;
 import com.helion3.prism.api.parameters.ParameterException;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
@@ -47,7 +48,7 @@ public class LookupCommand {
         return CommandSpec.builder()
             .description(Text.of("Search event records."))
             .permission("prism.lookup")
-            .arguments(GenericArguments.remainingJoinedStrings(Text.of("arguments")))
+            .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("arguments"))))
             .executor(new CommandExecutor() {
                 @Override
                 public CommandResult execute(CommandSource source, CommandContext args) throws CommandException {

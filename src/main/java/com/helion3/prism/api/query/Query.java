@@ -29,7 +29,7 @@ import java.util.List;
 final public class Query {
     private boolean isAggregate = true;
     private List<Condition> conditions = new ArrayList<Condition>();
-    private int limit = 5;
+    private int limit = 1000;
 
     /**
      * Add a condition.

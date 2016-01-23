@@ -101,23 +101,19 @@ abstract public class ResultRecord {
         String value = "";
         String eventName = data.getString(DataQueries.EventName).get();
 
-        if (eventName.contains("block")) {
-            // Determine which block state we're using
-            DataQuery path = DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
-            if (eventName.equals("place")) {
-                path = DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
-            }
+        // Determine which block state we're using
+        DataQuery path = DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
+        if (eventName.equals("place")) {
+            path = DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
+        }
 
-            // Use value
-            Optional<String> optionalBlockType = data.getString(path);
-            if (optionalBlockType.isPresent()) {
-                value = optionalBlockType.get();
+        // Use value
+        Optional<String> optionalBlockType = data.getString(path);
+        if (optionalBlockType.isPresent()) {
+            value = optionalBlockType.get();
 
-                if (value.contains(":")) {
-                    value = value.split(":")[1];
-                }
-            } else {
-                Prism.getLogger().debug("No value at path: " + path);
+            if (value.contains(":")) {
+                value = value.split(":")[1];
             }
         }
 

@@ -265,8 +265,6 @@ public class MongoRecords implements StorageAdapterRecords {
            pipeline.add(sorter);
            pipeline.add(limit);
 
-           Prism.getLogger().debug(pipeline.toString());
-
            aggregated = collection.aggregate(pipeline);
        } else {
            // Aggregation pipeline
@@ -274,8 +272,6 @@ public class MongoRecords implements StorageAdapterRecords {
            pipeline.add(matcher);
            pipeline.add(sorter);
            pipeline.add(limit);
-
-           Prism.getLogger().debug(pipeline.toString());
 
            aggregated = collection.aggregate(pipeline);
        }
@@ -290,7 +286,6 @@ public class MongoRecords implements StorageAdapterRecords {
                Document wrapper = cursor.next();
                Document document = shouldGroup ? (Document) wrapper.get("_id") : wrapper;
 
-               Prism.getLogger().debug(document.toString());
                DataContainer data = documentToDataContainer(document);
 
                if (shouldGroup) {

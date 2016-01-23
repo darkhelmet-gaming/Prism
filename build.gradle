@@ -1,3 +1,14 @@
+def getVersionName = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'describe', '--tags'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+version = getVersionName()
+
 // Gradle repositories and dependencies
 buildscript {
     repositories {
@@ -102,4 +113,3 @@ jar.manifest.mainAttributes(
         "Implementation-Title": name,
         "Implementation-Version": version + "+" + ciSystem + "-b" + buildNumber + ".git-" + commit,
         "Implementation-Vendor": url)
-

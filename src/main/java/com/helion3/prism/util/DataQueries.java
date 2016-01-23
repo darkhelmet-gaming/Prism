@@ -38,6 +38,7 @@ public class DataQueries {
     public static final DataQuery Created = of("Created");
     public static final DataQuery Data = of("Data");
     public static final DataQuery Entity = of("Entity");
+    public static final DataQuery EntityType = of("EntityType");
     public static final DataQuery EventName = of("EventName");
     public static final DataQuery ExtraData = of("ExtraData");
     public static final DataQuery id = of("Id");
@@ -46,10 +47,14 @@ public class DataQueries {
     public static final DataQuery Player = of("Player");
     public static final DataQuery Position = of("Position");
     public static final DataQuery ReplacementBlock = of("Replacement");
+    public static final DataQuery Rotation = of("Rotation");
     public static final DataQuery UnsafeData = of("UnsafeData");
     public static final DataQuery WorldName = of("WorldName");
     public static final DataQuery WorldUuid = of("WorldUuid");
     public static final DataQuery X = of("X");
     public static final DataQuery Y = of("Y");
     public static final DataQuery Z = of("Z");
+
+    // Pending cleanup from Sponge?
+    public static final DataQuery Pos = of("Pos");
 }

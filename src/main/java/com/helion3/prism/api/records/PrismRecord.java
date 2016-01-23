@@ -36,7 +36,8 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -210,6 +211,7 @@ public class PrismRecord {
          */
         public PrismRecord killed(Living entity){
             this.eventName = "death";
+            writeEntity(entity);
             return new PrismRecord(source, this);
         }
 
@@ -223,7 +225,8 @@ public class PrismRecord {
         private void writeBlockTransaction(Transaction<BlockSnapshot> transaction) {
             checkNotNull(transaction);
 
-//            Prism.getLogger().debug(DataUtils.jsonFromDataView(transaction.getOriginal().toContainer()).toString());
+//            Prism.getLogger().debug(DataUtil.jsonFromDataView(transaction.getOriginal().toContainer()).toString());
+//            Prism.getLogger().debug(DataUtil.jsonFromDataView(transaction.getFinal().toContainer()).toString());
 
             // Location
             DataContainer location = transaction.getOriginal().getLocation().get().toContainer();
@@ -235,6 +238,36 @@ public class PrismRecord {
             // Storing the state only, so we don't also get location
             data.set(DataQueries.OriginalBlock, formatBlockDataContainer(transaction.getOriginal()));
             data.set(DataQueries.ReplacementBlock, formatBlockDataContainer(transaction.getFinal()));
+        }
+
+        /**
+         * Helper method for formatting entity container data.
+         * @param entity
+         */
+        private void writeEntity(Entity entity) {
+            checkNotNull(entity);
+//            Prism.getLogger().debug(DataUtil.jsonFromDataView(entity.toContainer()).toString());
+
+            DataContainer entityData = entity.toContainer();
+
+            Optional<DataView> position = entityData.getView(DataQueries.Position);
+            if (position.isPresent()) {
+                position.get().set(DataQueries.WorldUuid, entityData.get(DataQueries.WorldUuid).get());
+                data.set(DataQueries.Location, position.get());
+
+                entityData.remove(DataQueries.Position);
+                entityData.remove(DataQueries.WorldUuid);
+            }
+
+            Optional<DataView> optionalUnsafeData = entityData.getView(DataQueries.UnsafeData);
+            if (optionalUnsafeData.isPresent()) {
+                DataView unsafeData = optionalUnsafeData.get();
+                unsafeData.remove(DataQueries.Rotation);
+                unsafeData.remove(DataQueries.Pos);
+                entityData.set(DataQueries.UnsafeData, unsafeData);
+            }
+
+            data.set(DataQueries.Entity, entityData);
         }
 
         /**
@@ -309,10 +342,16 @@ public class PrismRecord {
                 source = player.get();
             }
 
-            // World?
-            Optional<World> world = cause.first(World.class);
-            if (world.isPresent()) {
-                source = world.get();
+            // Attacker?
+            Optional<EntityDamageSource> attacker = cause.first(EntityDamageSource.class);
+            if (attacker.isPresent()) {
+                source = attacker.get().getSource();
+            }
+
+            // Indirect attacker?
+            Optional<IndirectEntityDamageSource> indirectAttacker = cause.first(IndirectEntityDamageSource.class);
+            if (indirectAttacker.isPresent()) {
+                source = indirectAttacker.get().getIndirectSource();
             }
 
             // Default to something!

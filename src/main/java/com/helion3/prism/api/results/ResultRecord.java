@@ -95,13 +95,23 @@ abstract public class ResultRecord {
      * block, or entity of this event record.
      *
      * @return String target name.
+     * @todo I really want to change this...
      */
     public String getTargetName() {
         String value = "";
         String eventName = data.getString(DataQueries.EventName).get();
+        DataQuery path;
+
+        path = DataQueries.Entity.then(DataQueries.EntityType);
+        if (this instanceof ResultRecordAggregate) {
+            path = DataQueries.Entity;
+        }
+
+        if (data.getString(path).isPresent()) {
+            return formatId(data.getString(path).get());
+        }
 
         // Determine which block state we're using
-        DataQuery path;
         if (this instanceof ResultRecordAggregate) {
             path = DataQueries.OriginalBlock;
             if (eventName.equals("place")) {
@@ -117,13 +127,17 @@ abstract public class ResultRecord {
         // Use value
         Optional<String> optionalBlockType = data.getString(path);
         if (optionalBlockType.isPresent()) {
-            value = optionalBlockType.get();
-
-            if (value.contains(":")) {
-                value = value.split(":")[1];
-            }
+            value = formatId(optionalBlockType.get());
         }
 
         return value;
+    }
+
+    private String formatId(String id) {
+        if (id.contains(":")) {
+            id = id.split(":")[1];
+        }
+
+        return id;
     }
 }

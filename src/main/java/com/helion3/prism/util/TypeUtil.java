@@ -74,6 +74,9 @@ public class TypeUtil {
             case "place":
                 verb = "placed";
                 break;
+            case "death":
+                verb = "killed";
+                break;
             default:
                 verb = word;
         }

@@ -96,7 +96,8 @@ public class MongoRecords implements StorageAdapterRecords {
                             convertedList.add(documentFromView((DataView) object));
                         }
                         else if (object.getClass().isEnum()) {
-                            // Ignoring, this data should exist elsewhere in the document
+                            // Ignoring, this data should exist elsewhere in the document.
+                            // this is ConnectedDirections and other vanilla manipulators
                             //convertedList.add(object.toString());
                         }
                         else if (DataUtil.isPrimitiveType(object)) {
@@ -259,10 +260,15 @@ public class MongoRecords implements StorageAdapterRecords {
            groupFields.put(DataQueries.EventName.toString(), "$" + DataQueries.EventName);
            groupFields.put(DataQueries.Player.toString(), "$" + DataQueries.Player);
            groupFields.put(DataQueries.Cause.toString(), "$" + DataQueries.Cause);
+           // Original block
            groupFields.put(DataQueries.OriginalBlock.toString(),
                "$" + DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
+           // Replacement block
            groupFields.put(DataQueries.ReplacementBlock.toString(),
                "$" + DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
+           // Entity
+           groupFields.put(DataQueries.Entity.toString(), "$" + DataQueries.Entity.then(DataQueries.EntityType));
+           // Day
            groupFields.put("dayOfMonth", new Document("$dayOfMonth", "$" + DataQueries.Created));
            groupFields.put("month", new Document("$month", "$" + DataQueries.Created));
            groupFields.put("year", new Document("$year", "$" + DataQueries.Created));

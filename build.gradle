@@ -30,7 +30,7 @@ apply plugin: 'idea'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 // Default tasks
-defaultTasks 'licenseFormat', 'check', 'build'
+defaultTasks 'licenseFormat', 'check', 'build', 'shadowJar'
 
 // Extended project information
 ext.projectName = 'Prism'

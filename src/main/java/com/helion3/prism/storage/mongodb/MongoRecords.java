@@ -23,6 +23,8 @@
  */
 package com.helion3.prism.storage.mongodb;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -187,6 +189,7 @@ public class MongoRecords implements StorageAdapterRecords {
    @Override
    public CompletableFuture<List<ResultRecord>> query(QuerySession session) throws Exception {
        Query query = session.getQuery();
+       checkNotNull(query);
 
        // Prepare results
        List<ResultRecord> results = new ArrayList<ResultRecord>();

@@ -52,7 +52,7 @@ public class ChangeBlockListener {
             BlockType finalBlock = transaction.getFinal().getState().getType();
 
             if (event instanceof ChangeBlockEvent.Break || event instanceof Detonate) {
-                if (Prism.listening.BREAK && !BlockUtil.rejectPlaceCombination(original, finalBlock)) {
+                if (Prism.listening.BREAK && !BlockUtil.rejectBreakCombination(original, finalBlock)) {
                     record.brokeBlock(transaction).save();
                 }
             }

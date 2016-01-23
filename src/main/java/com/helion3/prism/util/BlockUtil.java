@@ -39,28 +39,30 @@ public class BlockUtil {
      */
     public static boolean rejectPlaceCombination(BlockType a, BlockType b) {
         return (
-                // Just basic state changes
-                a.equals(BlockTypes.LIT_FURNACE) || b.equals(BlockTypes.LIT_FURNACE) ||
-                a.equals(BlockTypes.LIT_REDSTONE_LAMP) || b.equals(BlockTypes.LIT_REDSTONE_LAMP) ||
-                a.equals(BlockTypes.LIT_REDSTONE_ORE) || b.equals(BlockTypes.LIT_REDSTONE_ORE) ||
+            // Just basic state changes
+            a.equals(BlockTypes.LIT_FURNACE) || b.equals(BlockTypes.LIT_FURNACE) ||
+            a.equals(BlockTypes.LIT_REDSTONE_LAMP) || b.equals(BlockTypes.LIT_REDSTONE_LAMP) ||
+            a.equals(BlockTypes.LIT_REDSTONE_ORE) || b.equals(BlockTypes.LIT_REDSTONE_ORE) ||
 
-                // It's all water...
-                (a.equals(BlockTypes.WATER) && b.equals(BlockTypes.FLOWING_WATER)) ||
-                (a.equals(BlockTypes.FLOWING_WATER) && b.equals(BlockTypes.WATER)) ||
+            // It's all water...
+            (a.equals(BlockTypes.WATER) && b.equals(BlockTypes.FLOWING_WATER)) ||
+            (a.equals(BlockTypes.FLOWING_WATER) && b.equals(BlockTypes.WATER)) ||
 
-                // It's all lava....
-                (a.equals(BlockTypes.LAVA) && b.equals(BlockTypes.FLOWING_LAVA)) ||
-                (a.equals(BlockTypes.FLOWING_LAVA) && b.equals(BlockTypes.LAVA)) ||
+            // It's all lava....
+            (a.equals(BlockTypes.LAVA) && b.equals(BlockTypes.FLOWING_LAVA)) ||
+            (a.equals(BlockTypes.FLOWING_LAVA) && b.equals(BlockTypes.LAVA)) ||
 
-                // Crap that fell into lava
-                (a.equals(BlockTypes.LAVA) && b.equals(BlockTypes.GRAVEL)) ||
-                (a.equals(BlockTypes.FLOWING_LAVA) && b.equals(BlockTypes.GRAVEL)) ||
-                (a.equals(BlockTypes.LAVA) && b.equals(BlockTypes.SAND)) ||
-                (a.equals(BlockTypes.FLOWING_LAVA) && b.equals(BlockTypes.SAND)) ||
+            // Crap that fell into lava
+            (a.equals(BlockTypes.LAVA) && b.equals(BlockTypes.GRAVEL)) ||
+            (a.equals(BlockTypes.FLOWING_LAVA) && b.equals(BlockTypes.GRAVEL)) ||
+            (a.equals(BlockTypes.LAVA) && b.equals(BlockTypes.SAND)) ||
+            (a.equals(BlockTypes.FLOWING_LAVA) && b.equals(BlockTypes.SAND)) ||
 
-                // It's fire...
-                (a.equals(BlockTypes.AIR) && b.equals(BlockTypes.FIRE)) ||
-                (a.equals(BlockTypes.FIRE) && b.equals(BlockTypes.AIR))
+            // It's fire...
+            (a.equals(BlockTypes.FIRE) && b.equals(BlockTypes.AIR)) ||
+
+            // You can't place air
+            a.equals(BlockTypes.AIR)
         );
     }
 
@@ -74,9 +76,9 @@ public class BlockUtil {
      */
     public static boolean rejectBreakCombination(BlockType a, BlockType b) {
         return (
-                // You can't break these...
-                a.equals(BlockTypes.FIRE) ||
-                a.equals(BlockTypes.AIR)
+            // You can't break these...
+            a.equals(BlockTypes.FIRE) ||
+            a.equals(BlockTypes.AIR)
         );
     }
 }

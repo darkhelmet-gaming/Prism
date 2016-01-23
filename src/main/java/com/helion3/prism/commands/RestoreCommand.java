@@ -120,12 +120,13 @@ public class RestoreCommand implements CommandCallable {
                         }
                     });
                 } catch (Exception e) {
-                    // @todo handle
+                    source.sendMessage(Format.error(Text.of(e.getMessage())));
                     e.printStackTrace();
                 }
             });
         } catch(Exception e) {
             source.sendMessage(Format.error(Text.of(e.getMessage())));
+            e.printStackTrace();
         }
 
         return CommandResult.success();

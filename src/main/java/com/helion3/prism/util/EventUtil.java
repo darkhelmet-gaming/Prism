@@ -23,12 +23,11 @@
  */
 package com.helion3.prism.util;
 
-import java.util.Optional;
-
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.living.animal.Sheep;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 
 public class EventUtil {
@@ -43,17 +42,63 @@ public class EventUtil {
      * @param cause Cause chain from event
      * @return boolean If should be rejected
      */
-    public static boolean rejectEventIdentity(BlockType a, BlockType b, Cause cause) {
+    public static boolean rejectBreakEventIdentity(BlockType a, BlockType b, Cause cause) {
+        // Falling blocks
+        if (a.equals(BlockTypes.GRAVEL) && b.equals(BlockTypes.AIR)) {
+            return !cause.first(Player.class).isPresent();
+        }
+
+        // Natural flow events
+        if ((a.equals(BlockTypes.FLOWING_WATER) || a.equals(BlockTypes.FLOWING_LAVA)) && b.equals(BlockTypes.AIR)) {
+            return !cause.first(Player.class).isPresent();
+        }
+
+        // Interesting bugs...
+        if (a.equals(BlockTypes.AIR) && b.equals(BlockTypes.AIR)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Reject certain events which can only be identified
+     * by the change + cause signature.
+     *
+     * @param a BlockType original
+     * @param b BlockType replacement
+     * @param cause Cause chain from event
+     * @return boolean If should be rejected
+     */
+    public static boolean rejectPlaceEventIdentity(BlockType a, BlockType b, Cause cause) {
         // Things that eat grass...
         if (a.equals(BlockTypes.GRASS) && b.equals(BlockTypes.DIRT)) {
-            Optional<Sheep> sheep = cause.first(Sheep.class);
-            return sheep.isPresent();
+            return cause.first(Sheep.class).isPresent();
         }
 
         // Grass-like "Grow" events
         if (a.equals(BlockTypes.DIRT) && b.equals(BlockTypes.GRASS)) {
-            Optional<BlockSnapshot> snapshot = cause.first(BlockSnapshot.class);
-            return snapshot.isPresent();
+            return cause.first(BlockSnapshot.class).isPresent();
+        }
+
+        // Vine grow events
+        if (a.equals(BlockTypes.AIR) && b.equals(BlockTypes.VINE)) {
+            return !cause.first(Player.class).isPresent();
+        }
+
+        // Natural flow events
+        if (a.equals(BlockTypes.AIR) && (b.equals(BlockTypes.FLOWING_WATER) || b.equals(BlockTypes.FLOWING_LAVA))) {
+            return !cause.first(Player.class).isPresent();
+        }
+
+        // Falling blocks
+        if (a.equals(BlockTypes.AIR) && b.equals(BlockTypes.GRAVEL)) {
+            return !cause.first(Player.class).isPresent();
+        }
+
+        // Grass vanishing
+        if (a.equals(BlockTypes.GRASS) && b.equals(BlockTypes.DIRT)) {
+            return !cause.first(Player.class).isPresent();
         }
 
         return false;

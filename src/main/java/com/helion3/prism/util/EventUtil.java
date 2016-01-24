@@ -26,7 +26,7 @@ package com.helion3.prism.util;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.entity.living.animal.Sheep;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 
@@ -45,11 +45,6 @@ public class EventUtil {
     public static boolean rejectBreakEventIdentity(BlockType a, BlockType b, Cause cause) {
         // Falling blocks
         if (a.equals(BlockTypes.GRAVEL) && b.equals(BlockTypes.AIR)) {
-            return !cause.first(Player.class).isPresent();
-        }
-
-        // Natural flow events
-        if ((a.equals(BlockTypes.FLOWING_WATER) || a.equals(BlockTypes.FLOWING_LAVA)) && b.equals(BlockTypes.AIR)) {
             return !cause.first(Player.class).isPresent();
         }
 
@@ -73,7 +68,7 @@ public class EventUtil {
     public static boolean rejectPlaceEventIdentity(BlockType a, BlockType b, Cause cause) {
         // Things that eat grass...
         if (a.equals(BlockTypes.GRASS) && b.equals(BlockTypes.DIRT)) {
-            return cause.first(Sheep.class).isPresent();
+            return cause.first(Living.class).isPresent();
         }
 
         // Grass-like "Grow" events
@@ -83,11 +78,6 @@ public class EventUtil {
 
         // Vine grow events
         if (a.equals(BlockTypes.AIR) && b.equals(BlockTypes.VINE)) {
-            return !cause.first(Player.class).isPresent();
-        }
-
-        // Natural flow events
-        if (a.equals(BlockTypes.AIR) && (b.equals(BlockTypes.FLOWING_WATER) || b.equals(BlockTypes.FLOWING_LAVA))) {
             return !cause.first(Player.class).isPresent();
         }
 

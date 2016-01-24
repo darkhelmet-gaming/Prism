@@ -25,8 +25,11 @@ package com.helion3.prism.api.query;
 
 import org.spongepowered.api.command.CommandSource;
 
+import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.parameters.ParameterException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -40,7 +43,8 @@ import javax.annotation.Nullable;
 public class QuerySession {
     protected Query query;
     protected final CommandSource commandSource;
-    private int radius;
+    protected int radius;
+    protected List<Flag> flags = new ArrayList<Flag>();
 
     /**
      * Constructs a new session without any command source.
@@ -62,6 +66,14 @@ public class QuerySession {
     }
 
     /**
+     * Add a flag to this query session.
+     * @param flag Flag
+     */
+    public void addFlag(Flag flag) {
+        flags.add(flag);
+    }
+
+    /**
      * Returns the command source this session belongs to, if any.
      *
      * @return CommandSource
@@ -77,6 +89,16 @@ public class QuerySession {
      */
     public Query getQuery(){
         return query;
+    }
+
+    /**
+     * Check if a given flag is present.
+     *
+     * @param flag Flag
+     * @return
+     */
+    public boolean hasFlag(Flag flag) {
+        return flags.contains(flag);
     }
 
     /**

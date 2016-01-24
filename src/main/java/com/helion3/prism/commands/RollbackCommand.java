@@ -39,6 +39,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 
 import com.helion3.prism.Prism;
+import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.results.Actionable;
@@ -83,7 +84,12 @@ public class RollbackCommand implements CommandCallable {
                                 int fire = WorldUtil.removeAroundFromLocation(BlockTypes.FIRE, ((Player) source).getLocation(), session.getRadius());
                                 int items = WorldUtil.removeItemEntitiesAroundLocation(((Player) source).getLocation(), session.getRadius());
 
-                                if (fire + items > 0) {
+                                int liquids = 0;
+                                if (session.hasFlag(Flag.DRAIN)) {
+                                    liquids = WorldUtil.removeLiquidsAroundLocation(((Player) source).getLocation(), session.getRadius());
+                                }
+
+                                if (fire + items + liquids > 0) {
                                     source.sendMessage(Format.bonus("Cleaning area..."));
                                 }
                             }

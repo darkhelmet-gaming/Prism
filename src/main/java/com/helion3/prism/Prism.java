@@ -47,6 +47,7 @@ import org.spongepowered.api.config.DefaultConfig;
 import com.google.inject.Inject;
 import com.helion3.prism.api.filters.FilterList;
 import com.helion3.prism.api.filters.FilterMode;
+import com.helion3.prism.api.flags.FlagDrain;
 import com.helion3.prism.api.flags.FlagHandler;
 import com.helion3.prism.api.flags.FlagNoGroup;
 import com.helion3.prism.api.parameters.ParameterBlock;
@@ -302,6 +303,7 @@ final public class Prism {
      * Registers all default flag handlers
      */
     private void registerFlagHandlers() {
+        registerFlagHandler(new FlagDrain());
         registerFlagHandler(new FlagNoGroup());
     }
 

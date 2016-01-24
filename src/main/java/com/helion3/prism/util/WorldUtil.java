@@ -119,4 +119,20 @@ public class WorldUtil {
 
         return entities.size();
     }
+
+    /**
+     * Drain all liquids from a radius around a given location.
+     *
+     * @param location Location center
+     * @param radius Integer radius around location
+     * @return integer Count of removals
+     */
+    public static int removeLiquidsAroundLocation(Location<World> location, int radius) {
+        int changeCount = 0;
+        for (BlockType liquid : BlockUtil.getLiquidBlockTypes()) {
+            changeCount = removeAroundFromLocation(liquid, location, radius);
+        }
+
+        return changeCount;
+    }
 }

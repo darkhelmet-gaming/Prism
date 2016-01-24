@@ -41,6 +41,7 @@ import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.util.DataQueries;
+import com.helion3.prism.util.Format;
 
 public class ParameterPlayer extends SimpleParameterHandler {
     private final Pattern pattern = Pattern.compile("[\\w,:-]+");
@@ -72,6 +73,7 @@ public class ParameterPlayer extends SimpleParameterHandler {
                 try {
                     query.addCondition(Condition.of(DataQueries.Player.toString(), MatchRule.EQUALS, profile.get().getUniqueId().toString()));
                 } catch (InterruptedException | ExecutionException e) {
+                    session.getCommandSource().get().sendMessage(Format.error(String.format("Cannot find profile for user \"%s\"", value)));
                     e.printStackTrace();
                 }
             }

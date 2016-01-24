@@ -34,12 +34,12 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 
-public class FlagNoGroup extends SimpleFlagHandler {
+public class FlagDrain extends SimpleFlagHandler {
     /**
-     * Flag which disables record grouping.
+     * Flag which allows liquids to be drained from an applier region.
      */
-    public FlagNoGroup() {
-        super(ImmutableList.of("no-group"));
+    public FlagDrain() {
+        super(ImmutableList.of("drain"));
     }
 
     @Override
@@ -54,8 +54,7 @@ public class FlagNoGroup extends SimpleFlagHandler {
 
     @Override
     public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, Optional<String> value, Query query) {
-        session.addFlag(Flag.NO_GROUP);
-        query.setAggregate(false);
+        session.addFlag(Flag.DRAIN);
         return Optional.empty();
     }
 }

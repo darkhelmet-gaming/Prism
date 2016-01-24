@@ -23,14 +23,49 @@
  */
 package com.helion3.prism.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.property.block.MatterProperty;
+import org.spongepowered.api.data.property.block.MatterProperty.Matter;
+
+import com.helion3.prism.Prism;
 
 public class BlockUtil {
     private BlockUtil() {}
 
     /**
+     * Get a list of all LIQUID block types.
+     *
+     * @return List<BlockType>
+     */
+    public static List<BlockType> getLiquidBlockTypes() {
+        List<BlockType> liquids = new ArrayList<BlockType>();
+
+        Collection<BlockType> types = Prism.getGame().getRegistry().getAllOf(BlockType.class);
+        for (BlockType type : types) {
+            Optional<MatterProperty> property = type.getProperty(MatterProperty.class);
+            if (property.isPresent() && property.get().equals(Matter.LIQUID)) {
+                liquids.add(type);
+            }
+        }
+
+        // @todo Sponge has not yet implemented the MatterProperties...
+        liquids.add(BlockTypes.LAVA);
+        liquids.add(BlockTypes.FLOWING_LAVA);
+        liquids.add(BlockTypes.WATER);
+        liquids.add(BlockTypes.FLOWING_WATER);
+
+        return liquids;
+    }
+
+    /**
      * Reject specific blocks from an applier because they're 99% going to do more harm.
+     *
      * @param type BlockType
      * @return
      */
@@ -64,6 +99,13 @@ public class BlockUtil {
             (a.equals(BlockTypes.LAVA) && b.equals(BlockTypes.FLOWING_LAVA)) ||
             (a.equals(BlockTypes.FLOWING_LAVA) && b.equals(BlockTypes.LAVA)) ||
 
+            // Natural flow.
+            // Note: If moved back to EventUtil these will allow tracking player-caused flow
+            // on a per-block basis. This would allow rollbacks of every single flow block.
+            // However, it's incredibly heavy on the database and usually satisfied by a drain.
+            // This will still allow liquids which break non-air blocks to be tracked
+            (a.equals(BlockTypes.AIR) && (b.equals(BlockTypes.FLOWING_WATER) || b.equals(BlockTypes.FLOWING_LAVA))) ||
+
             // Crap that fell into lava
             (a.equals(BlockTypes.LAVA) && b.equals(BlockTypes.GRAVEL)) ||
             (a.equals(BlockTypes.FLOWING_LAVA) && b.equals(BlockTypes.GRAVEL)) ||
@@ -90,7 +132,10 @@ public class BlockUtil {
         return (
             // You can't break these...
             a.equals(BlockTypes.FIRE) ||
-            a.equals(BlockTypes.AIR)
+            a.equals(BlockTypes.AIR) ||
+
+            // Note, see "natural flow" comment above.
+            ((a.equals(BlockTypes.FLOWING_WATER) || a.equals(BlockTypes.FLOWING_LAVA)) && b.equals(BlockTypes.AIR))
         );
     }
 }

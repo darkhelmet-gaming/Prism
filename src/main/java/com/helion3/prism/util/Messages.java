@@ -24,12 +24,21 @@
 package com.helion3.prism.util;
 
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
 
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Text.Builder;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
+import com.flowpowered.math.vector.Vector3i;
+import com.helion3.prism.Prism;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.results.ResultRecordAggregate;
 import com.helion3.prism.api.results.ResultRecordComplete;
@@ -63,9 +72,27 @@ public class Messages {
 
             if (optionalLocation.isPresent()) {
                 DataView loc = (DataView) optionalLocation.get();
-                builder.append(Text.of(TextColors.GRAY, "@ ", loc.getInt(DataQueries.X).get(), " ",
-                        loc.getInt(DataQueries.Y).get(), " ",
-                        loc.getInt(DataQueries.Z).get(), " "));
+
+                int x = loc.getInt(DataQueries.X).get();
+                int y = loc.getInt(DataQueries.Y).get();
+                int z = loc.getInt(DataQueries.Z).get();
+
+                builder.append(Text.of(TextColors.GRAY, "@ ", x, " ", y, " ", z, " "));
+
+                // Allow teleportation on click
+                Optional<World> world = Prism.getGame().getServer().getWorld(UUID.fromString((String) loc.get(DataQueries.WorldUuid).get()));
+                if (world.isPresent()) {
+                    Location<World> teleportLoc = world.get().getLocation(new Vector3i(x, y, z));
+
+                    builder.onClick(TextActions.executeCallback(new Consumer<CommandSource>() {
+                        @Override
+                        public void accept(CommandSource t) {
+                            if (t instanceof Player) {
+                                ((Player) t).setLocation(teleportLoc);
+                            }
+                        }
+                    }));
+                }
             }
 
             builder.append(Text.of(TextColors.WHITE, recordComplete.getRelativeTime()));

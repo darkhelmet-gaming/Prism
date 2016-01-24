@@ -62,7 +62,7 @@ public class BlockUtil {
             (a.equals(BlockTypes.FIRE) && b.equals(BlockTypes.AIR)) ||
 
             // You can't place air
-            a.equals(BlockTypes.AIR)
+            b.equals(BlockTypes.AIR)
         );
     }
 

@@ -70,6 +70,8 @@ public class RequiredInteractListener {
 
                 // Pass off to an async lookup helper
                 AsyncUtil.lookup(session);
+
+                event.setCancelled(true);
             }
         }
     }

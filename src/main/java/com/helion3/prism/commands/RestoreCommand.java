@@ -75,7 +75,7 @@ public class RestoreCommand implements CommandCallable {
                             for (ResultRecord result : results) {
                                 if(result instanceof Actionable) {
                                     Actionable actionable = (Actionable) result;
-                                    actionResults.add(actionable.redo());
+                                    actionResults.add(actionable.restore());
                                 }
                             }
 

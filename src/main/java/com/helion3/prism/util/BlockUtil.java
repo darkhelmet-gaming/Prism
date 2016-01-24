@@ -30,6 +30,18 @@ public class BlockUtil {
     private BlockUtil() {}
 
     /**
+     * Reject specific blocks from an applier because they're 99% going to do more harm.
+     * @param type BlockType
+     * @return
+     */
+    public static boolean rejectIllegalApplierBlock(BlockType type) {
+        return (type.equals(BlockTypes.FIRE) ||
+                type.equals(BlockTypes.TNT) ||
+                type.equals(BlockTypes.LAVA) ||
+                type.equals(BlockTypes.FLOWING_LAVA));
+    }
+
+    /**
      * Sponge's ChangeBlockEvent.Place covers a lot, but it also includes a lot
      * we don't want. So here we can setup checks to filter out block combinations.
      *

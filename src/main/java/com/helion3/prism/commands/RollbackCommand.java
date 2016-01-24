@@ -75,7 +75,7 @@ public class RollbackCommand implements CommandCallable {
                             for (ResultRecord result : results) {
                                 if(result instanceof Actionable) {
                                     Actionable actionable = (Actionable) result;
-                                    actionResults.add(actionable.undo());
+                                    actionResults.add(actionable.rollback());
                                 }
                             }
 

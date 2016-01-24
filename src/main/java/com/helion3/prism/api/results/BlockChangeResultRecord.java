@@ -33,6 +33,7 @@ import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.block.BlockSnapshot.Builder;
 
 import com.helion3.prism.Prism;
+import com.helion3.prism.util.BlockUtil;
 import com.helion3.prism.util.DataQueries;
 
 /**
@@ -40,7 +41,7 @@ import com.helion3.prism.util.DataQueries;
  */
 public class BlockChangeResultRecord extends ResultRecordComplete implements Actionable {
     @Override
-    public ActionableResult undo() {
+    public ActionableResult rollback() {
         Optional<Object> optionalOriginal = data.get(DataQueries.OriginalBlock);
 
         if (!optionalOriginal.isPresent()) {
@@ -66,6 +67,11 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
         }
 
         BlockSnapshot snapshot = optionalSnapshot.get();
+
+        // Filter unsafe blocks
+        if (BlockUtil.rejectIllegalApplierBlock(snapshot.getState().getType())) {
+            return ActionableResult.skipped(SkipReason.ILLEGAL_BLOCK);
+        }
 
         // Current block in this space.
         BlockSnapshot original = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
@@ -104,7 +110,7 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
     }
 
     @Override
-    public ActionableResult redo() {
+    public ActionableResult restore() {
         Optional<Object> optionalFinal = data.get(DataQueries.ReplacementBlock);
         if (!optionalFinal.isPresent()) {
             return ActionableResult.skipped(SkipReason.INVALID_BLOCK);
@@ -129,6 +135,11 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
         }
 
         BlockSnapshot snapshot = optionalSnapshot.get();
+
+        // Filter unsafe blocks
+        if (BlockUtil.rejectIllegalApplierBlock(snapshot.getState().getType())) {
+            return ActionableResult.skipped(SkipReason.ILLEGAL_BLOCK);
+        }
 
         // Current block in this space.
         BlockSnapshot original = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());

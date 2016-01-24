@@ -24,6 +24,10 @@
 package com.helion3.prism.api.results;
 
 public enum SkipReason {
+    /**
+     * Block isn't safe and may not be places in the world.
+     */
+    ILLEGAL_BLOCK,
 
     /**
      * World or location are missing. Likely if a record was made for

@@ -259,10 +259,10 @@ public class MongoRecords implements StorageAdapterRecords {
            groupFields.put(DataQueries.EventName.toString(), "$" + DataQueries.EventName);
            groupFields.put(DataQueries.Player.toString(), "$" + DataQueries.Player);
            groupFields.put(DataQueries.Cause.toString(), "$" + DataQueries.Cause);
-           groupFields.put(DataQueries.OriginalBlock.toString(), new Document(DataQueries.BlockState.toString(),
-               "$" + DataQueries.OriginalBlock.then(DataQueries.BlockState)));
-           groupFields.put(DataQueries.ReplacementBlock.toString(), new Document(DataQueries.BlockState.toString(),
-                   "$" + DataQueries.ReplacementBlock.then(DataQueries.BlockState)));
+           groupFields.put(DataQueries.OriginalBlock.toString(),
+               "$" + DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
+           groupFields.put(DataQueries.ReplacementBlock.toString(),
+               "$" + DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
            groupFields.put("dayOfMonth", new Document("$dayOfMonth", "$" + DataQueries.Created));
            groupFields.put("month", new Document("$month", "$" + DataQueries.Created));
            groupFields.put("year", new Document("$year", "$" + DataQueries.Created));
@@ -301,6 +301,7 @@ public class MongoRecords implements StorageAdapterRecords {
                Document document = shouldGroup ? (Document) wrapper.get("_id") : wrapper;
 
                DataContainer data = documentToDataContainer(document);
+//               Prism.getLogger().debug("DOC: " + DataUtil.jsonFromDataView(data).toString());
 
                if (shouldGroup) {
                    data.set(DataQueries.Count, wrapper.get(DataQueries.Count.toString()));

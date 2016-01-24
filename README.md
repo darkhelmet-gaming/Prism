@@ -45,6 +45,7 @@ Because of this, our feature set is growing. File an issue or let us know in IRC
 
 ## Flags
 
+- `drain` - Drain liquids within a rollback area.
 - `--no-group` - Prevent record grouping in lookups.
 
 ## Permissions

@@ -101,9 +101,17 @@ abstract public class ResultRecord {
         String eventName = data.getString(DataQueries.EventName).get();
 
         // Determine which block state we're using
-        DataQuery path = DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
-        if (eventName.equals("place")) {
-            path = DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
+        DataQuery path;
+        if (this instanceof ResultRecordAggregate) {
+            path = DataQueries.OriginalBlock;
+            if (eventName.equals("place")) {
+                path = DataQueries.ReplacementBlock;
+            }
+        } else {
+            path = DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
+            if (eventName.equals("place")) {
+                path = DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
+            }
         }
 
         // Use value
@@ -118,14 +126,4 @@ abstract public class ResultRecord {
 
         return value;
     }
-//
-//    /**
-//     * Returns a user-friendly relative "time since" value.
-//     *
-//     * @return String "time since" value.
-//     */
-//    public String getRelativeTime() {
-//        // todo varies based on aggregate or complete
-//        return "";
-//    }
 }

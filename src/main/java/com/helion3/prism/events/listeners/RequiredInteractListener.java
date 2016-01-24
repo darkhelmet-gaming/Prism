@@ -56,6 +56,8 @@ public class RequiredInteractListener {
             if (event instanceof InteractBlockEvent) {
                 QuerySession session = new QuerySession(playerCause.get());
                 Query query = session.newQuery();
+                query.setAggregate(false);
+
                 InteractBlockEvent blockEvent = (InteractBlockEvent) event;
 
                 // Location of block

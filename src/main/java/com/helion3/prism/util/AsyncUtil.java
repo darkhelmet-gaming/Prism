@@ -60,17 +60,24 @@ public class AsyncUtil {
         async(session, new AsyncCallback() {
             @Override
             public void success(List<ResultRecord> results) {
-                List<Text> messages = new ArrayList<Text>();
-                for (ResultRecord result : results) {
-                    messages.add(Messages.from(result));
-                }
 
-                Optional<PaginationService> service = Prism.getGame().getServiceManager().provide(PaginationService.class);
-                if (service.isPresent()) {
-                    // Build paginated content
-                    PaginationBuilder builder = service.get().builder();
-                    builder.contents(messages);
-                    builder.sendTo(session.getCommandSource().get());
+                if (results.size() > 5) {
+                    List<Text> messages = new ArrayList<Text>();
+                    for (ResultRecord result : results) {
+                        messages.add(Messages.from(result));
+                    }
+
+                    Optional<PaginationService> service = Prism.getGame().getServiceManager().provide(PaginationService.class);
+                    if (service.isPresent()) {
+                        // Build paginated content
+                        PaginationBuilder builder = service.get().builder();
+                        builder.contents(messages);
+                        builder.sendTo(session.getCommandSource().get());
+                    }
+                } else {
+                    for (ResultRecord result : results) {
+                        session.getCommandSource().get().sendMessage(Messages.from(result));
+                    }
                 }
             }
 

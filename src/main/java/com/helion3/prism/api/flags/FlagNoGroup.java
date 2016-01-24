@@ -36,7 +36,7 @@ import com.helion3.prism.api.query.QuerySession;
 
 public class FlagNoGroup extends SimpleFlagHandler {
     /**
-     * Flag which disable record grouping.
+     * Flag which disables record grouping.
      */
     public FlagNoGroup() {
         super(ImmutableList.of("no-group"));

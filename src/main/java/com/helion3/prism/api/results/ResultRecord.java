@@ -118,14 +118,14 @@ abstract public class ResultRecord {
 
         return value;
     }
-
-    /**
-     * Returns a user-friendly relative "time since" value.
-     *
-     * @return String "time since" value.
-     */
-    public String getRelativeTime() {
-        // todo varies based on aggregate or complete
-        return "";
-    }
+//
+//    /**
+//     * Returns a user-friendly relative "time since" value.
+//     *
+//     * @return String "time since" value.
+//     */
+//    public String getRelativeTime() {
+//        // todo varies based on aggregate or complete
+//        return "";
+//    }
 }

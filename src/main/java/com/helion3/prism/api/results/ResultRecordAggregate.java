@@ -29,14 +29,5 @@ package com.helion3.prism.api.results;
  * etc.
  */
 public class ResultRecordAggregate extends ResultRecord {
-    /**
-     * Returns a user-friendly relative "time since" value.
-     *
-     * @return String "time since" value.
-     */
-    @Override
-    public String getRelativeTime() {
-        // @todo can at least show the month/day/year, but needs relative support and format choices
-        return "";
-    }
+
 }

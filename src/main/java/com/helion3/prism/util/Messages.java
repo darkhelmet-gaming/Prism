@@ -23,12 +23,16 @@
  */
 package com.helion3.prism.util;
 
+import java.util.Optional;
+
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Text.Builder;
 import org.spongepowered.api.text.format.TextColors;
 
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.results.ResultRecordAggregate;
+import com.helion3.prism.api.results.ResultRecordComplete;
 
 public class Messages {
     private Messages() {}
@@ -53,9 +57,19 @@ public class Messages {
         if (result instanceof ResultRecordAggregate) {
             int count = result.data.getInt(DataQueries.Count).get();
             builder.append(Text.of(TextColors.GREEN, "x" + count, " "));
-        }
+        } else {
+            ResultRecordComplete recordComplete = (ResultRecordComplete) result;
+            Optional<Object> optionalLocation = result.data.get(DataQueries.Location);
 
-        builder.append(Text.of(TextColors.WHITE, result.getRelativeTime()));
+            if (optionalLocation.isPresent()) {
+                DataView loc = (DataView) optionalLocation.get();
+                builder.append(Text.of(TextColors.GRAY, "@ ", loc.getInt(DataQueries.X).get(), " ",
+                        loc.getInt(DataQueries.Y).get(), " ",
+                        loc.getInt(DataQueries.Z).get(), " "));
+            }
+
+            builder.append(Text.of(TextColors.WHITE, recordComplete.getRelativeTime()));
+        }
 
         return builder.build();
     }

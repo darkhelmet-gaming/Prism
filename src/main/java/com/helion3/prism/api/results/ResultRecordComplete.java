@@ -40,7 +40,6 @@ public class ResultRecordComplete extends ResultRecord {
      *
      * @return String "time since" value.
      */
-    @Override
     public String getRelativeTime() {
         Date created = (Date) data.get(DataQueries.Created).get();
         return DateUtil.getTimeSince(created);

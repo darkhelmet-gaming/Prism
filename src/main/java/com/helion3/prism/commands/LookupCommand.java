@@ -34,7 +34,6 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 
-import com.helion3.prism.api.parameters.ParameterException;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.util.AsyncUtil;
@@ -67,8 +66,9 @@ public class LookupCommand {
                             // Pass off to an async lookup helper
                             AsyncUtil.lookup(session);
                         });
-                    } catch(ParameterException e) {
+                    } catch(Exception e) {
                         source.sendMessage(Format.error(Text.of(e.getMessage())));
+                        e.printStackTrace();
                     }
 
                     return CommandResult.success();

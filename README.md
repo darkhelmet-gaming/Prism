@@ -73,6 +73,7 @@ Please follow prism development on `irc.esper.net` in `#prism`
 Prism 3 is the successor to Prism 1/2 (for Bukkit/Spigot/Cauldron). While much of the code has been rewritten it's still influenced by our original vision.
 
 - viveleroi (*Creator, Lead Dev*)
+- Dev Testing: Wolfire1, Ollie2000, ickyacky
 
 #### Prism 1.x - 2.x
 

@@ -72,11 +72,16 @@ public class RestoreCommand implements CommandCallable {
                             source.sendMessage(Format.error("No results."));
                         } else {
                             // Iterate record results
-                            for (ResultRecord result : results) {
-                                if(result instanceof Actionable) {
-                                    Actionable actionable = (Actionable) result;
-                                    actionResults.add(actionable.restore());
+                            try {
+                                for (ResultRecord result : results) {
+                                    if(result instanceof Actionable) {
+                                        Actionable actionable = (Actionable) result;
+                                        actionResults.add(actionable.restore());
+                                    }
                                 }
+                            } catch (Exception e) {
+                                source.sendMessage(Format.error(Text.of(e.getMessage())));
+                                e.printStackTrace();
                             }
 
                             if (source instanceof Player) {

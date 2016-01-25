@@ -36,10 +36,10 @@ public enum SkipReason {
     INVALID_LOCATION,
 
     /**
-     * Block types are invalid. Likely due to mods being removed or
-     * block names being changed between updates.
+     * Data is invalid. Likely due to mods being removed or
+     * data being changed between updates.
      */
-    INVALID_BLOCK,
+    INVALID,
 
     /**
      * Location or target we're attempting to change exists in
@@ -48,6 +48,11 @@ public enum SkipReason {
      * spot.
      */
     OCCUPIED,
+
+    /**
+     * Action has yet to be implemented.
+     */
+    UNIMPLEMENTED,
 
     /**
      * An unknown error occurred.

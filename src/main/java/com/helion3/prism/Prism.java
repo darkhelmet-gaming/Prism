@@ -58,6 +58,7 @@ import com.helion3.prism.api.parameters.ParameterRadius;
 import com.helion3.prism.api.parameters.ParameterTime;
 import com.helion3.prism.api.results.ActionableResult;
 import com.helion3.prism.api.results.BlockChangeResultRecord;
+import com.helion3.prism.api.results.EntityResultRecord;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
@@ -287,6 +288,7 @@ final public class Prism {
         registerResultRecord("decay", BlockChangeResultRecord.class);
         registerResultRecord("grow", BlockChangeResultRecord.class);
         registerResultRecord("place", BlockChangeResultRecord.class);
+        registerResultRecord("death", EntityResultRecord.class);
     }
 
     /**

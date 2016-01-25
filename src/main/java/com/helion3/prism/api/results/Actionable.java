@@ -35,7 +35,7 @@ public interface Actionable {
      *
      * @return ActionableResult Results of applier action
      */
-    public ActionableResult rollback();
+    public ActionableResult rollback() throws Exception;
 
     /**
      * Re-applies the result of this event to a subject,
@@ -44,5 +44,5 @@ public interface Actionable {
      *
      * @return ActionableResult Results of applier action
      */
-    public ActionableResult restore();
+    public ActionableResult restore() throws Exception;
 }

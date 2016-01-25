@@ -73,11 +73,16 @@ public class RollbackCommand implements CommandCallable {
                             source.sendMessage(Format.error("No results."));
                         } else {
                             // Iterate record results
-                            for (ResultRecord result : results) {
-                                if(result instanceof Actionable) {
-                                    Actionable actionable = (Actionable) result;
-                                    actionResults.add(actionable.rollback());
+                            try {
+                                for (ResultRecord result : results) {
+                                    if(result instanceof Actionable) {
+                                        Actionable actionable = (Actionable) result;
+                                        actionResults.add(actionable.rollback());
+                                    }
                                 }
+                            } catch(Exception e) {
+                                source.sendMessage(Format.error(Text.of(e.getMessage())));
+                                e.printStackTrace();
                             }
 
                             if (source instanceof Player) {
@@ -96,7 +101,6 @@ public class RollbackCommand implements CommandCallable {
 
                             int appliedCount = 0;
                             int skippedCount = 0;
-
                             for (ActionableResult result : actionResults) {
                                 if (result.applied()) {
                                     appliedCount++;

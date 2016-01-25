@@ -41,11 +41,11 @@ import com.helion3.prism.util.DataQueries;
  */
 public class BlockChangeResultRecord extends ResultRecordComplete implements Actionable {
     @Override
-    public ActionableResult rollback() {
+    public ActionableResult rollback() throws Exception {
         Optional<Object> optionalOriginal = data.get(DataQueries.OriginalBlock);
 
         if (!optionalOriginal.isPresent()) {
-            return ActionableResult.skipped(SkipReason.INVALID_BLOCK);
+            return ActionableResult.skipped(SkipReason.INVALID);
         }
 
         // Our data is stored with a different structure, so we'll need
@@ -63,7 +63,7 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
 
         Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(finalBlock);
         if (!optionalSnapshot.isPresent()) {
-            return ActionableResult.skipped(SkipReason.INVALID_BLOCK);
+            return ActionableResult.skipped(SkipReason.INVALID);
         }
 
         BlockSnapshot snapshot = optionalSnapshot.get();
@@ -110,10 +110,10 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
     }
 
     @Override
-    public ActionableResult restore() {
+    public ActionableResult restore() throws Exception {
         Optional<Object> optionalFinal = data.get(DataQueries.ReplacementBlock);
         if (!optionalFinal.isPresent()) {
-            return ActionableResult.skipped(SkipReason.INVALID_BLOCK);
+            return ActionableResult.skipped(SkipReason.INVALID);
         }
 
         // Our data is stored with a different structure, so we'll need
@@ -131,7 +131,7 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
 
         Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(finalBlock);
         if (!optionalSnapshot.isPresent()) {
-            return ActionableResult.skipped(SkipReason.INVALID_BLOCK);
+            return ActionableResult.skipped(SkipReason.INVALID);
         }
 
         BlockSnapshot snapshot = optionalSnapshot.get();

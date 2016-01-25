@@ -85,6 +85,9 @@ public class DataUtil {
                         if (object instanceof DataView) {
                             convertedList.add(jsonFromDataView((DataView) object));
                         }
+                        else if (object instanceof List) {
+                            convertedList.add(gson.toJsonTree(object).getAsJsonArray());
+                        }
                         else if (object.getClass().isEnum()) {
                             //convertedList.add(object.toString());
                         }
@@ -94,7 +97,7 @@ public class DataUtil {
                             break;
                         }
                         else {
-                            Prism.getLogger().error("Unsupported json list data type: " + object.getClass().getName());
+                            Prism.getLogger().error("Unsupported json list data type: " + object.getClass().getName() + " for key " + key);
                         }
                     }
 

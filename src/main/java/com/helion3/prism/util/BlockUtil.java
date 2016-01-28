@@ -90,6 +90,11 @@ public class BlockUtil {
             a.equals(BlockTypes.LIT_FURNACE) || b.equals(BlockTypes.LIT_FURNACE) ||
             a.equals(BlockTypes.LIT_REDSTONE_LAMP) || b.equals(BlockTypes.LIT_REDSTONE_LAMP) ||
             a.equals(BlockTypes.LIT_REDSTONE_ORE) || b.equals(BlockTypes.LIT_REDSTONE_ORE) ||
+            a.equals(BlockTypes.UNLIT_REDSTONE_TORCH) || b.equals(BlockTypes.UNLIT_REDSTONE_TORCH) ||
+            (a.equals(BlockTypes.POWERED_REPEATER) && b.equals(BlockTypes.UNPOWERED_REPEATER)) ||
+            (a.equals(BlockTypes.UNPOWERED_REPEATER) && b.equals(BlockTypes.POWERED_REPEATER)) ||
+            (a.equals(BlockTypes.POWERED_COMPARATOR) && b.equals(BlockTypes.UNPOWERED_COMPARATOR)) ||
+            (a.equals(BlockTypes.UNPOWERED_COMPARATOR) && b.equals(BlockTypes.POWERED_COMPARATOR)) ||
 
             // It's all water...
             (a.equals(BlockTypes.WATER) && b.equals(BlockTypes.FLOWING_WATER)) ||
@@ -112,8 +117,13 @@ public class BlockUtil {
             (a.equals(BlockTypes.LAVA) && b.equals(BlockTypes.SAND)) ||
             (a.equals(BlockTypes.FLOWING_LAVA) && b.equals(BlockTypes.SAND)) ||
 
-            // It's fire...
+            // It's fire (which didn't burn anything)
             (a.equals(BlockTypes.FIRE) && b.equals(BlockTypes.AIR)) ||
+            (a.equals(BlockTypes.AIR) && b.equals(BlockTypes.FIRE)) ||
+
+            // Piston
+            a.equals(BlockTypes.PISTON_EXTENSION) || b.equals(BlockTypes.PISTON_EXTENSION) ||
+            a.equals(BlockTypes.PISTON_HEAD) || b.equals(BlockTypes.PISTON_HEAD) ||
 
             // You can't place air
             b.equals(BlockTypes.AIR)

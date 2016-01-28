@@ -39,7 +39,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.results.Actionable;
 import com.helion3.prism.api.results.ActionableResult;
@@ -58,10 +57,10 @@ public class RestoreCommand implements CommandCallable {
         try {
             source.sendMessage(Format.heading("Querying records..."));
 
-            CompletableFuture<Query> future = session.newQueryFromArguments(arguments);
-            future.thenAccept(query -> {
-                query.setAggregate(false);
-                query.setLimit(Prism.getConfig().getNode("query", "actionable", "limit").getInt());
+            CompletableFuture<Void> future = session.newQueryFromArguments(arguments);
+            future.thenAccept((v) -> {
+                session.getQuery().setAggregate(false);
+                session.getQuery().setLimit(Prism.getConfig().getNode("query", "actionable", "limit").getInt());
 
                 try {
                     List<ActionableResult> actionResults = new ArrayList<ActionableResult>();

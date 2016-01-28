@@ -28,14 +28,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.Map.Entry;
 
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.helion3.prism.Prism;
 
 public class DataUtil {
@@ -57,6 +63,69 @@ public class DataUtil {
                 object instanceof Long ||
                 object instanceof Short ||
                 object instanceof String);
+    }
+
+    /**
+     * Build a DataView from provided JSON.
+     * @param json JsonObject
+     * @return DataView
+     */
+    public static DataView dataViewFromJson(JsonObject json) {
+        DataContainer data = new MemoryDataContainer();
+        for (Entry<String, JsonElement> entry : json.entrySet()) {
+            Optional<Object> value = jsonElementToObject(entry.getValue());
+            if (value.isPresent()) {
+                data.set(DataQuery.of(entry.getKey()), value.get());
+            } else {
+                Prism.getLogger().error(String.format("Failed to transform %s data.", entry.getKey()));
+            }
+        }
+
+        return data;
+    }
+
+    /**
+     * Attempts to convert a JsonElement to an a known type.
+     *
+     * @param element JsonElement
+     * @return Optional<Object>
+     */
+    private static Optional<Object> jsonElementToObject(JsonElement element) {
+        Object result = null;
+
+        if (element.isJsonObject()) {
+            result = dataViewFromJson(element.getAsJsonObject());
+        }
+        else if (element.isJsonPrimitive()) {
+            JsonPrimitive prim = element.getAsJsonPrimitive();
+
+            if (prim.isBoolean()) {
+                result = prim.getAsBoolean();
+            }
+            else if (prim.isNumber()) {
+                result = prim.getAsNumber().intValue();
+            }
+            else if (prim.isString()) {
+                result = prim.getAsString();
+            }
+        }
+        else if (element.isJsonArray()) {
+            List<Object> list = new ArrayList<Object>();
+            JsonArray arr = element.getAsJsonArray();
+            arr.forEach(new Consumer<JsonElement>() {
+                @Override
+                public void accept(JsonElement t) {
+                    Optional<Object> translated = jsonElementToObject(t);
+                    if (translated.isPresent()) {
+                        list.add(translated.get());
+                    }
+                }
+            });
+
+            result = list;
+        }
+
+        return Optional.ofNullable(result);
     }
 
     /**

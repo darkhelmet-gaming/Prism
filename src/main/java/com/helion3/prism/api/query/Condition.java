@@ -23,94 +23,10 @@
  */
 package com.helion3.prism.api.query;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+/**
+ * Represents a condition used to filter database results.
+ * May either be a group or a single field condition.
+ */
+public interface Condition {
 
-import org.spongepowered.api.data.DataQuery;
-
-import com.google.common.collect.Range;
-
-final public class Condition {
-    private final String field;
-    private final MatchRule matchRule;
-    private final Object value;
-
-    /**
-     * Statically build a new condition.
-     *
-     * @param dataQuery DataQuery matching the field name.
-     * @param rule MatchRule describing comparison of values.
-     * @param value List, String or Number value.
-     * @return Condition
-     */
-    public static Condition of(DataQuery query, MatchRule matchRule, Object value) {
-        return new Condition(query.toString(), matchRule, value);
-    }
-
-    /**
-     * Statically build a new condition.
-     *
-     * @param dataQuery DataQuery matching the field name.
-     * @param rule MatchRule describing comparison of values.
-     * @param value List, String or Number value.
-     * @return Condition
-     */
-    public static Condition of(String field, MatchRule matchRule, Object value) {
-        return new Condition(field, matchRule, value);
-    }
-
-    /**
-     * Statically build a new condition.
-     *
-     * @param dataQuery DataQuery matching the field name.
-     * @param value Range of values.
-     * @return Condition
-     */
-    public static Condition of(String field, Range<?> value) {
-        return new Condition(field, MatchRule.BETWEEN, value);
-    }
-
-    /**
-     * Build a condition for use with querying the storage.
-     *
-     * @param dataQuery DataQuery matching the field name.
-     * @param rule MatchRule describing comparison of values.
-     * @param value List, String or Number value.
-     */
-    public Condition(String field, MatchRule matchRule, Object value) {
-        checkNotNull(field);
-        checkNotNull(matchRule);
-        checkNotNull(value);
-        this.field = field;
-        this.matchRule = matchRule;
-        this.value = value;
-    }
-
-    /**
-     * Returns the DataQuery name for the field
-     * this condition applies to.
-     *
-     * @return DataQuery DataQuery field name.
-     */
-    public String getFieldName() {
-        return field;
-    }
-
-    /**
-     * Returns the match rule for the given values.
-     *
-     * @return MatchRule Match rule for condition's value.
-     */
-    public MatchRule getMatchRule() {
-        return matchRule;
-    }
-
-    /**
-     * Returns the value to be used in the condition. How it's
-     * compared depends on the MatchRule.
-     *
-     * @return Object Any value of List, String, Number
-     */
-    public Object getValue() {
-        return value;
-    }
 }

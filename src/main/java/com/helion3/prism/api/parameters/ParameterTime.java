@@ -33,7 +33,7 @@ import org.spongepowered.api.command.CommandSource;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.helion3.prism.api.query.Condition;
+import com.helion3.prism.api.query.FieldCondition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
@@ -80,7 +80,7 @@ public class ParameterTime extends SimpleParameterHandler {
             rule = MatchRule.GREATER_THAN_EQUAL;
         }
 
-        query.addCondition(Condition.of(DataQueries.Created.toString(), rule, date));
+        query.addCondition(FieldCondition.of(DataQueries.Created, rule, date));
 
         return Optional.empty();
     }

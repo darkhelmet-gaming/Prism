@@ -31,22 +31,17 @@ final public class Query {
     private List<Condition> conditions = new ArrayList<Condition>();
     private int limit = 1000;
 
-    /**
-     * Add a condition.
-     *
-     * @param condition Condition
-     */
-    public void addCondition(Condition condition) {
-        conditions.add(condition);
+    public void addConditions(List<Condition> conditions) {
+        conditions.addAll(conditions);
     }
 
     /**
-     * Add a list of conditions.
+     * Convenience method to add a single AND condition.
      *
-     * @param conditions List of conditions.
+     * @param condition FieldCondition
      */
-    public void addConditions(List<Condition> conditions) {
-        this.conditions.addAll(conditions);
+    public void addCondition(Condition condition) {
+        conditions.add(condition);
     }
 
     /**

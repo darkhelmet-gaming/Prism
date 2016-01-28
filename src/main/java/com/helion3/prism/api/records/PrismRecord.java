@@ -238,6 +238,12 @@ public class PrismRecord {
             // Storing the state only, so we don't also get location
             data.set(DataQueries.OriginalBlock, formatBlockDataContainer(transaction.getOriginal()));
             data.set(DataQueries.ReplacementBlock, formatBlockDataContainer(transaction.getFinal()));
+
+            if (this.eventName.equals("break")) {
+                data.set(DataQueries.Target, data.getString(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType)).get().replace("_", " "));
+            } else {
+                data.set(DataQueries.Target, data.getString(DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType)).get().replace("_", " "));
+            }
         }
 
         /**
@@ -267,6 +273,7 @@ public class PrismRecord {
                 entityData.set(DataQueries.UnsafeData, unsafeData);
             }
 
+            data.set(DataQueries.Target, entity.getType().getId().replace("_", " "));
             data.set(DataQueries.Entity, entityData);
         }
 

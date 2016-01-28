@@ -23,8 +23,6 @@
  */
 package com.helion3.prism.api.parameters;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -34,7 +32,7 @@ import org.spongepowered.api.command.CommandSource;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.helion3.prism.api.query.Condition;
+import com.helion3.prism.api.query.FieldCondition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
@@ -64,15 +62,7 @@ public class ParameterEventName extends SimpleParameterHandler {
 
     @Override
     public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
-        final String[] nameArgs = value.split(",");
-
-        List<String> eventNames = new ArrayList<String>();
-        for (String eventName : nameArgs) {
-            // @todo partial name matching, validation
-            eventNames.add(eventName);
-        }
-
-        query.addCondition(new Condition(DataQueries.EventName.toString(), MatchRule.INCLUDES, eventNames));
+        query.addCondition(new FieldCondition(DataQueries.EventName, MatchRule.EQUALS, value));
 
         return Optional.empty();
     }

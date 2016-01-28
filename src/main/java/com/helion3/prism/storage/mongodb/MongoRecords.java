@@ -46,10 +46,13 @@ import com.google.common.collect.Range;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.helion3.prism.Prism;
+import com.helion3.prism.api.query.FieldCondition;
 import com.helion3.prism.api.query.Condition;
+import com.helion3.prism.api.query.ConditionGroup;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
+import com.helion3.prism.api.query.ConditionGroup.Operator;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.results.ResultRecordAggregate;
 import com.helion3.prism.api.results.ResultRecordComplete;
@@ -72,6 +75,7 @@ public class MongoRecords implements StorageAdapterRecords {
 
     /**
      * Converts a DataView to a Document, recursively if needed.
+     *
      * @param view Data view/container.
      * @return Document for Mongo storage.
      */
@@ -150,11 +154,8 @@ public class MongoRecords implements StorageAdapterRecords {
         }
 
         return result;
-    }
+   }
 
-   /**
-    *
-    */
    @Override
    public StorageWriteResult write(List<DataContainer> containers) throws Exception {
        MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
@@ -182,11 +183,61 @@ public class MongoRecords implements StorageAdapterRecords {
    }
 
    /**
-    * Execute a query session, for a list of resulting actions
+    * Recursive method of building condition documents.
     *
-    * @param session
-    * @return List of {@link com.helion3.prism.api.actions.ActionHandler}
+    * @param fieldsOrGroups List<Condition>
+    * @return Document
     */
+   private Document buildConditions(List<Condition> fieldsOrGroups) {
+       Document conditions = new Document();
+
+       for (Condition fieldOrGroup : fieldsOrGroups) {
+           if (fieldOrGroup instanceof ConditionGroup) {
+               ConditionGroup group = (ConditionGroup) fieldOrGroup;
+               Document subdoc = buildConditions(group.getConditions());
+
+               if (group.getOperator().equals(Operator.OR)) {
+                   conditions.append("$or", subdoc);
+               } else {
+                   conditions.putAll(subdoc);
+               }
+           } else {
+               FieldCondition field = (FieldCondition) fieldOrGroup;
+
+               // Match an array of items
+               if (field.getValue() instanceof List) {
+                   String matchRule = field.getMatchRule().equals(MatchRule.INCLUDES) ? "$in" : "$nin";
+                   conditions.put(field.getFieldName().toString(), new Document(matchRule, field.getValue()));
+               }
+
+               else if (field.getMatchRule().equals(MatchRule.EQUALS)) {
+                   conditions.put(field.getFieldName().toString(), field.getValue());
+               }
+
+               else if (field.getMatchRule().equals(MatchRule.GREATER_THAN_EQUAL)) {
+                   conditions.put(field.getFieldName().toString(), new Document("$gte", field.getValue()));
+               }
+
+               else if (field.getMatchRule().equals(MatchRule.LESS_THAN_EQUAL)) {
+                   conditions.put(field.getFieldName().toString(), new Document("$lte", field.getValue()));
+               }
+
+               else if (field.getMatchRule().equals(MatchRule.BETWEEN)) {
+                   if (!(field.getValue() instanceof Range)) {
+                       throw new IllegalArgumentException("\"Between\" match value must be a Range.");
+                   }
+
+                   Range<?> range = (Range<?>) field.getValue();
+
+                   Document between = new Document("$gte", range.lowerEndpoint()).append("$lte", range.upperEndpoint());
+                   conditions.put(field.getFieldName().toString(), between);
+               }
+           }
+       }
+
+       return conditions;
+   }
+
    @Override
    public CompletableFuture<List<ResultRecord>> query(QuerySession session) throws Exception {
        Query query = session.getQuery();
@@ -199,43 +250,8 @@ public class MongoRecords implements StorageAdapterRecords {
        // Get collection
        MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
 
-       // Query conditions
-       Document conditions = new Document();
-       for (Condition condition : query.getConditions()) {
-           Object value = condition.getValue();
-
-           // Match an array of items
-           if (value instanceof List) {
-               String matchRule = condition.getMatchRule().equals(MatchRule.INCLUDES) ? "$in" : "$nin";
-               conditions.append(condition.getFieldName(), new Document(matchRule, value));
-           }
-
-           else if (condition.getMatchRule().equals(MatchRule.EQUALS)) {
-               conditions.append(condition.getFieldName(), value);
-           }
-
-           else if (condition.getMatchRule().equals(MatchRule.GREATER_THAN_EQUAL)) {
-               conditions.append(condition.getFieldName(), new Document("$gte", value));
-           }
-
-           else if (condition.getMatchRule().equals(MatchRule.LESS_THAN_EQUAL)) {
-               conditions.append(condition.getFieldName(), new Document("$lte", value));
-           }
-
-           else if (condition.getMatchRule().equals(MatchRule.BETWEEN)) {
-               if (!(value instanceof Range)) {
-                   throw new IllegalArgumentException("\"Between\" match value must be a Range.");
-               }
-
-               Range<?> range = (Range<?>) value;
-
-               Document between = new Document("$gte", range.lowerEndpoint()).append("$lte", range.upperEndpoint());
-               conditions.append(condition.getFieldName(), between);
-           }
-       }
-
        // Append all conditions
-       Document matcher = new Document("$match", conditions);
+       Document matcher = new Document("$match", buildConditions(query.getConditions()));
 
        // Session configs
        int sortDir = 1; // @todo needs implementation
@@ -260,12 +276,7 @@ public class MongoRecords implements StorageAdapterRecords {
            groupFields.put(DataQueries.EventName.toString(), "$" + DataQueries.EventName);
            groupFields.put(DataQueries.Player.toString(), "$" + DataQueries.Player);
            groupFields.put(DataQueries.Cause.toString(), "$" + DataQueries.Cause);
-           // Original block
-           groupFields.put(DataQueries.OriginalBlock.toString(),
-               "$" + DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
-           // Replacement block
-           groupFields.put(DataQueries.ReplacementBlock.toString(),
-               "$" + DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
+           groupFields.put(DataQueries.Target.toString(), "$" + DataQueries.Target);
            // Entity
            groupFields.put(DataQueries.Entity.toString(), "$" + DataQueries.Entity.then(DataQueries.EntityType));
            // Day
@@ -286,6 +297,7 @@ public class MongoRecords implements StorageAdapterRecords {
            pipeline.add(limit);
 
            aggregated = collection.aggregate(pipeline);
+           Prism.getLogger().debug("MongoDB Query: " + pipeline);
        } else {
            // Aggregation pipeline
            List<Document> pipeline = new ArrayList<Document>();
@@ -294,6 +306,7 @@ public class MongoRecords implements StorageAdapterRecords {
            pipeline.add(limit);
 
            aggregated = collection.aggregate(pipeline);
+           Prism.getLogger().debug("MongoDB Query: " + pipeline);
        }
 
        // Iterate results and build our event record list
@@ -307,7 +320,6 @@ public class MongoRecords implements StorageAdapterRecords {
                Document document = shouldGroup ? (Document) wrapper.get("_id") : wrapper;
 
                DataContainer data = documentToDataContainer(document);
-//               Prism.getLogger().debug("DOC: " + DataUtil.jsonFromDataView(data).toString());
 
                if (shouldGroup) {
                    data.set(DataQueries.Count, wrapper.get(DataQueries.Count.toString()));

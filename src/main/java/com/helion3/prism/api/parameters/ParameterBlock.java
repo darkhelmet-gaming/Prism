@@ -32,7 +32,7 @@ import org.spongepowered.api.command.CommandSource;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.helion3.prism.api.query.Condition;
+import com.helion3.prism.api.query.FieldCondition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
@@ -60,7 +60,7 @@ public class ParameterBlock extends SimpleParameterHandler {
 
     @Override
     public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
-        query.addCondition(Condition.of(DataQueries.OriginalBlock + "." + DataQueries.BlockState + "." + DataQueries.BlockType, MatchRule.EQUALS, Pattern.compile(value)));
+        query.addCondition(FieldCondition.of(DataQueries.Target, MatchRule.EQUALS, Pattern.compile(value)));
 
         return Optional.empty();
     }

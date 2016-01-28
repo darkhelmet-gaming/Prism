@@ -54,6 +54,36 @@ Because of this, our feature set is growing. File an issue or let us know in IRC
 - `prism.rollback` - Can perform a rollback.
 - `prism.override.radius` - Can exceed the maximum radius in the config.
 
+## Configuration
+
+Coming soon. Bug vive about this.
+
+## Databases
+
+Prism supports a variety of databases. We work hard to ensure is Prism is fast and efficient, but there are a lot of variables and no matter how much we tweak the "out-of-box" experience, the location, hardware, and configuration of your database servers can be a crucial factor.
+
+###Mongo (Recommended)
+
+[MongoDB](https://www.mongodb.com/) is a "no-sql" database, meaning it works very differently from sql-based databases. Rather than define fixed schemas, we store records as "documents". Given the variable nature of Minecraft and Mod data, it's difficult to work with a fixed schema.
+
+We really appreciate other features like it's incredible performance. 
+
+Mongo can be installed and run similarly to other database servers.
+
+###MySQL/MariaDB
+
+MySQL and the MariaDB fork are familiar products, especially for users of Prism 1/2. We continue to support these two products.
+
+###H2
+
+H2 is a file-based storage engine which does not require any servers or setup on your part. It's useful only for testing or small servers. File-based storage engines are quite limited compared to database servers.
+
+Unfortunately, H2 does not fully support batch inserts the way Prism needs -  this impacts Prism's performance as it either prevents us from using batches, or prevents us from utilizing table relationships.
+
+###Others?
+
+Prism can be extended with support for additional storage engines. We always are open to PRs if you would like to submit further support.
+
 ## API
 
 Prism 3 offers an API which allows you to:

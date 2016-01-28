@@ -52,6 +52,12 @@ public class Configuration {
                 rootNode = configManager.load();
             }
 
+            // Storage
+            ConfigurationNode storageEng = rootNode.getNode("storage", "engine");
+            if (storageEng.isVirtual()) {
+                storageEng.setValue("h2");
+            }
+
             // Database
             ConfigurationNode dbName = rootNode.getNode("db", "name");
             if (dbName.isVirtual()) {

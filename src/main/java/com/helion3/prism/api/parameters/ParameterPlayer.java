@@ -36,7 +36,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.Condition;
+import com.helion3.prism.api.query.FieldCondition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
@@ -71,7 +71,7 @@ public class ParameterPlayer extends SimpleParameterHandler {
             @Override
             public void run() {
                 try {
-                    query.addCondition(Condition.of(DataQueries.Player.toString(), MatchRule.EQUALS, profile.get().getUniqueId().toString()));
+                    query.addCondition(FieldCondition.of(DataQueries.Player, MatchRule.EQUALS, profile.get().getUniqueId().toString()));
                 } catch (InterruptedException | ExecutionException e) {
                     session.getCommandSource().get().sendMessage(Format.error(String.format("Cannot find profile for user \"%s\"", value)));
                     e.printStackTrace();

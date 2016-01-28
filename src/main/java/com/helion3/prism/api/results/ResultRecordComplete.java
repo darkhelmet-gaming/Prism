@@ -24,6 +24,7 @@
 package com.helion3.prism.api.results;
 
 import java.util.Date;
+import java.util.Optional;
 
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.DateUtil;
@@ -41,7 +42,14 @@ public class ResultRecordComplete extends ResultRecord {
      * @return String "time since" value.
      */
     public String getRelativeTime() {
-        Date created = (Date) data.get(DataQueries.Created).get();
-        return DateUtil.getTimeSince(created);
+        Optional<Object> date = data.get(DataQueries.Created);
+        String relativeTime = "";
+
+        if (date.isPresent()) {
+            Date created = (Date) date.get();
+            relativeTime = DateUtil.getTimeSince(created);
+        }
+
+        return relativeTime;
     }
 }

@@ -46,7 +46,7 @@ public class AsyncUtil {
      * @param source CommandSource running this lookup.
      * @param session
      */
-    public static void lookup(final QuerySession session) {
+    public static void lookup(final QuerySession session) throws Exception {
         if (!session.getCommandSource().isPresent()) {
             // @todo handle this.
             return;
@@ -60,11 +60,14 @@ public class AsyncUtil {
         async(session, new AsyncCallback() {
             @Override
             public void success(List<ResultRecord> results) {
-
                 if (results.size() > 5) {
                     List<Text> messages = new ArrayList<Text>();
-                    for (ResultRecord result : results) {
-                        messages.add(Messages.from(result));
+                    try {
+                        for (ResultRecord result : results) {
+                            messages.add(Messages.from(result));
+                        }
+                    } catch(Exception e) {
+                        e.printStackTrace();
                     }
 
                     Optional<PaginationService> service = Prism.getGame().getServiceManager().provide(PaginationService.class);

@@ -23,10 +23,7 @@
  */
 package com.helion3.prism.api.results;
 
-import java.util.Optional;
-
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
 
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.TypeUtil;
@@ -40,22 +37,7 @@ abstract public class ResultRecord {
      * @return String verb variant of event group.
      */
     public String getEventVerb() {
-        return TypeUtil.translateToPastTense(getEventGroupName());
-    }
-
-    /**
-     * Returns the group portion of an event name.
-     *
-     * @return String event group name.
-     */
-    public String getEventGroupName() {
-        String value = getEventName();
-
-        if (value.contains("-")) {
-            value = value.split("-")[1];
-        }
-
-        return value;
+        return TypeUtil.translateToPastTense(getEventName());
     }
 
     /**
@@ -64,14 +46,7 @@ abstract public class ResultRecord {
      * @return String event name.
      */
     public String getEventName() {
-        String value = "unknown";
-
-        Optional<String> optional = data.getString(DataQueries.EventName);
-        if (optional.isPresent()) {
-            value = optional.get();
-        }
-
-        return value;
+        return data.getString(DataQueries.EventName).orElse("unknown");
     }
 
     /**
@@ -80,14 +55,7 @@ abstract public class ResultRecord {
      * @return String source name.
      */
     public String getSourceName() {
-        String value = "unknown";
-
-        Optional<String> optional = data.getString(DataQueries.Cause);
-        if (optional.isPresent()) {
-            value = optional.get();
-        }
-
-        return value;
+        return data.getString(DataQueries.Cause).orElse("unknown");
     }
 
     /**
@@ -95,44 +63,17 @@ abstract public class ResultRecord {
      * block, or entity of this event record.
      *
      * @return String target name.
-     * @todo I really want to change this...
      */
     public String getTargetName() {
-        String value = "";
-        String eventName = data.getString(DataQueries.EventName).get();
-        DataQuery path;
-
-        path = DataQueries.Entity.then(DataQueries.EntityType);
-        if (this instanceof ResultRecordAggregate) {
-            path = DataQueries.Entity;
-        }
-
-        if (data.getString(path).isPresent()) {
-            return formatId(data.getString(path).get());
-        }
-
-        // Determine which block state we're using
-        if (this instanceof ResultRecordAggregate) {
-            path = DataQueries.OriginalBlock;
-            if (eventName.equals("place")) {
-                path = DataQueries.ReplacementBlock;
-            }
-        } else {
-            path = DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
-            if (eventName.equals("place")) {
-                path = DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType);
-            }
-        }
-
-        // Use value
-        Optional<String> optionalBlockType = data.getString(path);
-        if (optionalBlockType.isPresent()) {
-            value = formatId(optionalBlockType.get());
-        }
-
-        return value;
+        return formatId(data.getString(DataQueries.Target).orElse("unknown"));
     }
 
+    /**
+     * Strips ID prefixes, like "minecraft:".
+     *
+     * @param id String ID
+     * @return String
+     */
     private String formatId(String id) {
         if (id.contains(":")) {
             id = id.split(":")[1];

@@ -68,6 +68,7 @@ import com.helion3.prism.events.listeners.RequiredInteractListener;
 import com.helion3.prism.events.listeners.JoinListener;
 import com.helion3.prism.events.listeners.QuitListener;
 import com.helion3.prism.queues.RecordingQueueManager;
+import com.helion3.prism.storage.h2.H2StorageAdapter;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 
 /**
@@ -86,6 +87,7 @@ final public class Prism {
     private static Map<Player, List<ActionableResult>> lastActionResults = new HashMap<Player, List<ActionableResult>>();
     private static Logger logger;
     private static Map<String,Class<? extends ResultRecord>> resultRecords = new HashMap<String,Class<? extends ResultRecord>>();
+    private static File parentDirectory;
     private static Object plugin;
     private static StorageAdapter storageAdapter;
 
@@ -107,6 +109,7 @@ final public class Prism {
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
         plugin = this;
+        parentDirectory = defaultConfig.getParentFile();
 
         // Load configuration data
         config = new Configuration(defaultConfig, configManager);
@@ -123,8 +126,19 @@ final public class Prism {
         registerSpongeEventListeners(game.getEventManager());
 
         // Initialize storage engine
-        storageAdapter = new MongoStorageAdapter();
+        String engine = config.getNode("storage", "engine").getString();
+
         try {
+            if (engine.equalsIgnoreCase("h2")) {
+                storageAdapter = new H2StorageAdapter();
+            }
+            else if (engine.equalsIgnoreCase("mongo")) {
+                storageAdapter = new MongoStorageAdapter();
+            }
+            else {
+                throw new Exception("Invalid storage engine configured.");
+            }
+
             storageAdapter.connect();
         } catch (Exception e) {
             // @todo handle this
@@ -244,6 +258,14 @@ final public class Prism {
      */
     public static List<ParameterHandler> getParameterHandlers() {
         return handlers;
+    }
+
+    /**
+     * Get parent directory.
+     * @return File
+     */
+    public static File getParentDirectory() {
+        return parentDirectory;
     }
 
     /**

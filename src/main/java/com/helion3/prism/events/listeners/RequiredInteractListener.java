@@ -34,10 +34,11 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.Conditions;
+import com.helion3.prism.api.query.ConditionGroup;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.util.AsyncUtil;
+import com.helion3.prism.util.Format;
 
 public class RequiredInteractListener {
     /**
@@ -68,10 +69,15 @@ public class RequiredInteractListener {
                     location = location.getRelative(blockEvent.getTargetSide());
                 }
 
-                query.addConditions(Conditions.from(location));
+                query.addCondition(ConditionGroup.from(location));
 
                 // Pass off to an async lookup helper
-                AsyncUtil.lookup(session);
+                try {
+                    AsyncUtil.lookup(session);
+                } catch (Exception e) {
+                    playerCause.get().sendMessage(Format.error(e.getMessage()));
+                    e.printStackTrace();
+                }
 
                 event.setCancelled(true);
             }

@@ -37,7 +37,7 @@ import org.spongepowered.api.world.World;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.Conditions;
+import com.helion3.prism.api.query.ConditionGroup;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.util.Format;
@@ -79,7 +79,7 @@ public class ParameterRadius extends SimpleParameterHandler {
 
             session.setRadius(radius);
 
-            query.addConditions(Conditions.from(location, radius));
+            query.addCondition(ConditionGroup.from(location, radius));
         }
 
         return Optional.empty();
@@ -94,7 +94,7 @@ public class ParameterRadius extends SimpleParameterHandler {
             // Player location
             Location<World> location = ((Player) session.getCommandSource().get()).getLocation();
 
-            query.addConditions(Conditions.from(location, defaultRadius));
+            query.addCondition(ConditionGroup.from(location, defaultRadius));
 
             session.setRadius(defaultRadius);
 

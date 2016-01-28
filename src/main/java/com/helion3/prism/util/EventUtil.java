@@ -26,6 +26,7 @@ package com.helion3.prism.util;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -76,19 +77,9 @@ public class EventUtil {
             return cause.first(BlockSnapshot.class).isPresent();
         }
 
-        // Vine grow events
-        if (a.equals(BlockTypes.AIR) && b.equals(BlockTypes.VINE)) {
-            return !cause.first(Player.class).isPresent();
-        }
-
-        // Falling blocks
-        if (a.equals(BlockTypes.AIR) && b.equals(BlockTypes.GRAVEL)) {
-            return !cause.first(Player.class).isPresent();
-        }
-
-        // Grass vanishing
-        if (a.equals(BlockTypes.GRASS) && b.equals(BlockTypes.DIRT)) {
-            return !cause.first(Player.class).isPresent();
+        // If no entity at fault, we don't care about placement that didn't affect anything
+        if (!cause.first(Entity.class).isPresent()) {
+            return (a.equals(BlockTypes.AIR));
         }
 
         return false;

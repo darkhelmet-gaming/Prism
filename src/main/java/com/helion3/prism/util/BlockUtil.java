@@ -145,7 +145,11 @@ public class BlockUtil {
             a.equals(BlockTypes.AIR) ||
 
             // Note, see "natural flow" comment above.
-            ((a.equals(BlockTypes.FLOWING_WATER) || a.equals(BlockTypes.FLOWING_LAVA)) && b.equals(BlockTypes.AIR))
+            ((a.equals(BlockTypes.FLOWING_WATER) || a.equals(BlockTypes.FLOWING_LAVA)) && b.equals(BlockTypes.AIR)) ||
+
+            // Piston
+            a.equals(BlockTypes.PISTON_EXTENSION) || b.equals(BlockTypes.PISTON_EXTENSION) ||
+            a.equals(BlockTypes.PISTON_HEAD) || b.equals(BlockTypes.PISTON_HEAD)
         );
     }
 }

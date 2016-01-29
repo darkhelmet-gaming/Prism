@@ -137,14 +137,9 @@ public class QuerySession {
      * @return CompletableFuture<Query>
      */
     public CompletableFuture<Void> newQueryFromArguments(@Nullable String arguments) throws ParameterException {
-        CompletableFuture<Void> returnFuture = new CompletableFuture<Void>();
-
         CompletableFuture<Query> future = QueryBuilder.fromArguments(this, arguments);
-        future.thenAccept(query -> {
+        return future.thenAccept(query -> {
             this.query = query;
-            returnFuture.complete(null);
         });
-
-        return returnFuture;
     }
 }

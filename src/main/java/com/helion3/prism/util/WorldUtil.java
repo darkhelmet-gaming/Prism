@@ -71,7 +71,7 @@ public class WorldUtil {
             for (int z = zMin; z <= zMax; z++) {
                 for (int y = yMin; y <= yMax; y++) {
                     if (world.getBlock(x, y, z).getType().equals(type)) {
-                        world.setBlockType(x, y, z, BlockTypes.AIR);
+                        world.setBlockType(x, y, z, BlockTypes.AIR, false);
                         changeCount++;
                     }
                 }

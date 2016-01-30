@@ -77,7 +77,7 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
         BlockSnapshot original = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
 
         // Actually restore!
-        if (!optionalSnapshot.get().restore(true, true)) {
+        if (!optionalSnapshot.get().restore(true, false)) {
             return ActionableResult.skipped(SkipReason.UNKNOWN);
         }
 
@@ -145,7 +145,7 @@ public class BlockChangeResultRecord extends ResultRecordComplete implements Act
         BlockSnapshot original = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
 
         // Actually restore!
-        if (!optionalSnapshot.get().restore(true, true)) {
+        if (!optionalSnapshot.get().restore(true, false)) {
             return ActionableResult.skipped(SkipReason.UNKNOWN);
         }
 

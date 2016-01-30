@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import com.helion3.prism.api.flags.Flag;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
@@ -84,10 +85,18 @@ public class RestoreCommand implements CommandCallable {
                             }
 
                             if (source instanceof Player) {
-                                int fire = WorldUtil.removeAroundFromLocation(BlockTypes.FIRE, ((Player) source).getLocation(), session.getRadius());
-                                int items = WorldUtil.removeItemEntitiesAroundLocation(((Player) source).getLocation(), session.getRadius());
+                                int changes = 0;
 
-                                if (fire + items > 0) {
+                                if (session.hasFlag(Flag.CLEAN)) {
+                                    changes += WorldUtil.removeIllegalBlocks(((Player) source).getLocation(), session.getRadius());
+                                    changes += WorldUtil.removeItemEntitiesAroundLocation(((Player) source).getLocation(), session.getRadius());
+                                }
+
+                                if (session.hasFlag(Flag.DRAIN)) {
+                                    changes += WorldUtil.removeLiquidsAroundLocation(((Player) source).getLocation(), session.getRadius());
+                                }
+
+                                if (changes > 0) {
                                     source.sendMessage(Format.bonus("Cleaning area..."));
                                 }
                             }

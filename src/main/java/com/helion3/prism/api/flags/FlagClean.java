@@ -23,19 +23,37 @@
  */
 package com.helion3.prism.api.flags;
 
-public enum Flag {
-    /**
-     * Trigger illegal block/item drop cleanup during a rollback.
-     */
-    CLEAN,
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.helion3.prism.api.query.Query;
+import com.helion3.prism.api.query.QuerySession;
+import org.spongepowered.api.command.CommandSource;
 
-    /**
-     * Trigger liquid drain during a rollback.
-     */
-    DRAIN,
+import javax.annotation.Nullable;
+import java.util.Optional;
 
+
+public class FlagClean extends SimpleFlagHandler {
     /**
-     * Prevent aggregation of result records.
+     * Flag which allows illegal blocks/item entities to be drained from an applier region.
      */
-    NO_GROUP;
+    public FlagClean() {
+        super(ImmutableList.of("clean"));
+    }
+
+    @Override
+    public boolean acceptsSource(@Nullable CommandSource source) {
+        return true;
+    }
+
+    @Override
+    public boolean acceptsValue(String value) {
+        return true;
+    }
+
+    @Override
+    public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, Optional<String> value, Query query) {
+        session.addFlag(Flag.CLEAN);
+        return Optional.empty();
+    }
 }

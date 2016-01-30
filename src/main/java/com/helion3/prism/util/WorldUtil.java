@@ -36,6 +36,45 @@ import org.spongepowered.api.world.World;
 public class WorldUtil {
     private WorldUtil() {}
 
+
+    public static int removeIllegalBlocks(Location<World> location, int radius) {
+        final World world = location.getExtent();
+
+        int xMin = location.getBlockX() - radius;
+        int xMax = location.getBlockX() + radius;
+
+        int zMin = location.getBlockZ() - radius;
+        int zMax = location.getBlockZ() + radius;
+
+        int yMin = location.getBlockY() - radius;
+        int yMax = location.getBlockY() + radius;
+
+        // Clamp Y basement
+        if (yMin < 0) {
+            yMin = 0;
+        }
+
+        // Clamp Y ceiling
+        if (yMax >= world.getDimension().getBuildHeight()) {
+            yMax = world.getDimension().getBuildHeight();
+        }
+
+        int changeCount = 0;
+        for (int x = xMin; x <= xMax; x++) {
+            for (int z = zMin; z <= zMax; z++) {
+                for (int y = yMin; y <= yMax; y++) {
+                    BlockType existing = world.getBlock(x, y, z).getType();
+                    if (existing.equals(BlockTypes.FIRE) || existing.equals(BlockTypes.TNT)) {
+                        world.setBlockType(x, y, z, BlockTypes.AIR, false);
+                        changeCount++;
+                    }
+                }
+            }
+        }
+
+        return changeCount;
+    }
+
     /**
      * Remove a specific block from a given radius around a region.
      *

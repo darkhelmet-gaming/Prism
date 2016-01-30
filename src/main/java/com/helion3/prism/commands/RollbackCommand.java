@@ -31,7 +31,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -85,15 +84,18 @@ public class RollbackCommand implements CommandCallable {
                             }
 
                             if (source instanceof Player) {
-                                int fire = WorldUtil.removeAroundFromLocation(BlockTypes.FIRE, ((Player) source).getLocation(), session.getRadius());
-                                int items = WorldUtil.removeItemEntitiesAroundLocation(((Player) source).getLocation(), session.getRadius());
+                                int changes = 0;
 
-                                int liquids = 0;
-                                if (session.hasFlag(Flag.DRAIN)) {
-                                    liquids = WorldUtil.removeLiquidsAroundLocation(((Player) source).getLocation(), session.getRadius());
+                                if (session.hasFlag(Flag.CLEAN)) {
+                                    changes += WorldUtil.removeIllegalBlocks(((Player) source).getLocation(), session.getRadius());
+                                    changes += WorldUtil.removeItemEntitiesAroundLocation(((Player) source).getLocation(), session.getRadius());
                                 }
 
-                                if (fire + items + liquids > 0) {
+                                if (session.hasFlag(Flag.DRAIN)) {
+                                    changes += WorldUtil.removeLiquidsAroundLocation(((Player) source).getLocation(), session.getRadius());
+                                }
+
+                                if (changes > 0) {
                                     source.sendMessage(Format.bonus("Cleaning area..."));
                                 }
                             }

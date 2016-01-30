@@ -10,6 +10,10 @@ Prism 3.x has been completely rewritten for Sponge. It's still very early in the
 
 Because of this, our feature set is growing. File an issue or let us know in IRC what's important to you.
 
+## Downloads
+
+- [Builds](http://dhmc.us:8080/job/Prism/)
+
 ## Installation
 
 1. Place into your `mods` directory. Prism (3 Alpha) currenty only supports **MongoDB**. 

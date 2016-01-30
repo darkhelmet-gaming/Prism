@@ -27,6 +27,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import com.helion3.prism.api.records.ResultAggregate;
+import com.helion3.prism.api.records.ResultComplete;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.living.player.Player;
@@ -39,20 +41,18 @@ import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.helion3.prism.Prism;
-import com.helion3.prism.api.results.ResultRecord;
-import com.helion3.prism.api.results.ResultRecordAggregate;
-import com.helion3.prism.api.results.ResultRecordComplete;
+import com.helion3.prism.api.records.Result;
 
 public class Messages {
     private Messages() {}
 
     /**
-     * Generates Text output from a ResultRecord.
+     * Generates Text output from a Result.
      *
-     * @param result ResultRecord
+     * @param result Result
      * @return Text
      */
-    public static Text from(ResultRecord result) {
+    public static Text from(Result result) {
         Builder builder = Text.builder().append(Text.of(
             TextColors.DARK_AQUA, result.getSourceName(), " ",
             TextColors.WHITE, result.getEventVerb(), " "
@@ -63,11 +63,11 @@ public class Messages {
             builder.append(Text.of(TextColors.DARK_AQUA, target, " "));
         }
 
-        if (result instanceof ResultRecordAggregate) {
+        if (result instanceof ResultAggregate) {
             int count = result.data.getInt(DataQueries.Count).get();
             builder.append(Text.of(TextColors.GREEN, "x" + count, " "));
         } else {
-            ResultRecordComplete recordComplete = (ResultRecordComplete) result;
+            ResultComplete recordComplete = (ResultComplete) result;
             Optional<Object> optionalLocation = result.data.get(DataQueries.Location);
 
             if (optionalLocation.isPresent()) {

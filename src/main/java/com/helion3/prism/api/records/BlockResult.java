@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.results;
+package com.helion3.prism.api.records;
 
 import java.util.Optional;
 
@@ -39,7 +39,7 @@ import com.helion3.prism.util.DataQueries;
 /**
  * Represents a block change event record.
  */
-public class BlockChangeResultRecord extends ResultRecordComplete implements Actionable {
+public class BlockResult extends ResultComplete implements Actionable {
     @Override
     public ActionableResult rollback() throws Exception {
         Optional<Object> optionalOriginal = data.get(DataQueries.OriginalBlock);

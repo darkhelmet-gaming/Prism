@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import com.helion3.prism.api.records.Result;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
@@ -40,9 +41,8 @@ import org.spongepowered.api.entity.living.player.Player;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.results.Actionable;
-import com.helion3.prism.api.results.ActionableResult;
-import com.helion3.prism.api.results.ResultRecord;
+import com.helion3.prism.api.records.Actionable;
+import com.helion3.prism.api.records.ActionableResult;
 import com.helion3.prism.util.Format;
 import com.helion3.prism.util.Template;
 import com.helion3.prism.util.Translation;
@@ -65,14 +65,14 @@ public class RollbackCommand implements CommandCallable {
                 try {
                     List<ActionableResult> actionResults = new ArrayList<ActionableResult>();
                     // Iterate query results
-                    CompletableFuture<List<ResultRecord>> futureResults = Prism.getStorageAdapter().records().query(session);
+                    CompletableFuture<List<Result>> futureResults = Prism.getStorageAdapter().records().query(session);
                     futureResults.thenAccept(results -> {
                         if (results.isEmpty()) {
                             source.sendMessage(Format.error("No results."));
                         } else {
                             // Iterate record results
                             try {
-                                for (ResultRecord result : results) {
+                                for (Result result : results) {
                                     if(result instanceof Actionable) {
                                         Actionable actionable = (Actionable) result;
                                         actionResults.add(actionable.rollback());

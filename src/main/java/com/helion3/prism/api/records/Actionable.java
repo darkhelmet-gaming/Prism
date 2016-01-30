@@ -21,13 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.results;
+package com.helion3.prism.api.records;
 
-/**
- * Represents aggregate results from a query. Individual records are grouped
- * together and lose record-specific data like location, a specific timestamp,
- * etc.
- */
-public class ResultRecordAggregate extends ResultRecord {
+public interface Actionable {
+    /**
+     * Reverses the result of this event on a subject
+     * unless the state of the subject has changed since
+     * this event, in way that would conflict.
+     *
+     * For example, if the subject was a block, and
+     * the action removed the block, this will restore
+     * the block at the same location.
+     *
+     * @return ActionableResult Results of applier action
+     */
+    public ActionableResult rollback() throws Exception;
 
+    /**
+     * Re-applies the result of this event to a subject,
+     * unless the subject does not exist in a state that
+     * would allow this change.
+     *
+     * @return ActionableResult Results of applier action
+     */
+    public ActionableResult restore() throws Exception;
 }

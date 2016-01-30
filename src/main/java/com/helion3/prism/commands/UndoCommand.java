@@ -38,7 +38,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 import com.helion3.prism.Prism;
-import com.helion3.prism.api.results.ActionableResult;
+import com.helion3.prism.api.records.ActionableResult;
 import com.helion3.prism.util.Format;
 import com.helion3.prism.util.Template;
 import com.helion3.prism.util.Translation;

@@ -72,7 +72,7 @@ final public class Query {
     /**
      * Get the record limit.
      *
-     * @return Record limit.
+     * @return Result limit.
      */
     public int getLimit() {
         return limit;
@@ -81,7 +81,7 @@ final public class Query {
     /**
      * Set the record limit.
      *
-     * @param limit int Record limit
+     * @param limit int Result limit
      */
     public void setLimit(int limit) {
         this.limit = limit;

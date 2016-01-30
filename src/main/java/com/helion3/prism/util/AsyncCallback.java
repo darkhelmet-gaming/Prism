@@ -25,10 +25,10 @@ package com.helion3.prism.util;
 
 import java.util.List;
 
-import com.helion3.prism.api.results.ResultRecord;
+import com.helion3.prism.api.records.Result;
 
 public class AsyncCallback {
-    public void success(List<ResultRecord> results) {}
+    public void success(List<Result> results) {}
 
     public void empty() {}
 

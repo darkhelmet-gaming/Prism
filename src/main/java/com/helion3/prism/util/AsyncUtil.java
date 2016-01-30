@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import com.helion3.prism.api.records.Result;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.pagination.PaginationBuilder;
@@ -35,7 +36,6 @@ import org.spongepowered.api.service.pagination.PaginationService;
 
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.results.ResultRecord;
 
 public class AsyncUtil {
     private AsyncUtil() {}
@@ -59,11 +59,11 @@ public class AsyncUtil {
 
         async(session, new AsyncCallback() {
             @Override
-            public void success(List<ResultRecord> results) {
+            public void success(List<Result> results) {
                 if (results.size() > 5) {
                     List<Text> messages = new ArrayList<Text>();
                     try {
-                        for (ResultRecord result : results) {
+                        for (Result result : results) {
                             messages.add(Messages.from(result));
                         }
                     } catch(Exception e) {
@@ -78,7 +78,7 @@ public class AsyncUtil {
                         builder.sendTo(session.getCommandSource().get());
                     }
                 } else {
-                    for (ResultRecord result : results) {
+                    for (Result result : results) {
                         session.getCommandSource().get().sendMessage(Messages.from(result));
                     }
                 }
@@ -109,7 +109,7 @@ public class AsyncUtil {
             @Override
             public void run(){
                 try {
-                    CompletableFuture<List<ResultRecord>> future = Prism.getStorageAdapter().records().query(session);
+                    CompletableFuture<List<Result>> future = Prism.getStorageAdapter().records().query(session);
                     future.thenAccept(results -> {
                         if (results.isEmpty()) {
                             callback.empty();

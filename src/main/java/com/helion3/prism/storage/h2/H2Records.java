@@ -35,6 +35,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import com.helion3.prism.api.records.Result;
+import com.helion3.prism.api.records.ResultComplete;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -49,9 +51,7 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.query.SQLQuery;
-import com.helion3.prism.api.results.ResultRecord;
-import com.helion3.prism.api.results.ResultRecordAggregate;
-import com.helion3.prism.api.results.ResultRecordComplete;
+import com.helion3.prism.api.records.ResultAggregate;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
@@ -146,10 +146,10 @@ public class H2Records implements StorageAdapterRecords {
     }
 
     @Override
-    public CompletableFuture<List<ResultRecord>> query(QuerySession session) throws Exception {
+    public CompletableFuture<List<Result>> query(QuerySession session) throws Exception {
         // Prepare results
-        List<ResultRecord> results = new ArrayList<ResultRecord>();
-        CompletableFuture<List<ResultRecord>> future = new CompletableFuture<List<ResultRecord>>();
+        List<Result> results = new ArrayList<Result>();
+        CompletableFuture<List<Result>> future = new CompletableFuture<List<Result>>();
 
         Connection conn = H2StorageAdapter.getConnection();
         PreparedStatement statement = null;
@@ -167,16 +167,16 @@ public class H2Records implements StorageAdapterRecords {
 
             while (rs.next()) {
                 // Build our result object
-                ResultRecord result = null;
+                Result result = null;
                 if (session.getQuery().isAggregate()) {
-                    result = new ResultRecordAggregate();
+                    result = new ResultAggregate();
                 } else {
                     // Pull record class for this event, if any
-                    Class<? extends ResultRecord> clazz = Prism.getResultRecord(rs.getString("eventName"));
+                    Class<? extends Result> clazz = Prism.getResultRecord(rs.getString("eventName"));
                     if (clazz != null){
                         result = clazz.newInstance();
                     } else {
-                        result = new ResultRecordComplete();
+                        result = new ResultComplete();
                     }
                 }
 
@@ -223,7 +223,7 @@ public class H2Records implements StorageAdapterRecords {
                     public void run() {
                         try {
                             for (GameProfile profile : profiles.get()) {
-                                for (ResultRecord r : results) {
+                                for (Result r : results) {
                                     Optional<Object> cause = r.data.get(DataQueries.Cause);
                                     if (cause.isPresent() && ((String) cause.get()).equals(profile.getUniqueId().toString())) {
                                         r.data.set(DataQueries.Cause, profile.getName());

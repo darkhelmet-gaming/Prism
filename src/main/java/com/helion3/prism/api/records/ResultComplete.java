@@ -21,41 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.results;
+package com.helion3.prism.api.records;
 
-public enum SkipReason {
-    /**
-     * Block isn't safe and may not be places in the world.
-     */
-    ILLEGAL_BLOCK,
+import java.util.Date;
+import java.util.Optional;
 
-    /**
-     * World or location are missing. Likely if a record was made for
-     * a world which no longer exists.
-     */
-    INVALID_LOCATION,
+import com.helion3.prism.util.DataQueries;
+import com.helion3.prism.util.DateUtil;
 
+/**
+ * Represents a complete copy of event record data from
+ * a query result. Used for displaying individual entries
+ * or for non-lookup actions.
+ *
+ */
+public class ResultComplete extends Result {
     /**
-     * Data is invalid. Likely due to mods being removed or
-     * data being changed between updates.
+     * Returns a user-friendly relative "time since" value.
+     *
+     * @return String "time since" value.
      */
-    INVALID,
+    public String getRelativeTime() {
+        Optional<Object> date = data.get(DataQueries.Created);
+        String relativeTime = "";
 
-    /**
-     * Location or target we're attempting to change exists in
-     * a state we don't expect. For example, if you try to rollback
-     * a block but someone has already placed a new block in that
-     * spot.
-     */
-    OCCUPIED,
+        if (date.isPresent()) {
+            Date created = (Date) date.get();
+            relativeTime = DateUtil.getTimeSince(created);
+        }
 
-    /**
-     * Action has yet to be implemented.
-     */
-    UNIMPLEMENTED,
-
-    /**
-     * An unknown error occurred.
-     */
-    UNKNOWN
+        return relativeTime;
+    }
 }

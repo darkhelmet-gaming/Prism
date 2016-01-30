@@ -35,6 +35,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import com.helion3.prism.api.records.ResultComplete;
+import com.helion3.prism.api.records.Result;
 import org.bson.Document;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -53,9 +55,7 @@ import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.query.ConditionGroup.Operator;
-import com.helion3.prism.api.results.ResultRecord;
-import com.helion3.prism.api.results.ResultRecordAggregate;
-import com.helion3.prism.api.results.ResultRecordComplete;
+import com.helion3.prism.api.records.ResultAggregate;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
@@ -239,13 +239,13 @@ public class MongoRecords implements StorageAdapterRecords {
    }
 
    @Override
-   public CompletableFuture<List<ResultRecord>> query(QuerySession session) throws Exception {
+   public CompletableFuture<List<Result>> query(QuerySession session) throws Exception {
        Query query = session.getQuery();
        checkNotNull(query);
 
        // Prepare results
-       List<ResultRecord> results = new ArrayList<ResultRecord>();
-       CompletableFuture<List<ResultRecord>> future = new CompletableFuture<List<ResultRecord>>();
+       List<Result> results = new ArrayList<Result>();
+       CompletableFuture<List<Result>> future = new CompletableFuture<List<Result>>();
 
        // Get collection
        MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
@@ -326,16 +326,16 @@ public class MongoRecords implements StorageAdapterRecords {
                }
 
                // Build our result object
-               ResultRecord result = null;
+               Result result = null;
                if (shouldGroup) {
-                   result = new ResultRecordAggregate();
+                   result = new ResultAggregate();
                } else {
                    // Pull record class for this event, if any
-                   Class<? extends ResultRecord> clazz = Prism.getResultRecord(wrapper.getString(DataQueries.EventName.toString()));
+                   Class<? extends Result> clazz = Prism.getResultRecord(wrapper.getString(DataQueries.EventName.toString()));
                    if (clazz != null){
                        result = clazz.newInstance();
                    } else {
-                       result = new ResultRecordComplete();
+                       result = new ResultComplete();
                    }
                }
 
@@ -359,7 +359,7 @@ public class MongoRecords implements StorageAdapterRecords {
                    public void run() {
                        try {
                            for (GameProfile profile : profiles.get()) {
-                               for (ResultRecord r : results) {
+                               for (Result r : results) {
                                    Optional<Object> cause = r.data.get(DataQueries.Cause);
                                    if (cause.isPresent() && ((String) cause.get()).equals(profile.getUniqueId().toString())) {
                                        r.data.set(DataQueries.Cause, profile.getName());

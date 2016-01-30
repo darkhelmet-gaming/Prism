@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.helion3.prism.api.records.BlockResult;
+import com.helion3.prism.api.records.Result;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
@@ -56,10 +58,8 @@ import com.helion3.prism.api.parameters.ParameterHandler;
 import com.helion3.prism.api.parameters.ParameterPlayer;
 import com.helion3.prism.api.parameters.ParameterRadius;
 import com.helion3.prism.api.parameters.ParameterTime;
-import com.helion3.prism.api.results.ActionableResult;
-import com.helion3.prism.api.results.BlockChangeResultRecord;
-import com.helion3.prism.api.results.EntityResultRecord;
-import com.helion3.prism.api.results.ResultRecord;
+import com.helion3.prism.api.records.ActionableResult;
+import com.helion3.prism.api.records.EntityResult;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.events.listeners.ChangeBlockListener;
@@ -87,7 +87,7 @@ final public class Prism {
     private static List<FlagHandler> flagHandlers = new ArrayList<FlagHandler>();
     private static Map<Player, List<ActionableResult>> lastActionResults = new HashMap<Player, List<ActionableResult>>();
     private static Logger logger;
-    private static Map<String,Class<? extends ResultRecord>> resultRecords = new HashMap<String,Class<? extends ResultRecord>>();
+    private static Map<String,Class<? extends Result>> resultRecords = new HashMap<String,Class<? extends Result>>();
     private static File parentDirectory;
     private static Object plugin;
     private static StorageAdapter storageAdapter;
@@ -285,7 +285,7 @@ final public class Prism {
      * @param eventName Event name.
      * @return Result record class.
      */
-    public static Class<? extends ResultRecord> getResultRecord(String eventName) {
+    public static Class<? extends Result> getResultRecord(String eventName) {
         return resultRecords.get(eventName);
     }
 
@@ -310,11 +310,11 @@ final public class Prism {
      * Registers all default event names and their handling classes
      */
     private void registerEventResultRecords() {
-        registerResultRecord("break", BlockChangeResultRecord.class);
-        registerResultRecord("decay", BlockChangeResultRecord.class);
-        registerResultRecord("grow", BlockChangeResultRecord.class);
-        registerResultRecord("place", BlockChangeResultRecord.class);
-        registerResultRecord("death", EntityResultRecord.class);
+        registerResultRecord("break", BlockResult.class);
+        registerResultRecord("decay", BlockResult.class);
+        registerResultRecord("grow", BlockResult.class);
+        registerResultRecord("place", BlockResult.class);
+        registerResultRecord("death", EntityResult.class);
     }
 
     /**
@@ -361,7 +361,7 @@ final public class Prism {
      * @param eventName
      * @param record
      */
-    public void registerResultRecord(String eventName, Class<? extends ResultRecord> clazz) {
+    public void registerResultRecord(String eventName, Class<? extends Result> clazz) {
         if (resultRecords.containsKey(eventName)) {
             throw new IllegalArgumentException("A result record is already registered for event \"" + eventName + "\"");
         }

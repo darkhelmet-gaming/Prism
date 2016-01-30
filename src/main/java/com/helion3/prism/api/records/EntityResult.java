@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.results;
+package com.helion3.prism.api.records;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ import org.spongepowered.api.entity.EntitySnapshot.Builder;
 import com.helion3.prism.Prism;
 import com.helion3.prism.util.DataQueries;
 
-public class EntityResultRecord extends ResultRecordComplete implements Actionable {
+public class EntityResult extends ResultComplete implements Actionable {
     @Override
     public ActionableResult rollback() throws Exception {
         DataView entityData = formatEntityData();

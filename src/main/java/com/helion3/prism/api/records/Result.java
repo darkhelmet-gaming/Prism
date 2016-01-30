@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.results;
+package com.helion3.prism.api.records;
 
 import org.spongepowered.api.data.DataContainer;
 
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.TypeUtil;
 
-abstract public class ResultRecord {
+abstract public class Result {
     public DataContainer data;
 
     /**

@@ -62,8 +62,8 @@ public class PrismRecord {
 
     /**
      * A final, save-ready record.
-     * @param source Record source builder.
-     * @param event Record event builder.
+     * @param source Result source builder.
+     * @param event Result event builder.
      */
     private PrismRecord(PrismRecordSourceBuilder source, PrismRecordEventBuilder event) {
         this.source = source;
@@ -392,7 +392,7 @@ public class PrismRecord {
 
     /**
      * Create a new record builder.
-     * @return PrismRecordBuilder Record builder.
+     * @return PrismRecordBuilder Result builder.
      */
     public static PrismRecordBuilder create() {
         return new PrismRecordBuilder();

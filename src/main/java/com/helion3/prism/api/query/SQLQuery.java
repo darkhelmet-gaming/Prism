@@ -29,13 +29,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.spongepowered.api.data.DataQuery;
+
 import com.google.common.collect.Range;
+import com.helion3.prism.Prism;
 import com.helion3.prism.util.TypeUtil;
 
 /**
  * Super simple SQL query builder.
  */
 public class SQLQuery {
+    private final static String tablePrefix = Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString();
     private final String query;
 
     /**
@@ -60,9 +64,11 @@ public class SQLQuery {
         private Mode mode;
         private List<String> columns = new ArrayList<String>();
         private List<String> groupBy = new ArrayList<String>();
+        private List<String> unhexCols = new ArrayList<String>();
         private String table;
         private Map<String, String> joins = new HashMap<String, String>();
         private List<Condition> conditions = new ArrayList<Condition>();
+        private Map<DataQuery, QueryValueMutator> valueMutators = new HashMap<DataQuery, QueryValueMutator>();
 
         public Builder select() {
             mode = Mode.SELECT;
@@ -119,6 +125,22 @@ public class SQLQuery {
         }
 
         /**
+         * HEX the result of a column.
+         *
+         * @param cols String... column name(s)
+         * @return Builder
+         */
+        public Builder hex(String... cols) {
+            for (String col : cols) {
+                columns.remove(col);
+                unhexCols.add(col.toLowerCase());
+                columns.add(String.format("HEX(%s) AS %1$sHexed", col));
+            }
+
+            return this;
+        }
+
+        /**
          * Add field/group conditions.
          *
          * @param conditions List<Condition>
@@ -126,6 +148,18 @@ public class SQLQuery {
          */
         public Builder conditions(List<Condition> conditions) {
             this.conditions.addAll(conditions);
+            return this;
+        }
+
+        /**
+         * Add a value mutator.
+         *
+         * @param path DataQuery
+         * @param mutator QueryValueMutator mutator
+         * @return Builder
+         */
+        public Builder valueMutator(DataQuery path, QueryValueMutator mutator) {
+            valueMutators.put(path, mutator);
             return this;
         }
 
@@ -221,8 +255,14 @@ public class SQLQuery {
             String fieldComparator = "";
             String field = popDataQuery(condition.getFieldName().toString());
 
+            String value = "'" + condition.getValue().toString() + "'";
+            QueryValueMutator mutator = valueMutators.get(condition.getFieldName());
+            if (mutator != null) {
+                value = mutator.mutate(value);
+            }
+
             if (condition.getMatchRule().equals(MatchRule.EQUALS)) {
-                fieldComparator += "= '" + condition.getValue() + "' ";
+                fieldComparator += "= " + value + " ";
             }
             else if (condition.getMatchRule().equals(MatchRule.BETWEEN)) {
                 Range<?> range = (Range<?>) condition.getValue();
@@ -262,11 +302,11 @@ public class SQLQuery {
      * @return SQLQuery
      */
     public static SQLQuery from(QuerySession session) {
-        Builder query = SQLQuery.builder().select().from("records");
+        Builder query = SQLQuery.builder().select().from(tablePrefix + "records");
         if (session.getQuery().isAggregate()) {
             query.col("COUNT(*) AS total").group("eventName", "target", "player", "cause");
         } else {
-            query.col("*").leftJoin("extra", "records.id = extra.record_id");
+            query.col("*").leftJoin(tablePrefix + "extra", "records.id = extra.record_id");
         }
 
         query.conditions(session.getQuery().getConditions());

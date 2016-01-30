@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.storage.h2;
+package com.helion3.prism.storage.mysql;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,7 +29,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -48,7 +51,9 @@ import com.google.gson.JsonParser;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
+import com.helion3.prism.api.query.QueryValueMutator;
 import com.helion3.prism.api.query.SQLQuery;
+import com.helion3.prism.api.query.SQLQuery.Builder;
 import com.helion3.prism.api.results.ResultRecord;
 import com.helion3.prism.api.results.ResultRecordAggregate;
 import com.helion3.prism.api.results.ResultRecordComplete;
@@ -57,18 +62,23 @@ import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.DataUtil;
+import com.helion3.prism.util.TypeUtil;
 
-public class H2Records implements StorageAdapterRecords {
+public class MySQLRecords implements StorageAdapterRecords {
     private final String tablePrefix = Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString();
 
     @Override
     public StorageWriteResult write(List<DataContainer> containers) throws Exception {
-        Connection conn = H2StorageAdapter.getConnection();
+        Connection conn = MySQLStorageAdapter.getConnection();
         PreparedStatement statement = null;
 
+        List<String> extraData = new ArrayList<String>();
+        Map<Integer, String> extraDataMap = new HashMap<Integer, String>();
+
         try {
-            String sql = "INSERT INTO " + tablePrefix + "records(created, eventName, world, x, y, z, target, player, cause) values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO " + tablePrefix + "records(created, eventName, world, x, y, z, target, player, cause) values(?, ?, UNHEX(?), ?, ?, ?, ?, UNHEX(?), ?)";
             statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            conn.setAutoCommit(false);
 
             for (DataContainer container : containers) {
                 DataView location = container.getView(DataQueries.Location).get();
@@ -76,18 +86,19 @@ public class H2Records implements StorageAdapterRecords {
                 String playerUUID = null;
                 Optional<String> player = container.getString(DataQueries.Player);
                 if (player.isPresent()) {
-                    playerUUID = player.get();
+                    playerUUID = TypeUtil.uuidStringToDbString(player.get());
                 }
 
                 statement.setLong( 1, System.currentTimeMillis() / 1000L );
                 statement.setObject(2, container.getString(DataQueries.EventName).get());
-                statement.setObject(3, location.getString(DataQueries.WorldUuid).get());
+                statement.setString(3, TypeUtil.uuidStringToDbString(location.getString(DataQueries.WorldUuid).get()));
                 statement.setInt(4, location.getInt(DataQueries.X).get());
                 statement.setInt(5, location.getInt(DataQueries.Y).get());
                 statement.setInt(6, location.getInt(DataQueries.Z).get());
                 statement.setString(7, container.getString(DataQueries.Target).get());
                 statement.setString(8, playerUUID);
                 statement.setString(9, container.getString(DataQueries.Cause).orElse(null));
+                statement.addBatch();
 
                 // Remove some data not needed for extra storage
                 container.remove(DataQueries.Location);
@@ -96,13 +107,24 @@ public class H2Records implements StorageAdapterRecords {
                 container.remove(DataQueries.Cause);
                 container.remove(DataQueries.Target);
 
-                statement.executeUpdate();
-                ResultSet keys = statement.getGeneratedKeys();
-
-                while (keys.next()) {
-                    writeExtraData(keys.getInt(1), DataUtil.jsonFromDataView(container).toString());
-                }
+                extraData.add(DataUtil.jsonFromDataView(container).toString());
             }
+
+            statement.executeBatch();
+            ResultSet keys = statement.getGeneratedKeys();
+            conn.commit();
+
+            int i = 0;
+            while (keys.next()) {
+                extraDataMap.put(keys.getInt(1), extraData.get(i));
+                i++;
+            }
+
+            if (containers.size() != extraData.size()) {
+                Prism.getLogger().debug("Container has more information than we have extra entries for.");
+            }
+
+            writeExtraData(extraDataMap);
         }
         finally {
             if (statement != null) {
@@ -115,24 +137,26 @@ public class H2Records implements StorageAdapterRecords {
         return null;
     }
 
-    /**
-     * Writes extra JSON to a separate table because we don't always need it.
-     *
-     * @param recordId Primary key of the parent record.
-     * @param json
-     * @return
-     * @throws Exception
-     */
-    protected StorageWriteResult writeExtraData(int recordId, String json) throws Exception {
-        Connection conn = H2StorageAdapter.getConnection();
+    protected StorageWriteResult writeExtraData(Map<Integer, String> extraDataMap) throws Exception {
+        if (extraDataMap.isEmpty()) {
+            throw new IllegalArgumentException("Extra data map must not be empty.");
+        }
+
+        Connection conn = MySQLStorageAdapter.getConnection();
         PreparedStatement statement = null;
 
         try {
             String sql = "INSERT INTO " + tablePrefix + "extra(record_id, json) values(?, ?)";
             statement = conn.prepareStatement(sql);
-            statement.setInt(1, recordId);
-            statement.setString(2, json);
-            statement.executeUpdate();
+
+            for (Entry<Integer, String> data : extraDataMap.entrySet()) {
+                statement.setInt(1, data.getKey());
+                statement.setString(2, data.getValue());
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+            conn.commit();
         }
         finally {
             if (statement != null) {
@@ -151,15 +175,32 @@ public class H2Records implements StorageAdapterRecords {
         List<ResultRecord> results = new ArrayList<ResultRecord>();
         CompletableFuture<List<ResultRecord>> future = new CompletableFuture<List<ResultRecord>>();
 
-        Connection conn = H2StorageAdapter.getConnection();
+        Connection conn = MySQLStorageAdapter.getConnection();
         PreparedStatement statement = null;
         ResultSet rs = null;
 
         try {
             List<UUID> uuidsPendingLookup = new ArrayList<UUID>();
 
-            SQLQuery query = SQLQuery.from(session);
-            Prism.getLogger().debug("H2 SQL Query: " + query);
+            // Manually builder a query since we need HEX
+            Builder builder = SQLQuery.builder().select().from(tablePrefix + "records");
+            if (session.getQuery().isAggregate()) {
+                builder.group("eventName", "target", "player", "cause").col("COUNT(*) AS total");
+            } else {
+                builder.col("*").leftJoin(tablePrefix + "extra", tablePrefix + "records.id = " + tablePrefix + "extra.record_id");
+            }
+
+            builder.hex("player", "world").conditions(session.getQuery().getConditions());
+
+            builder.valueMutator(DataQueries.Player, new QueryValueMutator(){
+                @Override
+                public String mutate(String value) {
+                    return "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')";
+                }
+            });
+
+            SQLQuery query = builder.build();
+            Prism.getLogger().debug("MySQL Query: " + query);
 
             // Build query
             statement = conn.prepareStatement(query.toString());
@@ -192,7 +233,7 @@ public class H2Records implements StorageAdapterRecords {
                     loc.set(DataQueries.X, rs.getInt("x"));
                     loc.set(DataQueries.Y, rs.getInt("y"));
                     loc.set(DataQueries.Z, rs.getInt("z"));
-                    loc.set(DataQueries.WorldUuid, rs.getString("world"));
+                    loc.set(DataQueries.WorldUuid, TypeUtil.uuidFromDbString(rs.getString("worldHexed")));
                     data.set(DataQueries.Location, loc);
 
                     JsonObject json = new JsonParser().parse(rs.getString("json")).getAsJsonObject();
@@ -204,9 +245,10 @@ public class H2Records implements StorageAdapterRecords {
                 }
 
                 // Determine the final name of the event source
-                if (rs.getString("player") != null && !rs.getString("player").isEmpty()) {
-                    uuidsPendingLookup.add(UUID.fromString(rs.getString("player")));
-                    data.set(DataQueries.Cause, rs.getString("player"));
+                if (rs.getString("playerHexed") != null && !rs.getString("playerHexed").isEmpty()) {
+                    UUID uuid = TypeUtil.uuidFromDbString(rs.getString("playerHexed"));
+                    uuidsPendingLookup.add(uuid);
+                    data.set(DataQueries.Cause, uuid.toString());
                 } else {
                     data.set(DataQueries.Cause, rs.getString("cause"));
                 }
@@ -262,3 +304,4 @@ public class H2Records implements StorageAdapterRecords {
         return null;
     }
 }
+

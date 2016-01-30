@@ -64,11 +64,6 @@ public class Configuration {
                 dbName.setValue("prism");
             }
 
-            ConfigurationNode dbTablePrefix = rootNode.getNode("db", "tablePrefix");
-            if (dbTablePrefix.isVirtual()) {
-                dbTablePrefix.setValue("prism");
-            }
-
             ConfigurationNode dbMongoHost = rootNode.getNode("db", "mongo", "host");
             if (dbMongoHost.isVirtual()) {
                 dbMongoHost.setValue("127.0.0.1");
@@ -82,6 +77,31 @@ public class Configuration {
             ConfigurationNode dbMongoExpires = rootNode.getNode("db", "mongo", "expiration");
             if (dbMongoExpires.isVirtual()) {
                 dbMongoExpires.setValue("8w");
+            }
+
+            ConfigurationNode dbMysqlHost = rootNode.getNode("db", "mysql", "host");
+            if (dbMysqlHost.isVirtual()) {
+                dbMysqlHost.setValue("127.0.0.1");
+            }
+
+            ConfigurationNode dbMysqlPort = rootNode.getNode("db", "mysql", "port");
+            if (dbMysqlPort.isVirtual()) {
+                dbMysqlPort.setValue(3306);
+            }
+
+            ConfigurationNode dbMysqlUser = rootNode.getNode("db", "mysql", "user");
+            if (dbMysqlUser.isVirtual()) {
+                dbMysqlUser.setValue("root");
+            }
+
+            ConfigurationNode dbMysqlPass = rootNode.getNode("db", "mysql", "pass");
+            if (dbMysqlPass.isVirtual()) {
+                dbMysqlPass.setValue("");
+            }
+
+            ConfigurationNode dbTablePrefix = rootNode.getNode("db", "mysql", "tablePrefix");
+            if (dbTablePrefix.isVirtual()) {
+                dbTablePrefix.setValue("prism_");
             }
 
             // Events

@@ -25,6 +25,7 @@ package com.helion3.prism.util;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -104,5 +105,39 @@ public class TypeUtil {
         }
 
         return verb;
+    }
+
+    /**
+     * Converts UUID to a string ready for use against a MySQL database.
+     *
+     * @param id UUID
+     */
+    public static String uuidToDbString(UUID id) {
+        return uuidStringToDbString(id.toString());
+    }
+
+    /**
+     * Converts UUID string to a string ready for use against a MySQL database.
+     *
+     * @param id String
+     */
+    public static String uuidStringToDbString(String id) {
+        return id.replace("-", "");
+    }
+
+    /**
+     * Converts an unhyphenated UUID string to a UUID.
+     *
+     * @param uuid String
+     */
+    public static UUID uuidFromDbString(String uuid) {
+        // Positions need to be -2
+        String completeUuid = uuid.substring(0, 8);
+        completeUuid += "-" + uuid.substring(8,12);
+        completeUuid += "-" + uuid.substring(12,16);
+        completeUuid += "-" + uuid.substring(16,20);
+        completeUuid += "-" + uuid.substring(20, uuid.length());
+        completeUuid = completeUuid.toLowerCase();
+        return UUID.fromString(completeUuid);
     }
 }

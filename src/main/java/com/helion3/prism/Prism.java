@@ -70,6 +70,7 @@ import com.helion3.prism.events.listeners.QuitListener;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.h2.H2StorageAdapter;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
+import com.helion3.prism.storage.mysql.MySQLStorageAdapter;
 
 /**
  * Prism is an event logging + rollback/restore engine for Minecraft servers.
@@ -134,6 +135,9 @@ final public class Prism {
             }
             else if (engine.equalsIgnoreCase("mongo")) {
                 storageAdapter = new MongoStorageAdapter();
+            }
+            else if (engine.equalsIgnoreCase("mysql")) {
+                storageAdapter = new MySQLStorageAdapter();
             }
             else {
                 throw new Exception("Invalid storage engine configured.");

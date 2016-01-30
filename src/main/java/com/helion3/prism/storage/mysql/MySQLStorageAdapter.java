@@ -21,32 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.storage.h2;
+package com.helion3.prism.storage.mysql;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.spongepowered.api.service.sql.SqlService;
-
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageAdapterSettings;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
-public class H2StorageAdapter implements StorageAdapter {
-    private final String tablePrefix = Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString();
-    private final SqlService sql = Prism.getGame().getServiceManager().provide(SqlService.class).get();
-    private final String dbPath = Prism.getParentDirectory().getAbsolutePath().toString() + "/" + Prism.getConfig().getNode("db", "name").getString();
+public class MySQLStorageAdapter implements StorageAdapter {
     private final StorageAdapterRecords records;
     private static DataSource db;
+    private final String dns;
 
     /**
      * Create a new instance of the H2 storage adapter.
      */
-    public H2StorageAdapter() {
-        records = new H2Records();
+    public MySQLStorageAdapter() {
+        records = new MySQLRecords();
+        dns = "jdbc:mysql://" + Prism.getConfig().getNode("db", "mysql", "host").getString() + ":"
+                + Prism.getConfig().getNode("db", "mysql", "port").getString() + "/" + Prism.getConfig().getNode("db", "name").getString();
     }
 
     /**
@@ -63,7 +63,12 @@ public class H2StorageAdapter implements StorageAdapter {
     public boolean connect() throws Exception {
         try {
             // Get data source
-            db = sql.getDataSource("jdbc:h2:" + dbPath);
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl(dns);
+            config.setUsername(Prism.getConfig().getNode("db", "mysql", "user").getString());
+            config.setPassword(Prism.getConfig().getNode("db", "mysql", "pass").getString());
+
+            db = new HikariDataSource(config);
 
             // Create table if needed
             createTables();
@@ -85,30 +90,30 @@ public class H2StorageAdapter implements StorageAdapter {
         Connection conn = getConnection();
 
         try {
-            String records = "CREATE TABLE IF NOT EXISTS " + tablePrefix + "records ("
-                    + "id int primary key auto_increment, "
-                    + "created bigint, "
+            String records = "CREATE TABLE IF NOT EXISTS "
+                    + Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString() + "records ("
+                    + "id int(10) unsigned NOT NULL AUTO_INCREMENT, "
+                    + "created int(10) unsigned NOT NULL, "
                     + "eventName varchar(16), "
-                    + "world UUID, "
-                    + "x int, "
-                    + "y smallint, "
-                    + "z int, "
+                    + "world binary(16) NOT NULL, "
+                    + "x int(10) NOT NULL, "
+                    + "y smallint(5) NOT NULL, "
+                    + "z int(10) NOT NULL, "
                     + "target varchar(55), "
-                    + "player UUID, "
-                    + "cause varchar(64))";
+                    + "player binary(16), "
+                    + "cause varchar(55), "
+                    + "PRIMARY KEY (`id`), "
+                    + "KEY  `location` (`world`, `x`, `z`, `y`))";
             conn.prepareStatement(records).execute();
 
-            String extra = "CREATE TABLE IF NOT EXISTS " + tablePrefix + "extra ("
-                    + "id int primary key auto_increment, "
-                    + "record_id int, "
-                    + "json varchar(30000))";
+            String extra = "CREATE TABLE IF NOT EXISTS "
+                    + Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString() + "extra ("
+                    + "id int(10) unsigned NOT NULL AUTO_INCREMENT, "
+                    + "record_id int(10) unsigned NOT NULL, "
+                    + "json TEXT, "
+                    + "PRIMARY KEY (`id`), "
+                    + "KEY `record_id` (`record_id`))";
             conn.prepareStatement(extra).execute();
-
-            String index = "CREATE INDEX IF NOT EXISTS location ON " + tablePrefix + "records(world, x, y, z)";
-            conn.prepareStatement(index).execute();
-
-            String extraIndex = "CREATE INDEX IF NOT EXISTS recordId ON " + tablePrefix + "extra(record_id)";
-            conn.prepareStatement(extraIndex).execute();
         }
         finally {
             conn.close();

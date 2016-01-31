@@ -84,7 +84,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         // Final block in this space.
         BlockSnapshot resultingBlock = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
 
-        return ActionableResult.success(new Transaction<BlockSnapshot>(original, resultingBlock));
+        return ActionableResult.success(new Transaction<>(original, resultingBlock));
     }
 
     public DataView formatBlockData(DataView finalBlock, Optional<Object> optionalLocation) {
@@ -152,6 +152,6 @@ public class BlockResult extends ResultComplete implements Actionable {
         // Final block in this space.
         BlockSnapshot resultingBlock = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
 
-        return ActionableResult.success(new Transaction<BlockSnapshot>(original, resultingBlock));
+        return ActionableResult.success(new Transaction<>(original, resultingBlock));
     }
 }

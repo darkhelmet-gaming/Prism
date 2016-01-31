@@ -185,12 +185,8 @@ public class MySQLRecords implements StorageAdapterRecords {
 
             builder.hex("player", "world").conditions(session.getQuery().getConditions());
 
-            builder.valueMutator(DataQueries.Player, new QueryValueMutator(){
-                @Override
-                public String mutate(String value) {
-                    return "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')";
-                }
-            });
+            builder.valueMutator(DataQueries.Player, value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
+            builder.valueMutator(DataQueries.WorldUuid, value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
 
             SQLQuery query = builder.build();
             Prism.getLogger().debug("MySQL Query: " + query);

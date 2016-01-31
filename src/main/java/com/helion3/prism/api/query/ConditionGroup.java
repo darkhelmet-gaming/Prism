@@ -97,7 +97,7 @@ final public class ConditionGroup implements Condition {
     public static ConditionGroup from(Location<?> location) {
         ConditionGroup conditions = new ConditionGroup(Operator.AND);
 
-        conditions.add(new FieldCondition(DataQueries.Location.then(DataQueries.WorldUuid), MatchRule.INCLUDES, location.getExtent().getUniqueId().toString()));
+        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.WorldUuid), MatchRule.EQUALS, location.getExtent().getUniqueId().toString()));
         conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.X), MatchRule.EQUALS, location.getBlockX()));
         conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Y), MatchRule.EQUALS, location.getBlockY()));
         conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Z), MatchRule.EQUALS, location.getBlockZ()));
@@ -116,7 +116,7 @@ final public class ConditionGroup implements Condition {
         ConditionGroup conditions = new ConditionGroup(Operator.AND);
 
         // World
-        conditions.add(new FieldCondition(DataQueries.Location.then(DataQueries.WorldUuid), MatchRule.INCLUDES, location.getExtent().getUniqueId().toString()));
+        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.WorldUuid), MatchRule.EQUALS, location.getExtent().getUniqueId().toString()));
 
         // X
         Range<Integer> xRange = Range.open(location.getBlockX() - radius, location.getBlockX() + radius);

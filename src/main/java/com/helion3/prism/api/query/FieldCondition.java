@@ -41,8 +41,8 @@ final public class FieldCondition implements Condition {
     /**
      * Statically build a new condition.
      *
-     * @param dataQuery DataQuery matching the field name.
-     * @param rule MatchRule describing comparison of values.
+     * @param query DataQuery matching the field name.
+     * @param matchRule MatchRule describing comparison of values.
      * @param value List, String or Number value.
      * @return Condition
      */
@@ -53,7 +53,7 @@ final public class FieldCondition implements Condition {
     /**
      * Statically build a new condition.
      *
-     * @param dataQuery DataQuery matching the field name.
+     * @param field DataQuery matching the field name.
      * @param value Range of values.
      * @return Condition
      */
@@ -64,8 +64,8 @@ final public class FieldCondition implements Condition {
     /**
      * Build a condition for use with querying the storage.
      *
-     * @param dataQuery DataQuery matching the field name.
-     * @param rule MatchRule describing comparison of values.
+     * @param field DataQuery matching the field name.
+     * @param matchRule MatchRule describing comparison of values.
      * @param value List, String or Number value.
      */
     public FieldCondition(DataQuery field, MatchRule matchRule, Object value) {

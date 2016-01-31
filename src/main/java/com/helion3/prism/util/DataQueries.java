@@ -51,7 +51,7 @@ public class DataQueries {
     public static final DataQuery Target = of("Target");
     public static final DataQuery UnsafeData = of("UnsafeData");
     public static final DataQuery WorldName = of("WorldName");
-    public static final DataQuery WorldUuid = of("WorldUuid");
+    public static final DataQuery WorldUuid = of("World");
     public static final DataQuery X = of("X");
     public static final DataQuery Y = of("Y");
     public static final DataQuery Z = of("Z");

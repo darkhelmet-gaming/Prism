@@ -52,25 +52,22 @@ public class PrismCommands {
         builder.put(ImmutableList.of("i", "wand"), new InspectCommand());
         builder.put(ImmutableList.of("l", "lookup"), LookupCommand.getCommand());
         builder.put(ImmutableList.of("near"), NearCommand.getCommand());
-        builder.put(ImmutableList.of("rb", "rollback"), new RollbackCommand());
-        builder.put(ImmutableList.of("rs", "restore"), new RestoreCommand());
+        builder.put(ImmutableList.of("rb", "rollback"), ApplierCommand.getCommand(ApplierCommand.ApplierMode.ROLLBACK));
+        builder.put(ImmutableList.of("rs", "restore"), ApplierCommand.getCommand(ApplierCommand.ApplierMode.RESTORE));
         builder.put(ImmutableList.of("undo"), UndoCommand.getCommand());
         builder.put(ImmutableList.of("ext"), ExtinguishCommand.getCommand());
         builder.put(ImmutableList.of("?", "help"), HelpCommand.getCommand());
 
         return CommandSpec.builder()
-            .executor(new CommandExecutor() {
-                @Override
-                public CommandResult execute(CommandSource source, CommandContext args) throws CommandException {
-                    source.sendMessage(Text.of(
-                        Format.heading(TextColors.GRAY, "By ", TextColors.GOLD, "viveleroi.\n"),
-                        TextColors.DARK_AQUA, "Tracking so good the NSA stole our name.\n",
-                        TextColors.GRAY, "Help: ", TextColors.WHITE, "/pr ?\n",
-                        TextColors.GRAY, "IRC: ", TextColors.WHITE, "irc.esper.net #prism\n",
-                        TextColors.GRAY, "Site: ", TextColors.WHITE, "http://discover-prism.com"
-                    ));
-                    return CommandResult.empty();
-                }
+            .executor((source, args) -> {
+                source.sendMessage(Text.of(
+                    Format.heading(TextColors.GRAY, "By ", TextColors.GOLD, "viveleroi.\n"),
+                    TextColors.DARK_AQUA, "Tracking so good the NSA stole our name.\n",
+                    TextColors.GRAY, "Help: ", TextColors.WHITE, "/pr ?\n",
+                    TextColors.GRAY, "IRC: ", TextColors.WHITE, "irc.esper.net #prism\n",
+                    TextColors.GRAY, "Site: ", TextColors.WHITE, "http://discover-prism.com"
+                ));
+                return CommandResult.empty();
             })
             .children(builder.build()).build();
     }

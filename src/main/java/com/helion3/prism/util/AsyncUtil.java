@@ -66,6 +66,7 @@ public class AsyncUtil {
                             messages.add(Messages.from(result));
                         }
                     } catch(Exception e) {
+                        session.getCommandSource().get().sendMessage(Format.error(e.getMessage()));
                         e.printStackTrace();
                     }
 
@@ -77,8 +78,13 @@ public class AsyncUtil {
                         builder.sendTo(session.getCommandSource().get());
                     }
                 } else {
-                    for (Result result : results) {
-                        session.getCommandSource().get().sendMessage(Messages.from(result));
+                    try {
+                        for (Result result : results) {
+                            session.getCommandSource().get().sendMessage(Messages.from(result));
+                        }
+                    } catch(Exception e) {
+                        session.getCommandSource().get().sendMessage(Format.error(e.getMessage()));
+                        e.printStackTrace();
                     }
                 }
             }

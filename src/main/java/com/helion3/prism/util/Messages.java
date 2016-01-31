@@ -79,17 +79,21 @@ public class Messages {
 
                 builder.append(Text.of(TextColors.GRAY, "@ ", x, " ", y, " ", z, " "));
 
+                UUID worldUuid;
+                if (loc.get(DataQueries.WorldUuid).get() instanceof UUID) {
+                    worldUuid = (UUID) loc.get(DataQueries.WorldUuid).get();
+                } else {
+                    worldUuid = UUID.fromString((String) loc.get(DataQueries.WorldUuid).get());
+                }
+
                 // Allow teleportation on click
-                Optional<World> world = Prism.getGame().getServer().getWorld(UUID.fromString((String) loc.get(DataQueries.WorldUuid).get()));
+                Optional<World> world = Prism.getGame().getServer().getWorld(worldUuid);
                 if (world.isPresent()) {
                     Location<World> teleportLoc = world.get().getLocation(new Vector3i(x, y, z));
 
-                    builder.onClick(TextActions.executeCallback(new Consumer<CommandSource>() {
-                        @Override
-                        public void accept(CommandSource t) {
-                            if (t instanceof Player) {
-                                ((Player) t).setLocation(teleportLoc);
-                            }
+                    builder.onClick(TextActions.executeCallback(t -> {
+                        if (t instanceof Player) {
+                            ((Player) t).setLocation(teleportLoc);
                         }
                     }));
                 }

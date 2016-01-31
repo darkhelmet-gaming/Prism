@@ -71,6 +71,11 @@ public class RequiredInteractListener {
 
                 query.addCondition(ConditionGroup.from(location));
 
+                playerCause.get().sendMessage(Format.heading(String.format("Querying x:%d y:%d z:%d:",
+                        location.getBlockX(),
+                        location.getBlockY(),
+                        location.getBlockZ())));
+
                 // Pass off to an async lookup helper
                 try {
                     AsyncUtil.lookup(session);

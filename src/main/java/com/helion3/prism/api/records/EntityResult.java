@@ -55,7 +55,7 @@ public class EntityResult extends ResultComplete implements Actionable {
         HealthData health = entity.get().get(HealthData.class).get();
         entity.get().offer(health.health().set(health.maxHealth().get()));
 
-        return ActionableResult.success(new Transaction<>(null, entity.get().createSnapshot()));
+        return ActionableResult.success(new Transaction<>(new SerializableNonExistant(), entity.get()));
     }
 
     @Override

@@ -34,6 +34,8 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
@@ -68,9 +70,20 @@ public class UndoCommand {
                     for (ActionableResult result : results) {
                         if (result.getTransaction().isPresent()) {
                             Object rawOriginal = result.getTransaction().get().getOriginal();
+                            Object rawFinal = result.getTransaction().get().getFinal();
 
                             if (rawOriginal instanceof BlockSnapshot) {
-                                if (((BlockSnapshot)rawOriginal).restore(true, true)) {
+                                if (((BlockSnapshot)rawOriginal).restore(true, false)) {
+                                    applied++;
+                                } else {
+                                    skipped++;
+                                }
+                            }
+
+                            if (rawFinal instanceof Entity) {
+                                Entity entity = (Entity) rawFinal;
+                                if (!entity.isRemoved()) {
+                                    entity.remove();
                                     applied++;
                                 } else {
                                     skipped++;

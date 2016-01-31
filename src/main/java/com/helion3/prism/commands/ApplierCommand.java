@@ -132,8 +132,8 @@ public class ApplierCommand {
                                 }
 
                                 source.sendMessage(Format.heading(
-                                        Text.of(Template.parseTemplate(messageTemplate, tokens)),
-                                        " ", Format.bonus(Translation.from("rollback.success.bonus"))
+                                    Text.of(Template.parseTemplate(messageTemplate, tokens)),
+                                    " ", Format.bonus(Translation.from("rollback.success.bonus"))
                                 ));
 
                                 if (source instanceof Player) {

@@ -128,6 +128,10 @@ public class RestoreCommand implements CommandCallable {
                                     Text.of(Template.parseTemplate(messageTemplate, tokens)),
                                     " ", Format.bonus(Translation.from("rollback.success.bonus"))
                                 ));
+
+                                if (source instanceof Player) {
+                                    Prism.getLastActionResults().put((Player) source, actionResults);
+                                }
                             }
                         }
                     });

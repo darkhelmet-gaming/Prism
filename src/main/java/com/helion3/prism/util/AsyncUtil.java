@@ -61,13 +61,8 @@ public class AsyncUtil {
             public void success(List<Result> results) {
                 if (results.size() > 5) {
                     List<Text> messages = new ArrayList<Text>();
-                    try {
-                        for (Result result : results) {
-                            messages.add(Messages.from(result));
-                        }
-                    } catch(Exception e) {
-                        session.getCommandSource().get().sendMessage(Format.error(e.getMessage()));
-                        e.printStackTrace();
+                    for (Result result : results) {
+                        messages.add(Messages.from(result));
                     }
 
                     Optional<PaginationService> service = Prism.getGame().getServiceManager().provide(PaginationService.class);
@@ -78,13 +73,8 @@ public class AsyncUtil {
                         builder.sendTo(session.getCommandSource().get());
                     }
                 } else {
-                    try {
-                        for (Result result : results) {
-                            session.getCommandSource().get().sendMessage(Messages.from(result));
-                        }
-                    } catch(Exception e) {
-                        session.getCommandSource().get().sendMessage(Format.error(e.getMessage()));
-                        e.printStackTrace();
+                    for (Result result : results) {
+                        session.getCommandSource().get().sendMessage(Messages.from(result));
                     }
                 }
             }
@@ -114,10 +104,15 @@ public class AsyncUtil {
             try {
                 CompletableFuture<List<Result>> future = Prism.getStorageAdapter().records().query(session, true);
                 future.thenAccept(results -> {
-                    if (results.isEmpty()) {
-                        callback.empty();
-                    } else {
-                        callback.success(results);
+                    try {
+                        if (results.isEmpty()) {
+                            callback.empty();
+                        } else {
+                            callback.success(results);
+                        }
+                    } catch(Exception e) {
+                        session.getCommandSource().get().sendMessage(Format.error(e.getMessage()));
+                        e.printStackTrace();
                     }
                 });
             } catch (Exception e) {

@@ -23,6 +23,7 @@
  */
 package com.helion3.prism.api.records;
 
+import com.helion3.prism.Prism;
 import org.spongepowered.api.data.DataContainer;
 
 import com.helion3.prism.util.DataQueries;
@@ -80,5 +81,31 @@ abstract public class Result {
         }
 
         return id;
+    }
+
+    /**
+     * Instantiate an appropriate Result for the event.
+     * @param eventName String name of event
+     * @param isAggregate boolean if aggregate
+     * @return Result
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    public static Result from(String eventName, boolean isAggregate) throws IllegalAccessException, InstantiationException {
+        // Build our result object
+        Result result = null;
+        if (isAggregate) {
+            result = new ResultAggregate();
+        } else {
+            // Pull record class for this event, if any
+            Class<? extends Result> clazz = Prism.getResultRecord(eventName);
+            if (clazz != null){
+                result = clazz.newInstance();
+            } else {
+                result = new ResultComplete();
+            }
+        }
+
+        return result;
     }
 }

@@ -39,8 +39,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import com.helion3.prism.api.records.Result;
-import com.helion3.prism.api.records.ResultAggregate;
-import com.helion3.prism.api.records.ResultComplete;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -208,18 +206,7 @@ public class MySQLRecords implements StorageAdapterRecords {
 
             while (rs.next()) {
                 // Build our result object
-                Result result = null;
-                if (session.getQuery().isAggregate()) {
-                    result = new ResultAggregate();
-                } else {
-                    // Pull record class for this event, if any
-                    Class<? extends Result> clazz = Prism.getResultRecord(rs.getString("eventName"));
-                    if (clazz != null){
-                        result = clazz.newInstance();
-                    } else {
-                        result = new ResultComplete();
-                    }
-                }
+                Result result = Result.from(rs.getString("eventName"), session.getQuery().isAggregate());
 
                 // Restore the data container
                 DataContainer data = new MemoryDataContainer();

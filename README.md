@@ -14,29 +14,28 @@ Because of this, our feature set is growing. File an issue or let us know in IRC
 
 - [Builds](http://dhmc.us:8080/job/Prism/)
 
+If using Mongo, download the `Prism-(version)-all.jar` file. Otherwise, download `Prism-(version).jar`.
+
 ## Installation
 
-1. Place into your `mods` directory. Prism (3 Alpha) currenty only supports **MongoDB**. 
+1. Place into your `mods` directory. 
 2. Ensure your Prism configuration file has the proper database connection details.
 
 ## Features
 
-- Unprecedented **block change tracking**. We've worked closing with the Sponge team to ensure it provides us the framework we need.
+- Unprecedented **block change tracking**. We've worked closely with the Sponge team to ensure it provides us the framework we need.
 - Lookup & "near" commands.
 - Rollback and Restore commands.
 - "Undo" command.
-- MongoDB support.
-
-## Planned/Coming Soon
-
-- H2/MySQL Support
-- Entity event tracking.
-- Item/inventory event tracking.
-- Support for additional databases.
+- MongoDB Support (Recommended)
+- H2, MySQL support.
 
 ## Commands
 
 - `/pr l (parameters)` - Lookup records, filtering by parameters.
+- `/pr rb (parameters)` - Rollback, filtering by parameters.
+- `/pr rs (parameters)` - Restore, filtering by parameters.
+- `/pr undo` - Undo your last rollback/restore action.
 
 ## Parameters
 
@@ -51,7 +50,7 @@ Because of this, our feature set is growing. File an issue or let us know in IRC
 
 - `clean` - Clean dangerous blocks and item drops from the rollback area.
 - `drain` - Drain liquids within a rollback area.
-- `--no-group` - Prevent record grouping in lookups.
+- `--no-group` - Prevent record grouping in lookups. Clicking on a single record will teleport you to those coordinates.
 
 ## Permissions
 
@@ -77,7 +76,9 @@ Mongo can be installed and run similarly to other database servers.
 
 ###MySQL/MariaDB
 
-MySQL and the MariaDB fork are familiar products, especially for users of Prism 1/2. We continue to support these two products.
+MySQL and the MariaDB fork are familiar products, especially for users of Prism 1/2. We continue to support these two products although native JSON support is essentially unavailable
+
+Recent versions of MySQL support native JSON, while MariaDB has some support - although they've diverged in their handling. Supporting would require special work for each and is not a priority at this time.
 
 ###H2
 

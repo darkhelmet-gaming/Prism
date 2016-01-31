@@ -306,7 +306,7 @@ public class SQLQuery {
         if (session.getQuery().isAggregate()) {
             query.col("COUNT(*) AS total").group("eventName", "target", "player", "cause");
         } else {
-            query.col("*").leftJoin(tablePrefix + "extra", "records.id = extra.record_id");
+            query.col("*").leftJoin(tablePrefix + "extra", tablePrefix + "records.id = " + tablePrefix + "extra.record_id");
         }
 
         query.conditions(session.getQuery().getConditions());

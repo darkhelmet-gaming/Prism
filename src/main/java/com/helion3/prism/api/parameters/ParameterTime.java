@@ -47,7 +47,7 @@ public class ParameterTime extends SimpleParameterHandler {
      * Handler for time-related parameters.
      */
     public ParameterTime() {
-        super(ImmutableList.of("before", "since"));
+        super(ImmutableList.of("before", "since", "t"));
     }
 
     @Override
@@ -76,7 +76,7 @@ public class ParameterTime extends SimpleParameterHandler {
 
         // Determine match rule based on before/since
         MatchRule rule = MatchRule.LESS_THAN_EQUAL;
-        if (parameter.equalsIgnoreCase("s") || parameter.equalsIgnoreCase("since")) {
+        if (parameter.equalsIgnoreCase("t") || parameter.equalsIgnoreCase("since")) {
             rule = MatchRule.GREATER_THAN_EQUAL;
         }
 

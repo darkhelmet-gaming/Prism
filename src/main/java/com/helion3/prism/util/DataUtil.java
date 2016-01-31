@@ -23,14 +23,15 @@
  */
 package com.helion3.prism.util;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.Map.Entry;
 
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.helion3.prism.api.records.Result;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -43,6 +44,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.helion3.prism.Prism;
+import org.spongepowered.api.profile.GameProfile;
 
 public class DataUtil {
     private DataUtil() {}
@@ -198,5 +200,30 @@ public class DataUtil {
         }
 
         return json;
+    }
+
+
+    public static CompletableFuture<List<Result>> translateUuidsToNames(List<Result> results, List<UUID> uuidsPendingLookup) {
+        CompletableFuture<List<Result>> future = new CompletableFuture<List<Result>>();
+
+        ListenableFuture<Collection<GameProfile>> profiles = Prism.getGame().getServer().getGameProfileManager().getAllById(uuidsPendingLookup, true);
+        profiles.addListener(() -> {
+            try {
+                for (GameProfile profile : profiles.get()) {
+                    for (Result r : results) {
+                        Optional<Object> cause = r.data.get(DataQueries.Cause);
+                        if (cause.isPresent() && ((String) cause.get()).equals(profile.getUniqueId().toString())) {
+                            r.data.set(DataQueries.Cause, profile.getName());
+                        }
+                    }
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+
+            future.complete(results);
+        }, MoreExecutors.sameThreadExecutor());
+
+        return future;
     }
 }

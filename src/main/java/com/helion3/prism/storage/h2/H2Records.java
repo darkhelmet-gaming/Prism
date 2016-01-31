@@ -204,28 +204,10 @@ public class H2Records implements StorageAdapterRecords {
                 results.add(result);
             }
 
-            // @todo move this, it's shared
             if (translate && !uuidsPendingLookup.isEmpty()) {
-                ListenableFuture<Collection<GameProfile>> profiles = Prism.getGame().getServer().getGameProfileManager().getAllById(uuidsPendingLookup, true);
-                profiles.addListener(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            for (GameProfile profile : profiles.get()) {
-                                for (Result r : results) {
-                                    Optional<Object> cause = r.data.get(DataQueries.Cause);
-                                    if (cause.isPresent() && ((String) cause.get()).equals(profile.getUniqueId().toString())) {
-                                        r.data.set(DataQueries.Cause, profile.getName());
-                                    }
-                                }
-                            }
-                        } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
-                        }
-
-                        future.complete(results);
-                    }
-                }, MoreExecutors.sameThreadExecutor());
+                DataUtil.translateUuidsToNames(results, uuidsPendingLookup).thenAccept(finalResults -> {
+                    future.complete(finalResults);
+                });
             } else {
                 future.complete(results);
             }

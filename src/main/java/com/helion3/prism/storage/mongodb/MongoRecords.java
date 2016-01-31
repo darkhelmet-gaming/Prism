@@ -26,14 +26,12 @@ package com.helion3.prism.storage.mongodb;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import com.helion3.prism.api.records.Result;
 import com.helion3.prism.util.Format;
@@ -42,11 +40,8 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.profile.GameProfile;
 
 import com.google.common.collect.Range;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.FieldCondition;
 import com.helion3.prism.api.query.Condition;
@@ -346,23 +341,9 @@ public class MongoRecords implements StorageAdapterRecords {
            }
 
            if (translate && !uuidsPendingLookup.isEmpty()) {
-               ListenableFuture<Collection<GameProfile>> profiles = Prism.getGame().getServer().getGameProfileManager().getAllById(uuidsPendingLookup, true);
-               profiles.addListener(() -> {
-                   try {
-                       for (GameProfile profile : profiles.get()) {
-                           for (Result r : results) {
-                               Optional<Object> cause = r.data.get(DataQueries.Cause);
-                               if (cause.isPresent() && ((String) cause.get()).equals(profile.getUniqueId().toString())) {
-                                   r.data.set(DataQueries.Cause, profile.getName());
-                               }
-                           }
-                       }
-                   } catch (InterruptedException | ExecutionException e) {
-                       e.printStackTrace();
-                   }
-
-                   future.complete(results);
-               }, MoreExecutors.sameThreadExecutor());
+               DataUtil.translateUuidsToNames(results, uuidsPendingLookup).thenAccept(finalResults -> {
+                   future.complete(finalResults);
+               });
            } else {
                future.complete(results);
            }

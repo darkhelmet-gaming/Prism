@@ -43,8 +43,7 @@ public class AsyncUtil {
     /**
      * Helper utility for running a lookup asynchronously.
      *
-     * @param source CommandSource running this lookup.
-     * @param session
+     * @param session QuerySession running this lookup.
      */
     public static void lookup(final QuerySession session) throws Exception {
         if (!session.getCommandSource().isPresent()) {
@@ -105,22 +104,19 @@ public class AsyncUtil {
      * @param callback AsyncCallback describing the success, empty, and error callbacks.
      */
     private static void async(final QuerySession session, AsyncCallback callback) {
-        Prism.getGame().getScheduler().createTaskBuilder().async().execute(new Runnable(){
-            @Override
-            public void run(){
-                try {
-                    CompletableFuture<List<Result>> future = Prism.getStorageAdapter().records().query(session);
-                    future.thenAccept(results -> {
-                        if (results.isEmpty()) {
-                            callback.empty();
-                        } else {
-                            callback.success(results);
-                        }
-                    });
-                } catch (Exception e) {
-                    callback.error(e);
-                    e.printStackTrace();
-                }
+        Prism.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
+            try {
+                CompletableFuture<List<Result>> future = Prism.getStorageAdapter().records().query(session, true);
+                future.thenAccept(results -> {
+                    if (results.isEmpty()) {
+                        callback.empty();
+                    } else {
+                        callback.success(results);
+                    }
+                });
+            } catch (Exception e) {
+                callback.error(e);
+                e.printStackTrace();
             }
         }).submit(Prism.getPlugin());
     }

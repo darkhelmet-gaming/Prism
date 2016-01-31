@@ -36,7 +36,7 @@ public interface StorageAdapterRecords {
     /**
      * Writes a collection of events to storage
      *
-     * @param event {@link EventRecord}s to persist
+     * @param containers List<DataContainers></DataContainers> to persist
      * @return {@link StorageWriteResult}
      * @throws Exception
      */
@@ -45,11 +45,12 @@ public interface StorageAdapterRecords {
     /**
      * Execute a query session for a list of resulting actions
      *
-     * @param session
+     * @param session QuerySession
+     * @param translate Translate player UUIDs -> Last known names
      * @return List of {@link Result}
      * @throws Exception Abstract DB or query/handler exceptions
      */
-    CompletableFuture<List<Result>> query(QuerySession session) throws Exception;
+    CompletableFuture<List<Result>> query(QuerySession session, boolean translate) throws Exception;
 
     /**
      * Given a {@link Query} this will remove all matching records.

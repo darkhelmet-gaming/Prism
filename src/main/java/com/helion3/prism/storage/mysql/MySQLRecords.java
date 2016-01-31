@@ -170,7 +170,7 @@ public class MySQLRecords implements StorageAdapterRecords {
     }
 
     @Override
-    public CompletableFuture<List<Result>> query(QuerySession session) throws Exception {
+    public CompletableFuture<List<Result>> query(QuerySession session, boolean translate) throws Exception {
         // Prepare results
         List<Result> results = new ArrayList<Result>();
         CompletableFuture<List<Result>> future = new CompletableFuture<List<Result>>();
@@ -247,8 +247,11 @@ public class MySQLRecords implements StorageAdapterRecords {
                 // Determine the final name of the event source
                 if (rs.getString("playerHexed") != null && !rs.getString("playerHexed").isEmpty()) {
                     UUID uuid = TypeUtil.uuidFromDbString(rs.getString("playerHexed"));
-                    uuidsPendingLookup.add(uuid);
                     data.set(DataQueries.Cause, uuid.toString());
+
+                    if (translate) {
+                        uuidsPendingLookup.add(uuid);
+                    }
                 } else {
                     data.set(DataQueries.Cause, rs.getString("cause"));
                 }
@@ -258,26 +261,23 @@ public class MySQLRecords implements StorageAdapterRecords {
             }
 
             // @todo move this, it's shared
-            if (!uuidsPendingLookup.isEmpty()) {
+            if (translate && !uuidsPendingLookup.isEmpty()) {
                 ListenableFuture<Collection<GameProfile>> profiles = Prism.getGame().getServer().getGameProfileManager().getAllById(uuidsPendingLookup, true);
-                profiles.addListener(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            for (GameProfile profile : profiles.get()) {
-                                for (Result r : results) {
-                                    Optional<Object> cause = r.data.get(DataQueries.Cause);
-                                    if (cause.isPresent() && ((String) cause.get()).equals(profile.getUniqueId().toString())) {
-                                        r.data.set(DataQueries.Cause, profile.getName());
-                                    }
+                profiles.addListener(() -> {
+                    try {
+                        for (GameProfile profile : profiles.get()) {
+                            for (Result r : results) {
+                                Optional<Object> cause = r.data.get(DataQueries.Cause);
+                                if (cause.isPresent() && ((String) cause.get()).equals(profile.getUniqueId().toString())) {
+                                    r.data.set(DataQueries.Cause, profile.getName());
                                 }
                             }
-                        } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
                         }
-
-                        future.complete(results);
+                    } catch (InterruptedException | ExecutionException e) {
+                        e.printStackTrace();
                     }
+
+                    future.complete(results);
                 }, MoreExecutors.sameThreadExecutor());
             } else {
                 future.complete(results);

@@ -146,7 +146,7 @@ public class H2Records implements StorageAdapterRecords {
     }
 
     @Override
-    public CompletableFuture<List<Result>> query(QuerySession session) throws Exception {
+    public CompletableFuture<List<Result>> query(QuerySession session, boolean translate) throws Exception {
         // Prepare results
         List<Result> results = new ArrayList<Result>();
         CompletableFuture<List<Result>> future = new CompletableFuture<List<Result>>();
@@ -205,8 +205,11 @@ public class H2Records implements StorageAdapterRecords {
 
                 // Determine the final name of the event source
                 if (rs.getString("player") != null && !rs.getString("player").isEmpty()) {
-                    uuidsPendingLookup.add(UUID.fromString(rs.getString("player")));
                     data.set(DataQueries.Cause, rs.getString("player"));
+
+                    if (translate) {
+                        uuidsPendingLookup.add(UUID.fromString(rs.getString("player")));
+                    }
                 } else {
                     data.set(DataQueries.Cause, rs.getString("cause"));
                 }
@@ -216,7 +219,7 @@ public class H2Records implements StorageAdapterRecords {
             }
 
             // @todo move this, it's shared
-            if (!uuidsPendingLookup.isEmpty()) {
+            if (translate && !uuidsPendingLookup.isEmpty()) {
                 ListenableFuture<Collection<GameProfile>> profiles = Prism.getGame().getServer().getGameProfileManager().getAllById(uuidsPendingLookup, true);
                 profiles.addListener(new Runnable() {
                     @Override

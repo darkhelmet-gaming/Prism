@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.helion3.prism.api.flags.FlagClean;
 import com.helion3.prism.api.records.BlockResult;
 import com.helion3.prism.api.records.Result;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -331,6 +332,7 @@ final public class Prism {
      * Registers all default flag handlers
      */
     private void registerFlagHandlers() {
+        registerFlagHandler(new FlagClean());
         registerFlagHandler(new FlagDrain());
         registerFlagHandler(new FlagNoGroup());
     }

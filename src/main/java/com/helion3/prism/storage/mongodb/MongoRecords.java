@@ -37,6 +37,7 @@ import java.util.concurrent.ExecutionException;
 
 import com.helion3.prism.api.records.ResultComplete;
 import com.helion3.prism.api.records.Result;
+import com.helion3.prism.util.Format;
 import org.bson.Document;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -239,7 +240,7 @@ public class MongoRecords implements StorageAdapterRecords {
    }
 
    @Override
-   public CompletableFuture<List<Result>> query(QuerySession session) throws Exception {
+   public CompletableFuture<List<Result>> query(QuerySession session, boolean translate) throws Exception {
        Query query = session.getQuery();
        checkNotNull(query);
 
@@ -309,6 +310,8 @@ public class MongoRecords implements StorageAdapterRecords {
            Prism.getLogger().debug("MongoDB Query: " + pipeline);
        }
 
+       session.getCommandSource().get().sendMessage(Format.subduedHeading("Query completed, building snapshots..."));
+
        // Iterate results and build our event record list
        MongoCursor<Document> cursor = aggregated.iterator();
        try {
@@ -342,8 +345,11 @@ public class MongoRecords implements StorageAdapterRecords {
                // Determine the final name of the event source
                if (document.containsKey(DataQueries.Player.toString())) {
                    String uuid = document.getString(DataQueries.Player.toString());
-                   uuidsPendingLookup.add(UUID.fromString(uuid));
                    data.set(DataQueries.Cause, uuid);
+
+                   if (translate) {
+                       uuidsPendingLookup.add(UUID.fromString(uuid));
+                   }
                } else {
                    data.set(DataQueries.Cause, document.getString(DataQueries.Cause.toString()));
                }
@@ -352,26 +358,23 @@ public class MongoRecords implements StorageAdapterRecords {
                results.add(result);
            }
 
-           if (!uuidsPendingLookup.isEmpty()) {
+           if (translate && !uuidsPendingLookup.isEmpty()) {
                ListenableFuture<Collection<GameProfile>> profiles = Prism.getGame().getServer().getGameProfileManager().getAllById(uuidsPendingLookup, true);
-               profiles.addListener(new Runnable() {
-                   @Override
-                   public void run() {
-                       try {
-                           for (GameProfile profile : profiles.get()) {
-                               for (Result r : results) {
-                                   Optional<Object> cause = r.data.get(DataQueries.Cause);
-                                   if (cause.isPresent() && ((String) cause.get()).equals(profile.getUniqueId().toString())) {
-                                       r.data.set(DataQueries.Cause, profile.getName());
-                                   }
+               profiles.addListener(() -> {
+                   try {
+                       for (GameProfile profile : profiles.get()) {
+                           for (Result r : results) {
+                               Optional<Object> cause = r.data.get(DataQueries.Cause);
+                               if (cause.isPresent() && ((String) cause.get()).equals(profile.getUniqueId().toString())) {
+                                   r.data.set(DataQueries.Cause, profile.getName());
                                }
                            }
-                       } catch (InterruptedException | ExecutionException e) {
-                           e.printStackTrace();
                        }
-
-                       future.complete(results);
+                   } catch (InterruptedException | ExecutionException e) {
+                       e.printStackTrace();
                    }
+
+                   future.complete(results);
                }, MoreExecutors.sameThreadExecutor());
            } else {
                future.complete(results);

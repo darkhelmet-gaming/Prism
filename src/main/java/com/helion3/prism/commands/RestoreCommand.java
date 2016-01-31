@@ -65,7 +65,7 @@ public class RestoreCommand implements CommandCallable {
                 try {
                     List<ActionableResult> actionResults = new ArrayList<ActionableResult>();
                     // Iterate query results
-                    CompletableFuture<List<Result>> futureResults = Prism.getStorageAdapter().records().query(session);
+                    CompletableFuture<List<Result>> futureResults = Prism.getStorageAdapter().records().query(session, false);
                     futureResults.thenAccept(results -> {
                         if (results.isEmpty()) {
                             source.sendMessage(Format.error("No results."));

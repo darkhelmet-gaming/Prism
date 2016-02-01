@@ -32,6 +32,7 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageAdapterSettings;
+import com.helion3.prism.util.DataQueries;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -93,17 +94,21 @@ public class MySQLStorageAdapter implements StorageAdapter {
             String records = "CREATE TABLE IF NOT EXISTS "
                     + Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString() + "records ("
                     + "id int(10) unsigned NOT NULL AUTO_INCREMENT, "
-                    + "created int(10) unsigned NOT NULL, "
-                    + "eventName varchar(16), "
-                    + "world binary(16) NOT NULL, "
-                    + "x int(10) NOT NULL, "
-                    + "y smallint(5) NOT NULL, "
-                    + "z int(10) NOT NULL, "
-                    + "target varchar(55), "
-                    + "player binary(16), "
-                    + "cause varchar(55), "
+                    + DataQueries.Created + " int(10) unsigned NOT NULL, "
+                    + DataQueries.EventName + " varchar(16), "
+                    + DataQueries.WorldUuid + " binary(16) NOT NULL, "
+                    + DataQueries.X + " int(10) NOT NULL, "
+                    + DataQueries.Y + " smallint(5) NOT NULL, "
+                    + DataQueries.Z + " int(10) NOT NULL, "
+                    + DataQueries.Target + " varchar(55), "
+                    + DataQueries.Player + " binary(16), "
+                    + DataQueries.Cause + " varchar(55), "
                     + "PRIMARY KEY (`id`), "
-                    + "KEY  `location` (`world`, `x`, `z`, `y`))";
+                    + "KEY  `location` (`"+ DataQueries.WorldUuid
+                        + "`, `" + DataQueries.X
+                        + "`, `" + DataQueries.Z
+                        + "`, `" + DataQueries.Y
+                    + "`))";
             conn.prepareStatement(records).execute();
 
             String extra = "CREATE TABLE IF NOT EXISTS "

@@ -47,7 +47,6 @@ import com.google.gson.JsonParser;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.api.query.QueryValueMutator;
 import com.helion3.prism.api.query.SQLQuery;
 import com.helion3.prism.api.query.SQLQuery.Builder;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
@@ -69,7 +68,13 @@ public class MySQLRecords implements StorageAdapterRecords {
         Map<Integer, String> extraDataMap = new HashMap<Integer, String>();
 
         try {
-            String sql = "INSERT INTO " + tablePrefix + "records(created, eventName, world, x, y, z, target, player, cause) values(?, ?, UNHEX(?), ?, ?, ?, ?, UNHEX(?), ?)";
+            String sql = String.format("INSERT INTO %srecords(%s, %s, %s, %s, %s, %s, %s, %s, %s)" +
+                            " values(?, ?, UNHEX(?), ?, ?, ?, ?, UNHEX(?), ?)",
+                    tablePrefix,
+                    DataQueries.Created, DataQueries.EventName, DataQueries.WorldUuid,
+                    DataQueries.X, DataQueries.Y, DataQueries.Z,
+                    DataQueries.Target, DataQueries.Player, DataQueries.Cause
+            );
             statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             conn.setAutoCommit(false);
 
@@ -178,15 +183,20 @@ public class MySQLRecords implements StorageAdapterRecords {
             // Manually builder a query since we need HEX
             Builder builder = SQLQuery.builder().select().from(tablePrefix + "records");
             if (session.getQuery().isAggregate()) {
-                builder.group("eventName", "target", "player", "cause").col("COUNT(*) AS total");
+                builder.group(
+                    DataQueries.EventName.toString(),
+                    DataQueries.Target.toString(),
+                    DataQueries.Player.toString(),
+                    DataQueries.Cause.toString()
+                ).col("COUNT(*) AS total");
             } else {
                 builder.col("*").leftJoin(tablePrefix + "extra", tablePrefix + "records.id = " + tablePrefix + "extra.record_id");
             }
 
-            builder.hex("player", "world").conditions(session.getQuery().getConditions());
+            builder.hex(DataQueries.Player.toString(), DataQueries.WorldUuid.toString()).conditions(session.getQuery().getConditions());
 
             builder.valueMutator(DataQueries.Player, value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
-            builder.valueMutator(DataQueries.WorldUuid, value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
+            builder.valueMutator(DataQueries.Location.then(DataQueries.WorldUuid), value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
 
             SQLQuery query = builder.build();
             Prism.getLogger().debug("MySQL Query: " + query);
@@ -197,21 +207,21 @@ public class MySQLRecords implements StorageAdapterRecords {
 
             while (rs.next()) {
                 // Build our result object
-                Result result = Result.from(rs.getString("eventName"), session.getQuery().isAggregate());
+                Result result = Result.from(rs.getString(DataQueries.EventName.toString()), session.getQuery().isAggregate());
 
                 // Restore the data container
                 DataContainer data = new MemoryDataContainer();
-                data.set(DataQueries.EventName, rs.getString("eventName"));
-                data.set(DataQueries.Target, rs.getString("target"));
+                data.set(DataQueries.EventName, rs.getString(DataQueries.EventName.toString()));
+                data.set(DataQueries.Target, rs.getString(DataQueries.Target.toString()));
 
                 if (session.getQuery().isAggregate()) {
                     data.set(DataQueries.Count, rs.getInt("total"));
                 } else {
                     DataContainer loc = new MemoryDataContainer();
-                    loc.set(DataQueries.X, rs.getInt("x"));
-                    loc.set(DataQueries.Y, rs.getInt("y"));
-                    loc.set(DataQueries.Z, rs.getInt("z"));
-                    loc.set(DataQueries.WorldUuid, TypeUtil.uuidFromDbString(rs.getString("worldHexed")));
+                    loc.set(DataQueries.X, rs.getInt(DataQueries.X.toString()));
+                    loc.set(DataQueries.Y, rs.getInt(DataQueries.Y.toString()));
+                    loc.set(DataQueries.Z, rs.getInt(DataQueries.Z.toString()));
+                    loc.set(DataQueries.WorldUuid, TypeUtil.uuidFromDbString(rs.getString("worldUuidHexed")));
                     data.set(DataQueries.Location, loc);
 
                     JsonObject json = new JsonParser().parse(rs.getString("json")).getAsJsonObject();
@@ -231,7 +241,7 @@ public class MySQLRecords implements StorageAdapterRecords {
                         uuidsPendingLookup.add(uuid);
                     }
                 } else {
-                    data.set(DataQueries.Cause, rs.getString("cause"));
+                    data.set(DataQueries.Cause, rs.getString(DataQueries.Cause.toString()));
                 }
 
                 result.data = data;

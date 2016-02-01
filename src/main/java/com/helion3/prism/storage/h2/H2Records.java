@@ -52,7 +52,7 @@ import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.DataUtil;
 
 public class H2Records implements StorageAdapterRecords {
-    private final String tablePrefix = Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString();
+    private final String tablePrefix = Prism.getConfig().getNode("db", "h2", "tablePrefix").getString();
 
     @Override
     public StorageWriteResult write(List<DataContainer> containers) throws Exception {
@@ -60,7 +60,13 @@ public class H2Records implements StorageAdapterRecords {
         PreparedStatement statement = null;
 
         try {
-            String sql = "INSERT INTO " + tablePrefix + "records(created, eventName, world, x, y, z, target, player, cause) values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = String.format("INSERT INTO %srecords(%s, %s, %s, %s, %s, %s, %s, %s, %s)" +
+                " values(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                tablePrefix,
+                DataQueries.Created, DataQueries.EventName, DataQueries.WorldUuid,
+                DataQueries.X, DataQueries.Y, DataQueries.Z,
+                DataQueries.Target, DataQueries.Player, DataQueries.Cause
+            );
             statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             for (DataContainer container : containers) {
@@ -159,21 +165,21 @@ public class H2Records implements StorageAdapterRecords {
             rs = statement.executeQuery();
 
             while (rs.next()) {
-                Result result = Result.from(rs.getString("eventName"), session.getQuery().isAggregate());
+                Result result = Result.from(rs.getString(DataQueries.EventName.toString()), session.getQuery().isAggregate());
 
                 // Restore the data container
                 DataContainer data = new MemoryDataContainer();
-                data.set(DataQueries.EventName, rs.getString("eventName"));
-                data.set(DataQueries.Target, rs.getString("target"));
+                data.set(DataQueries.EventName, rs.getString(DataQueries.EventName.toString()));
+                data.set(DataQueries.Target, rs.getString(DataQueries.Target.toString()));
 
                 if (session.getQuery().isAggregate()) {
                     data.set(DataQueries.Count, rs.getInt("total"));
                 } else {
                     DataContainer loc = new MemoryDataContainer();
-                    loc.set(DataQueries.X, rs.getInt("x"));
-                    loc.set(DataQueries.Y, rs.getInt("y"));
-                    loc.set(DataQueries.Z, rs.getInt("z"));
-                    loc.set(DataQueries.WorldUuid, rs.getString("world"));
+                    loc.set(DataQueries.X, rs.getInt(DataQueries.X.toString()));
+                    loc.set(DataQueries.Y, rs.getInt(DataQueries.Y.toString()));
+                    loc.set(DataQueries.Z, rs.getInt(DataQueries.Z.toString()));
+                    loc.set(DataQueries.WorldUuid, rs.getString(DataQueries.WorldUuid.toString()));
                     data.set(DataQueries.Location, loc);
 
                     JsonObject json = new JsonParser().parse(rs.getString("json")).getAsJsonObject();
@@ -185,14 +191,15 @@ public class H2Records implements StorageAdapterRecords {
                 }
 
                 // Determine the final name of the event source
-                if (rs.getString("player") != null && !rs.getString("player").isEmpty()) {
-                    data.set(DataQueries.Cause, rs.getString("player"));
+                String player = rs.getString(DataQueries.Player.toString());
+                if (player != null && !player.isEmpty()) {
+                    data.set(DataQueries.Cause, player);
 
                     if (translate) {
-                        uuidsPendingLookup.add(UUID.fromString(rs.getString("player")));
+                        uuidsPendingLookup.add(UUID.fromString(player));
                     }
                 } else {
-                    data.set(DataQueries.Cause, rs.getString("cause"));
+                    data.set(DataQueries.Cause, rs.getString(DataQueries.Cause.toString()));
                 }
 
                 result.data = data;

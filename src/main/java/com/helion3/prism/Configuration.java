@@ -104,6 +104,11 @@ public class Configuration {
                 dbTablePrefix.setValue("prism_");
             }
 
+            ConfigurationNode dbh2TablePrefix = rootNode.getNode("db", "h2", "tablePrefix");
+            if (dbh2TablePrefix.isVirtual()) {
+                dbh2TablePrefix.setValue("prism_");
+            }
+
             // Events
             ConfigurationNode eventBlockBreak = rootNode.getNode("events", "break");
             if (eventBlockBreak.isVirtual()) {

@@ -258,7 +258,7 @@ public class SQLQuery {
             String value = "'" + condition.getValue().toString() + "'";
             QueryValueMutator mutator = valueMutators.get(condition.getFieldName());
             if (mutator != null) {
-                value = mutator.mutate(value);
+                value = mutator.mutate(condition.getValue().toString());
             }
 
             if (condition.getMatchRule().equals(MatchRule.EQUALS)) {

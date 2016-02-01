@@ -28,6 +28,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import com.helion3.prism.util.DataQueries;
 import org.spongepowered.api.service.sql.SqlService;
 
 import com.helion3.prism.Prism;
@@ -36,7 +37,7 @@ import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageAdapterSettings;
 
 public class H2StorageAdapter implements StorageAdapter {
-    private final String tablePrefix = Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString();
+    private final String tablePrefix = Prism.getConfig().getNode("db", "h2", "tablePrefix").getString();
     private final SqlService sql = Prism.getGame().getServiceManager().provide(SqlService.class).get();
     private final String dbPath = Prism.getParentDirectory().getAbsolutePath().toString() + "/" + Prism.getConfig().getNode("db", "name").getString();
     private final StorageAdapterRecords records;
@@ -87,15 +88,15 @@ public class H2StorageAdapter implements StorageAdapter {
         try {
             String records = "CREATE TABLE IF NOT EXISTS " + tablePrefix + "records ("
                     + "id int primary key auto_increment, "
-                    + "created bigint, "
-                    + "eventName varchar(16), "
-                    + "world UUID, "
-                    + "x int, "
-                    + "y smallint, "
-                    + "z int, "
-                    + "target varchar(55), "
-                    + "player UUID, "
-                    + "cause varchar(64))";
+                    + DataQueries.Created + " bigint, "
+                    + DataQueries.EventName + " varchar(16), "
+                    + DataQueries.WorldUuid + " UUID, "
+                    + DataQueries.X + " int, "
+                    + DataQueries.Y + " smallint, "
+                    + DataQueries.Z + " int, "
+                    + DataQueries.Target + " varchar(55), "
+                    + DataQueries.Player + " UUID, "
+                    + DataQueries.Cause + " varchar(64))";
             conn.prepareStatement(records).execute();
 
             String extra = "CREATE TABLE IF NOT EXISTS " + tablePrefix + "extra ("
@@ -104,7 +105,8 @@ public class H2StorageAdapter implements StorageAdapter {
                     + "json varchar(30000))";
             conn.prepareStatement(extra).execute();
 
-            String index = "CREATE INDEX IF NOT EXISTS location ON " + tablePrefix + "records(world, x, y, z)";
+            String index = "CREATE INDEX IF NOT EXISTS location ON " + tablePrefix + "records("
+                + DataQueries.WorldUuid + ", " + DataQueries.X + ", " + DataQueries.Y + ", " + DataQueries.Z + ")";
             conn.prepareStatement(index).execute();
 
             String extraIndex = "CREATE INDEX IF NOT EXISTS recordId ON " + tablePrefix + "extra(record_id)";

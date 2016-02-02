@@ -46,14 +46,14 @@ import com.helion3.prism.queues.RecordingQueue;
 import com.helion3.prism.util.DataQueries;
 
 /**
- * An easy-to-understand factory class for Prism {@link EventRecord}s.
+ * An easy-to-understand factory class for Prism records.
  *
  * By chaining methods together, you can build a record with
  * natural-language style syntax.
  *
  * For example:
  *
- * new PrismRecord().player(player).brokeBlock(transaction).save()
+ * PrismRecord.create().source(player).broke(transaction).save();
  *
  */
 public class PrismRecord {
@@ -204,9 +204,9 @@ public class PrismRecord {
         }
 
         /**
-         * Describes a single block place at a given Location.
+         * Describes an entity death.
          *
-         * @param transaction Block placed.
+         * @param entity Living entity.
          * @return PrismRecord
          */
         public PrismRecord killed(Living entity){
@@ -315,7 +315,8 @@ public class PrismRecord {
          * @return PrismRecordCompleted
          */
         public PrismRecord quit() {
-            this.eventName = "player-quit";
+            this.eventName = "quit";
+            writePlayerLocation((Player) source.getSource());
             return new PrismRecord(source, this);
         }
 
@@ -325,8 +326,19 @@ public class PrismRecord {
          * @return PrismRecordCompleted
          */
         public PrismRecord joined() {
-            this.eventName = "player-join";
+            this.eventName = "join";
+            writePlayerLocation((Player) source.getSource());
             return new PrismRecord(source, this);
+        }
+
+        /**
+         * Helper method for formatting player container data.
+         * @param player
+         */
+        private void writePlayerLocation(Player player) {
+            checkNotNull(player);
+
+            data.set(DataQueries.Location, player.getLocation().toContainer());
         }
     }
 

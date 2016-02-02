@@ -66,7 +66,7 @@ abstract public class Result {
      * @return String target name.
      */
     public String getTargetName() {
-        return formatId(data.getString(DataQueries.Target).orElse("unknown"));
+        return formatId(data.getString(DataQueries.Target).orElse(""));
     }
 
     /**

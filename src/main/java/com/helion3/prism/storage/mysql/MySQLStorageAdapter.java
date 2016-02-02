@@ -96,7 +96,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
                     + tablePrefix + "records ("
                     + "id int(10) unsigned NOT NULL AUTO_INCREMENT, "
                     + DataQueries.Created + " int(10) unsigned NOT NULL, "
-                    + DataQueries.EventName + " varchar(16), "
+                    + DataQueries.EventName + " varchar(16) NOT NULL, "
                     + DataQueries.WorldUuid + " binary(16) NOT NULL, "
                     + DataQueries.X + " int(10) NOT NULL, "
                     + DataQueries.Y + " smallint(5) NOT NULL, "

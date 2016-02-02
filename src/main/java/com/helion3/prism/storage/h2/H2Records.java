@@ -170,7 +170,9 @@ public class H2Records implements StorageAdapterRecords {
                 // Restore the data container
                 DataContainer data = new MemoryDataContainer();
                 data.set(DataQueries.EventName, rs.getString(DataQueries.EventName.toString()));
-                data.set(DataQueries.Target, rs.getString(DataQueries.Target.toString()));
+
+                String target = rs.getString(DataQueries.Target.toString());
+                data.set(DataQueries.Target, target != null ? target : "");
 
                 if (session.getQuery().isAggregate()) {
                     data.set(DataQueries.Count, rs.getInt("total"));

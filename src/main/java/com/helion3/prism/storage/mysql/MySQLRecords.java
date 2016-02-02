@@ -93,7 +93,7 @@ public class MySQLRecords implements StorageAdapterRecords {
                 statement.setInt(4, location.getInt(DataQueries.X).get());
                 statement.setInt(5, location.getInt(DataQueries.Y).get());
                 statement.setInt(6, location.getInt(DataQueries.Z).get());
-                statement.setString(7, container.getString(DataQueries.Target).get());
+                statement.setString(7, container.getString(DataQueries.Target).orElse(null));
                 statement.setString(8, playerUUID);
                 statement.setString(9, container.getString(DataQueries.Cause).orElse(null));
                 statement.addBatch();
@@ -212,7 +212,9 @@ public class MySQLRecords implements StorageAdapterRecords {
                 // Restore the data container
                 DataContainer data = new MemoryDataContainer();
                 data.set(DataQueries.EventName, rs.getString(DataQueries.EventName.toString()));
-                data.set(DataQueries.Target, rs.getString(DataQueries.Target.toString()));
+
+                String target = rs.getString(DataQueries.Target.toString());
+                data.set(DataQueries.Target, target != null ? target : "");
 
                 if (session.getQuery().isAggregate()) {
                     data.set(DataQueries.Count, rs.getInt("total"));

@@ -121,6 +121,13 @@ Prism 3 is the successor to Prism 1/2 (for Bukkit/Spigot/Cauldron). While much o
 - mafoan, randox24, tacovan, nehocbelac, Shampoo123, cxmmy14, Palczynski, drac17, ollie2000, PGKxNIGHTMARE, allies333, DocVanNostrand, drfizzman123, 00benallen, rachaelriott, PheonixTamer, YeaItsMe, Natman93, Brazter, sydney2005, rsleight, napalm1, Teh_Fishman, and plenty more from DHMC (*Live Testers on DHMC*)
 - Artwork by [LegendarySoldier](http://legendary-soldier.deviantart.com/)
 
+
+## YourKit
+
+Thanks to YourKit for an open source license for their [java profiling application](http://www.yourkit.com/).
+
+![YourKit](https://www.yourkit.com/images/yklogo.png)
+
 ## Donate to Vive
 
 [![alt text][2]][1]

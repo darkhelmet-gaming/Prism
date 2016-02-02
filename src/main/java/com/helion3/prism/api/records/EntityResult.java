@@ -30,6 +30,7 @@ import java.util.Optional;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
+import org.spongepowered.api.data.manipulator.mutable.entity.IgniteableData;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntitySnapshot.Builder;
@@ -52,6 +53,11 @@ public class EntityResult extends ResultComplete implements Actionable {
             return ActionableResult.skipped(SkipReason.INVALID);
         }
 
+        // Don't let it burn to death (again?)
+        IgniteableData flaming = entity.get().get(IgniteableData.class).get();
+        entity.get().offer(flaming.fireTicks().set(0));
+
+        // Heal, it was probably killed.
         HealthData health = entity.get().get(HealthData.class).get();
         entity.get().offer(health.health().set(health.maxHealth().get()));
 

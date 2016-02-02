@@ -37,6 +37,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 public class MySQLStorageAdapter implements StorageAdapter {
+    private final String tablePrefix = Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString();
     private final StorageAdapterRecords records;
     private static DataSource db;
     private final String dns;
@@ -92,7 +93,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
 
         try {
             String records = "CREATE TABLE IF NOT EXISTS "
-                    + Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString() + "records ("
+                    + tablePrefix + "records ("
                     + "id int(10) unsigned NOT NULL AUTO_INCREMENT, "
                     + DataQueries.Created + " int(10) unsigned NOT NULL, "
                     + DataQueries.EventName + " varchar(16), "
@@ -108,16 +109,25 @@ public class MySQLStorageAdapter implements StorageAdapter {
                         + "`, `" + DataQueries.X
                         + "`, `" + DataQueries.Z
                         + "`, `" + DataQueries.Y
-                    + "`))";
+                    + "`), "
+                    + "KEY `created` (`created`)"
+                    + ") ENGINE=InnoDB DEFAULT CHARACTER SET utf8 " +
+                    "  DEFAULT COLLATE utf8_general_ci;";
             conn.prepareStatement(records).execute();
 
             String extra = "CREATE TABLE IF NOT EXISTS "
-                    + Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString() + "extra ("
+                    + tablePrefix + "extra ("
                     + "id int(10) unsigned NOT NULL AUTO_INCREMENT, "
                     + "record_id int(10) unsigned NOT NULL, "
                     + "json TEXT, "
                     + "PRIMARY KEY (`id`), "
-                    + "KEY `record_id` (`record_id`))";
+                    + "KEY `record_id` (`record_id`), "
+                    + "CONSTRAINT " + tablePrefix + "extra_ibfk_1 "
+                    + "FOREIGN KEY (record_id) "
+                    + "REFERENCES " + tablePrefix + "records (id) "
+                    + "ON DELETE CASCADE"
+                    + ") ENGINE=InnoDB DEFAULT CHARACTER SET utf8 "
+                    + "DEFAULT COLLATE utf8_general_ci;";
             conn.prepareStatement(extra).execute();
         }
         finally {

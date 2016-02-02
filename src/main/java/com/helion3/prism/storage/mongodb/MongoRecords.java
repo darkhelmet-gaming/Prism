@@ -65,7 +65,7 @@ import com.mongodb.client.model.WriteModel;
 
 public class MongoRecords implements StorageAdapterRecords {
     private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
-    private final String expiration = Prism.getConfig().getNode("db", "mongo", "expiration").getString();
+    private final String expiration = Prism.getConfig().getNode("storage", "expireRecords").getString();
 
     /**
      * Converts a DataView to a Document, recursively if needed.

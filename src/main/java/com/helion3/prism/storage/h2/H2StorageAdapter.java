@@ -102,12 +102,21 @@ public class H2StorageAdapter implements StorageAdapter {
             String extra = "CREATE TABLE IF NOT EXISTS " + tablePrefix + "extra ("
                     + "id int primary key auto_increment, "
                     + "record_id int, "
-                    + "json varchar(30000))";
+                    + "json varchar(30000),"
+                    + "CONSTRAINT " + tablePrefix + "extra_ibfk_1 "
+                    + "FOREIGN KEY (record_id) "
+                    + "REFERENCES " + tablePrefix + "records (id) "
+                    + "ON DELETE CASCADE"
+                    + ");";
             conn.prepareStatement(extra).execute();
 
-            String index = "CREATE INDEX IF NOT EXISTS location ON " + tablePrefix + "records("
+            String locationIndex = "CREATE INDEX IF NOT EXISTS location ON " + tablePrefix + "records("
                 + DataQueries.WorldUuid + ", " + DataQueries.X + ", " + DataQueries.Y + ", " + DataQueries.Z + ")";
-            conn.prepareStatement(index).execute();
+            conn.prepareStatement(locationIndex).execute();
+
+            String dateIndex = "CREATE INDEX IF NOT EXISTS created ON " + tablePrefix + "records("
+                    + DataQueries.Created + ")";
+            conn.prepareStatement(dateIndex).execute();
 
             String extraIndex = "CREATE INDEX IF NOT EXISTS recordId ON " + tablePrefix + "extra(record_id)";
             conn.prepareStatement(extraIndex).execute();

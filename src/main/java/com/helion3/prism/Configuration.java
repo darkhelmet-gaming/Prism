@@ -58,12 +58,18 @@ public class Configuration {
                 storageEng.setValue("h2");
             }
 
+            ConfigurationNode dbExpires = rootNode.getNode("storage", "expireRecords");
+            if (dbExpires.isVirtual()) {
+                dbExpires.setValue("4w");
+            }
+
             // Database
             ConfigurationNode dbName = rootNode.getNode("db", "name");
             if (dbName.isVirtual()) {
                 dbName.setValue("prism");
             }
 
+            // MongoDB
             ConfigurationNode dbMongoHost = rootNode.getNode("db", "mongo", "host");
             if (dbMongoHost.isVirtual()) {
                 dbMongoHost.setValue("127.0.0.1");
@@ -74,9 +80,10 @@ public class Configuration {
                 dbMongoPort.setValue(27017);
             }
 
-            ConfigurationNode dbMongoExpires = rootNode.getNode("db", "mongo", "expiration");
-            if (dbMongoExpires.isVirtual()) {
-                dbMongoExpires.setValue("8w");
+            // MySQL
+            ConfigurationNode dbMysqlSchema = rootNode.getNode("db", "mysql", "schemaVersion");
+            if (dbMysqlSchema.isVirtual()) {
+                dbMysqlSchema.setValue(1);
             }
 
             ConfigurationNode dbMysqlHost = rootNode.getNode("db", "mysql", "host");
@@ -104,9 +111,15 @@ public class Configuration {
                 dbTablePrefix.setValue("prism_");
             }
 
-            ConfigurationNode dbh2TablePrefix = rootNode.getNode("db", "h2", "tablePrefix");
-            if (dbh2TablePrefix.isVirtual()) {
-                dbh2TablePrefix.setValue("prism_");
+            // H2
+            ConfigurationNode dbH2Schema = rootNode.getNode("db", "mysql", "schemaVersion");
+            if (dbH2Schema.isVirtual()) {
+                dbH2Schema.setValue(1);
+            }
+
+            ConfigurationNode dbH2TablePrefix = rootNode.getNode("db", "h2", "tablePrefix");
+            if (dbH2TablePrefix.isVirtual()) {
+                dbH2TablePrefix.setValue("prism_");
             }
 
             // Events

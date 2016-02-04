@@ -50,66 +50,63 @@ public class UndoCommand {
 
     public static CommandSpec getCommand() {
         return CommandSpec.builder()
-            .executor(new CommandExecutor() {
-                @Override
-                public CommandResult execute(CommandSource source, CommandContext args) throws CommandException {
-                    if (!(source instanceof Player)) {
-                        source.sendMessage(Format.error("You must be a player to use this command."));
-                        return CommandResult.empty();
-                    }
+            .executor((source, args) -> {
+                if (!(source instanceof Player)) {
+                    source.sendMessage(Format.error("You must be a player to use this command."));
+                    return CommandResult.empty();
+                }
 
-                    List<ActionableResult> results = Prism.getLastActionResults().get(source);
-                    if (results == null) {
-                        source.sendMessage(Format.error("You have no valid actions to undo."));
-                        return CommandResult.empty();
-                    }
+                List<ActionableResult> results = Prism.getLastActionResults().get(source);
+                if (results == null) {
+                    source.sendMessage(Format.error("You have no valid actions to undo."));
+                    return CommandResult.empty();
+                }
 
-                    int applied = 0;
-                    int skipped = 0;
+                int applied = 0;
+                int skipped = 0;
 
-                    for (ActionableResult result : results) {
-                        if (result.getTransaction().isPresent()) {
-                            Object rawOriginal = result.getTransaction().get().getOriginal();
-                            Object rawFinal = result.getTransaction().get().getFinal();
+                for (ActionableResult result : results) {
+                    if (result.getTransaction().isPresent()) {
+                        Object rawOriginal = result.getTransaction().get().getOriginal();
+                        Object rawFinal = result.getTransaction().get().getFinal();
 
-                            if (rawOriginal instanceof BlockSnapshot) {
-                                if (((BlockSnapshot)rawOriginal).restore(true, false)) {
-                                    applied++;
-                                } else {
-                                    skipped++;
-                                }
+                        if (rawOriginal instanceof BlockSnapshot) {
+                            if (((BlockSnapshot)rawOriginal).restore(true, false)) {
+                                applied++;
+                            } else {
+                                skipped++;
                             }
+                        }
 
-                            if (rawFinal instanceof Entity) {
-                                Entity entity = (Entity) rawFinal;
-                                if (!entity.isRemoved()) {
-                                    entity.remove();
-                                    applied++;
-                                } else {
-                                    skipped++;
-                                }
+                        if (rawFinal instanceof Entity) {
+                            Entity entity = (Entity) rawFinal;
+                            if (!entity.isRemoved()) {
+                                entity.remove();
+                                applied++;
+                            } else {
+                                skipped++;
                             }
                         }
                     }
-
-                    Map<String,String> tokens = new HashMap<String, String>();
-                    tokens.put("appliedCount", "" + applied);
-                    tokens.put("skippedCount", "" + skipped);
-
-                    String messageTemplate = null;
-                    if (skipped > 0) {
-                        messageTemplate = Translation.from("rollback.success.withskipped");
-                    } else {
-                        messageTemplate = Translation.from("rollback.success");
-                    }
-
-                    source.sendMessage(Format.heading(
-                        Text.of(Template.parseTemplate(messageTemplate, tokens)),
-                        " ", Format.bonus(Translation.from("rollback.success.bonus"))
-                    ));
-
-                    return CommandResult.success();
                 }
+
+                Map<String, String> tokens = new HashMap<>();
+                tokens.put("appliedCount", "" + applied);
+                tokens.put("skippedCount", "" + skipped);
+
+                String messageTemplate = null;
+                if (skipped > 0) {
+                    messageTemplate = Translation.from("rollback.success.withskipped");
+                } else {
+                    messageTemplate = Translation.from("rollback.success");
+                }
+
+                source.sendMessage(Format.heading(
+                    Text.of(Template.parseTemplate(messageTemplate, tokens)),
+                    " ", Format.bonus(Translation.from("rollback.success.bonus"))
+                ));
+
+                return CommandResult.success();
             })
             .build();
     }

@@ -44,21 +44,18 @@ public class ExtinguishCommand {
         return CommandSpec.builder()
             .permission("prism.extinguish")
             .arguments(GenericArguments.integer(Text.of("radius")))
-            .executor(new CommandExecutor() {
-                @Override
-                public CommandResult execute(CommandSource source, CommandContext args) throws CommandException {
-                    if (!(source instanceof Player)) {
-                        source.sendMessage(Format.error("You must be a player to use this command."));
-                        return CommandResult.empty();
-                    }
-
-                    int radius = args.<Integer>getOne("radius").get();
-                    int changes = WorldUtil.removeAroundFromLocation(BlockTypes.FIRE, ((Player) source).getLocation(), radius);
-
-                    source.sendMessage(Format.message(String.format("Removed %d matches within %d blocks", changes, radius)));
-
-                    return CommandResult.success();
+            .executor((source, args) -> {
+                if (!(source instanceof Player)) {
+                    source.sendMessage(Format.error("You must be a player to use this command."));
+                    return CommandResult.empty();
                 }
+
+                int radius = args.<Integer>getOne("radius").get();
+                int changes = WorldUtil.removeAroundFromLocation(BlockTypes.FIRE, ((Player) source).getLocation(), radius);
+
+                source.sendMessage(Format.message(String.format("Removed %d matches within %d blocks", changes, radius)));
+
+                return CommandResult.success();
             })
             .build();
     }

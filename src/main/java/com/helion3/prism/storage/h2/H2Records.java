@@ -56,18 +56,15 @@ public class H2Records implements StorageAdapterRecords {
 
     @Override
     public StorageWriteResult write(List<DataContainer> containers) throws Exception {
-        Connection conn = H2StorageAdapter.getConnection();
-        PreparedStatement statement = null;
-
-        try {
-            String sql = String.format("INSERT INTO %srecords(%s, %s, %s, %s, %s, %s, %s, %s, %s)" +
-                " values(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        String sql = String.format("INSERT INTO %srecords(%s, %s, %s, %s, %s, %s, %s, %s, %s)" +
+                        " values(?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 tablePrefix,
                 DataQueries.Created, DataQueries.EventName, DataQueries.WorldUuid,
                 DataQueries.X, DataQueries.Y, DataQueries.Z,
                 DataQueries.Target, DataQueries.Player, DataQueries.Cause
-            );
-            statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        );
+
+        try (Connection conn = H2StorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             for (DataContainer container : containers) {
                 DataView location = container.getView(DataQueries.Location).get();
@@ -103,13 +100,6 @@ public class H2Records implements StorageAdapterRecords {
                 }
             }
         }
-        finally {
-            if (statement != null) {
-                statement.close();
-            }
-
-            conn.close();
-        }
 
         return null;
     }
@@ -123,22 +113,12 @@ public class H2Records implements StorageAdapterRecords {
      * @throws Exception
      */
     protected StorageWriteResult writeExtraData(int recordId, String json) throws Exception {
-        Connection conn = H2StorageAdapter.getConnection();
-        PreparedStatement statement = null;
+        String sql = "INSERT INTO " + tablePrefix + "extra(record_id, json) values(?, ?)";
 
-        try {
-            String sql = "INSERT INTO " + tablePrefix + "extra(record_id, json) values(?, ?)";
-            statement = conn.prepareStatement(sql);
+        try (Connection conn = H2StorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, recordId);
             statement.setString(2, json);
             statement.executeUpdate();
-        }
-        finally {
-            if (statement != null) {
-                statement.close();
-            }
-
-            conn.close();
         }
 
         return null;
@@ -147,22 +127,14 @@ public class H2Records implements StorageAdapterRecords {
     @Override
     public CompletableFuture<List<Result>> query(QuerySession session, boolean translate) throws Exception {
         // Prepare results
-        List<Result> results = new ArrayList<Result>();
-        CompletableFuture<List<Result>> future = new CompletableFuture<List<Result>>();
+        List<Result> results = new ArrayList<>();
+        CompletableFuture<List<Result>> future = new CompletableFuture<>();
 
-        Connection conn = H2StorageAdapter.getConnection();
-        PreparedStatement statement = null;
-        ResultSet rs = null;
+        SQLQuery query = SQLQuery.from(session);
+        Prism.getLogger().debug("H2 SQL Query: " + query);
 
-        try {
-            List<UUID> uuidsPendingLookup = new ArrayList<UUID>();
-
-            SQLQuery query = SQLQuery.from(session);
-            Prism.getLogger().debug("H2 SQL Query: " + query);
-
-            // Build query
-            statement = conn.prepareStatement(query.toString());
-            rs = statement.executeQuery();
+        try (Connection conn = H2StorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(query.toString()); ResultSet rs = statement.executeQuery()) {
+            List<UUID> uuidsPendingLookup = new ArrayList<>();
 
             while (rs.next()) {
                 Result result = Result.from(rs.getString(DataQueries.EventName.toString()), session.getQuery().isAggregate());
@@ -209,23 +181,10 @@ public class H2Records implements StorageAdapterRecords {
             }
 
             if (translate && !uuidsPendingLookup.isEmpty()) {
-                DataUtil.translateUuidsToNames(results, uuidsPendingLookup).thenAccept(finalResults -> {
-                    future.complete(finalResults);
-                });
+                DataUtil.translateUuidsToNames(results, uuidsPendingLookup).thenAccept(future::complete);
             } else {
                 future.complete(results);
             }
-        }
-        finally {
-            if (rs != null) {
-                rs.close();
-            }
-
-            if (statement != null) {
-                statement.close();
-            }
-
-            conn.close();
         }
 
         return future;

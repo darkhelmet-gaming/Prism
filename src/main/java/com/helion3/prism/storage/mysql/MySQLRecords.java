@@ -61,21 +61,19 @@ public class MySQLRecords implements StorageAdapterRecords {
 
     @Override
     public StorageWriteResult write(List<DataContainer> containers) throws Exception {
-        Connection conn = MySQLStorageAdapter.getConnection();
-        PreparedStatement statement = null;
 
-        List<String> extraData = new ArrayList<String>();
-        Map<Integer, String> extraDataMap = new HashMap<Integer, String>();
+        List<String> extraData = new ArrayList<>();
+        Map<Integer, String> extraDataMap = new HashMap<>();
 
-        try {
-            String sql = String.format("INSERT INTO %srecords(%s, %s, %s, %s, %s, %s, %s, %s, %s)" +
-                            " values(?, ?, UNHEX(?), ?, ?, ?, ?, UNHEX(?), ?)",
-                    tablePrefix,
-                    DataQueries.Created, DataQueries.EventName, DataQueries.WorldUuid,
-                    DataQueries.X, DataQueries.Y, DataQueries.Z,
-                    DataQueries.Target, DataQueries.Player, DataQueries.Cause
-            );
-            statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        String sql = String.format("INSERT INTO %srecords(%s, %s, %s, %s, %s, %s, %s, %s, %s)" +
+                        " values(?, ?, UNHEX(?), ?, ?, ?, ?, UNHEX(?), ?)",
+                tablePrefix,
+                DataQueries.Created, DataQueries.EventName, DataQueries.WorldUuid,
+                DataQueries.X, DataQueries.Y, DataQueries.Z,
+                DataQueries.Target, DataQueries.Player, DataQueries.Cause
+        );
+
+        try (Connection conn = MySQLStorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             conn.setAutoCommit(false);
 
             for (DataContainer container : containers) {
@@ -124,13 +122,6 @@ public class MySQLRecords implements StorageAdapterRecords {
 
             writeExtraData(extraDataMap);
         }
-        finally {
-            if (statement != null) {
-                statement.close();
-            }
-
-            conn.close();
-        }
 
         return null;
     }
@@ -140,13 +131,8 @@ public class MySQLRecords implements StorageAdapterRecords {
             throw new IllegalArgumentException("Extra data map must not be empty.");
         }
 
-        Connection conn = MySQLStorageAdapter.getConnection();
-        PreparedStatement statement = null;
-
-        try {
-            String sql = "INSERT INTO " + tablePrefix + "extra(record_id, json) values(?, ?)";
-            statement = conn.prepareStatement(sql);
-
+        String sql = "INSERT INTO " + tablePrefix + "extra(record_id, json) values(?, ?)";
+        try (Connection conn = MySQLStorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(sql)) {
             for (Entry<Integer, String> data : extraDataMap.entrySet()) {
                 statement.setInt(1, data.getKey());
                 statement.setString(2, data.getValue());
@@ -156,13 +142,6 @@ public class MySQLRecords implements StorageAdapterRecords {
             statement.executeBatch();
             conn.commit();
         }
-        finally {
-            if (statement != null) {
-                statement.close();
-            }
-
-            conn.close();
-        }
 
         return null;
     }
@@ -170,41 +149,34 @@ public class MySQLRecords implements StorageAdapterRecords {
     @Override
     public CompletableFuture<List<Result>> query(QuerySession session, boolean translate) throws Exception {
         // Prepare results
-        List<Result> results = new ArrayList<Result>();
-        CompletableFuture<List<Result>> future = new CompletableFuture<List<Result>>();
+        List<Result> results = new ArrayList<>();
+        CompletableFuture<List<Result>> future = new CompletableFuture<>();
 
-        Connection conn = MySQLStorageAdapter.getConnection();
-        PreparedStatement statement = null;
-        ResultSet rs = null;
+        List<UUID> uuidsPendingLookup = new ArrayList<>();
 
-        try {
-            List<UUID> uuidsPendingLookup = new ArrayList<UUID>();
-
-            // Manually builder a query since we need HEX
-            Builder builder = SQLQuery.builder().select().from(tablePrefix + "records");
-            if (session.getQuery().isAggregate()) {
-                builder.group(
+        // Manually builder a query since we need HEX
+        Builder builder = SQLQuery.builder().select().from(tablePrefix + "records");
+        if (session.getQuery().isAggregate()) {
+            builder.group(
                     DataQueries.EventName.toString(),
                     DataQueries.Target.toString(),
                     DataQueries.Player.toString(),
                     DataQueries.Cause.toString()
-                ).col("COUNT(*) AS total");
-            } else {
-                builder.col("*").leftJoin(tablePrefix + "extra", tablePrefix + "records.id = " + tablePrefix + "extra.record_id");
-            }
+            ).col("COUNT(*) AS total");
+        } else {
+            builder.col("*").leftJoin(tablePrefix + "extra", tablePrefix + "records.id = " + tablePrefix + "extra.record_id");
+        }
 
-            builder.hex(DataQueries.Player.toString(), DataQueries.WorldUuid.toString()).conditions(session.getQuery().getConditions());
+        builder.hex(DataQueries.Player.toString(), DataQueries.WorldUuid.toString()).conditions(session.getQuery().getConditions());
 
-            builder.valueMutator(DataQueries.Player, value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
-            builder.valueMutator(DataQueries.Location.then(DataQueries.WorldUuid), value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
+        builder.valueMutator(DataQueries.Player, value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
+        builder.valueMutator(DataQueries.Location.then(DataQueries.WorldUuid), value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
 
-            SQLQuery query = builder.build();
-            Prism.getLogger().debug("MySQL Query: " + query);
+        // Build query
+        SQLQuery query = builder.build();
+        Prism.getLogger().debug("MySQL Query: " + query);
 
-            // Build query
-            statement = conn.prepareStatement(query.toString());
-            rs = statement.executeQuery();
-
+        try (Connection conn = MySQLStorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(query.toString()); ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
                 // Build our result object
                 Result result = Result.from(rs.getString(DataQueries.EventName.toString()), session.getQuery().isAggregate());
@@ -251,23 +223,10 @@ public class MySQLRecords implements StorageAdapterRecords {
             }
 
             if (translate && !uuidsPendingLookup.isEmpty()) {
-                DataUtil.translateUuidsToNames(results, uuidsPendingLookup).thenAccept(finalResults -> {
-                    future.complete(finalResults);
-                });
+                DataUtil.translateUuidsToNames(results, uuidsPendingLookup).thenAccept(future::complete);
             } else {
                 future.complete(results);
             }
-        }
-        finally {
-            if (rs != null) {
-                rs.close();
-            }
-
-            if (statement != null) {
-                statement.close();
-            }
-
-            conn.close();
         }
 
         return future;

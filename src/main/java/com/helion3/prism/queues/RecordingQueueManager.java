@@ -37,7 +37,7 @@ public class RecordingQueueManager extends Thread {
 
         while (true) {
 
-            List<DataContainer> eventsSaveBatch = new ArrayList<DataContainer>();
+            List<DataContainer> eventsSaveBatch = new ArrayList<>();
 
             // Assume we're iterating everything in the queue
             while (!RecordingQueue.getQueue().isEmpty()) {

@@ -28,7 +28,7 @@ import java.util.List;
 
 final public class Query {
     private boolean isAggregate = true;
-    private List<Condition> conditions = new ArrayList<Condition>();
+    private List<Condition> conditions = new ArrayList<>();
     private int limit = 1000;
 
     public void addConditions(List<Condition> conditions) {

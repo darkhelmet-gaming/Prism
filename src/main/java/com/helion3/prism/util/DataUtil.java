@@ -112,17 +112,9 @@ public class DataUtil {
             }
         }
         else if (element.isJsonArray()) {
-            List<Object> list = new ArrayList<Object>();
+            List<Object> list = new ArrayList<>();
             JsonArray arr = element.getAsJsonArray();
-            arr.forEach(new Consumer<JsonElement>() {
-                @Override
-                public void accept(JsonElement t) {
-                    Optional<Object> translated = jsonElementToObject(t);
-                    if (translated.isPresent()) {
-                        list.add(translated.get());
-                    }
-                }
-            });
+            arr.forEach(t -> jsonElementToObject(t).ifPresent(list::add));
 
             result = list;
         }
@@ -145,13 +137,11 @@ public class DataUtil {
             Optional<Object> optional = view.get(query);
             if (optional.isPresent()) {
                 String key = query.asString(".");
-                List<Object> convertedList = new ArrayList<Object>();
+                List<Object> convertedList = new ArrayList<>();
 
                 if (optional.get() instanceof List) {
-                    List<?> list = (List<?>) optional.get();
-                    Iterator<?> iterator = list.iterator();
-                    while (iterator.hasNext()) {
-                        Object object = iterator.next();
+
+                    for (Object object : (List<?>) optional.get()) {
 
                         if (object instanceof DataView) {
                             convertedList.add(jsonFromDataView((DataView) object));
@@ -204,7 +194,7 @@ public class DataUtil {
 
 
     public static CompletableFuture<List<Result>> translateUuidsToNames(List<Result> results, List<UUID> uuidsPendingLookup) {
-        CompletableFuture<List<Result>> future = new CompletableFuture<List<Result>>();
+        CompletableFuture<List<Result>> future = new CompletableFuture<>();
 
         ListenableFuture<Collection<GameProfile>> profiles = Prism.getGame().getServer().getGameProfileManager().getAllById(uuidsPendingLookup, true);
         profiles.addListener(() -> {
@@ -212,7 +202,7 @@ public class DataUtil {
                 for (GameProfile profile : profiles.get()) {
                     for (Result r : results) {
                         Optional<Object> cause = r.data.get(DataQueries.Cause);
-                        if (cause.isPresent() && ((String) cause.get()).equals(profile.getUniqueId().toString())) {
+                        if (cause.isPresent() && cause.get().equals(profile.getUniqueId().toString())) {
                             r.data.set(DataQueries.Cause, profile.getName());
                         }
                     }

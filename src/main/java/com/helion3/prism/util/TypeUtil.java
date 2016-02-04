@@ -23,34 +23,12 @@
  */
 package com.helion3.prism.util;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TypeUtil {
     private TypeUtil() {}
-
-    /**
-     * Joins an array together by a delimiter.
-     *
-     * @param list List of strings
-     * @param delimiter Delimiter
-     * @return
-     */
-    public static String join(List<String> list, String delimiter) {
-        StringBuffer buffer = new StringBuffer();
-        Iterator<?> iter = list.iterator();
-
-        while (iter.hasNext()) {
-            buffer.append(iter.next());
-            if (iter.hasNext())
-                buffer.append(delimiter);
-        }
-
-        return buffer.toString();
-    }
 
     /**
      * Java implementation of preg_match_all by https://github.com/raimonbosch.

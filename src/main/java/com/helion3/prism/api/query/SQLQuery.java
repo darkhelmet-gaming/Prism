@@ -62,13 +62,13 @@ public class SQLQuery {
      */
     public static class Builder {
         private Mode mode;
-        private List<String> columns = new ArrayList<String>();
-        private List<String> groupBy = new ArrayList<String>();
-        private List<String> unhexCols = new ArrayList<String>();
+        private List<String> columns = new ArrayList<>();
+        private List<String> groupBy = new ArrayList<>();
+        private List<String> unhexCols = new ArrayList<>();
         private String table;
-        private Map<String, String> joins = new HashMap<String, String>();
-        private List<Condition> conditions = new ArrayList<Condition>();
-        private Map<DataQuery, QueryValueMutator> valueMutators = new HashMap<DataQuery, QueryValueMutator>();
+        private Map<String, String> joins = new HashMap<>();
+        private List<Condition> conditions = new ArrayList<>();
+        private Map<DataQuery, QueryValueMutator> valueMutators = new HashMap<>();
 
         public Builder select() {
             mode = Mode.SELECT;
@@ -172,7 +172,7 @@ public class SQLQuery {
             String sql = mode.name() + " ";
 
             // Columns
-            sql += TypeUtil.join(columns, ", ") + " ";
+            sql += String.join(", ", columns) + " ";
 
             // Tables
             sql += "FROM " + table + " ";
@@ -185,12 +185,12 @@ public class SQLQuery {
             // Where
             List<String> queryConditions = buildConditions(conditions);
             if (!queryConditions.isEmpty()) {
-                sql += "WHERE " + TypeUtil.join(queryConditions, " ").replaceFirst("AND ", "").replaceFirst("OR ", "") + " ";
+                sql += "WHERE " + String.join(" ", queryConditions).replaceFirst("AND ", "").replaceFirst("OR ", "") + " ";
             }
 
             // Group By
             if (!groupBy.isEmpty()) {
-                sql += "GROUP BY " + TypeUtil.join(groupBy, ", ") + " ";
+                sql += "GROUP BY " + String.join(", ", groupBy) + " ";
             }
 
             return new SQLQuery(sql);
@@ -204,14 +204,14 @@ public class SQLQuery {
          * @return List of String conditions to append to a query.
          */
         private List<String> buildConditions(List<Condition> conditions) {
-            List<String> queryConditions = new ArrayList<String>();
+            List<String> queryConditions = new ArrayList<>();
             for (Condition fieldOrGroup : conditions) {
                 if (fieldOrGroup instanceof ConditionGroup) {
                     ConditionGroup group = (ConditionGroup) fieldOrGroup;
 
                     String query = "AND (";
 
-                    List<String> inner = new ArrayList<String>();
+                    List<String> inner = new ArrayList<>();
                     for (Object obj : group.getConditions()) {
                         if (obj instanceof ConditionGroup) {
                             query += buildConditions(((ConditionGroup) obj).getConditions());
@@ -228,7 +228,7 @@ public class SQLQuery {
                     }
 
                     if (!inner.isEmpty()) {
-                        query += TypeUtil.join(inner, group.getOperator().name() + " ");
+                        query += String.join(group.getOperator().name() + " ", inner);
                     }
 
                     queryConditions.add(query + ")");

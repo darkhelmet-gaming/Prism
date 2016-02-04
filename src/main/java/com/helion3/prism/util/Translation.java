@@ -29,7 +29,7 @@ import java.util.Map;
 final public class Translation {
 
     // @todo this is mega temporary, should be moved to a language file
-    private static Map<String,String> lang = new HashMap<String,String>();
+    private static Map<String,String> lang = new HashMap<>();
 
     private Translation() {}
 

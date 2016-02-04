@@ -54,8 +54,10 @@ public class EntityResult extends ResultComplete implements Actionable {
         }
 
         // Don't let it burn to death (again?)
-        IgniteableData flaming = entity.get().get(IgniteableData.class).get();
-        entity.get().offer(flaming.fireTicks().set(0));
+        Optional<IgniteableData> flaming = entity.get().get(IgniteableData.class);
+        if (flaming.isPresent()) {
+            entity.get().offer(flaming.get().fireTicks().set(0));
+        }
 
         // Heal, it was probably killed.
         HealthData health = entity.get().get(HealthData.class).get();

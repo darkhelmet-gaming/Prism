@@ -23,10 +23,7 @@
  */
 package com.helion3.prism.api.query;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.spongepowered.api.data.DataQuery;
@@ -256,6 +253,13 @@ public class SQLQuery {
             String field = popDataQuery(condition.getFieldName().toString());
 
             String value = "'" + condition.getValue().toString() + "'";
+
+            // Dates are stored as epochs in sql schemas
+            if (condition.getValue() instanceof Date) {
+                value = "" + (((Date) condition.getValue()).getTime() / 1000L);
+            }
+
+            // Allow db-specific mutations
             QueryValueMutator mutator = valueMutators.get(condition.getFieldName());
             if (mutator != null) {
                 value = mutator.mutate(condition.getValue().toString());
@@ -269,10 +273,10 @@ public class SQLQuery {
                 fieldComparator += "> " + range.lowerEndpoint() + " AND " + field + " < " + range.upperEndpoint() + " ";
             }
             else if (condition.getMatchRule().equals(MatchRule.GREATER_THAN_EQUAL)) {
-                fieldComparator += ">= " + condition.getValue() + " ";
+                fieldComparator += ">= " + value + " ";
             }
             else if (condition.getMatchRule().equals(MatchRule.LESS_THAN_EQUAL)) {
-                fieldComparator += "<= " + condition.getValue() + " ";
+                fieldComparator += "<= " + value + " ";
             }
             // @todo handle includes, excludes
 

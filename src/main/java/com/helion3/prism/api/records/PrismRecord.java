@@ -333,7 +333,7 @@ public class PrismRecord {
 
         /**
          * Helper method for formatting player container data.
-         * 
+         *
          * @param player
          */
         private void writePlayerLocation(Player player) {

@@ -65,6 +65,7 @@ public class SQLQuery {
         private Mode mode;
         private List<String> columns = new ArrayList<String>();
         private List<String> groupBy = new ArrayList<String>();
+        private List<String> orderBy = new ArrayList<String>();
         private List<String> unhexCols = new ArrayList<String>();
         private String table;
         private Map<String, String> joins = new HashMap<String, String>();
@@ -165,6 +166,19 @@ public class SQLQuery {
         }
 
         /**
+         * Add order by columns.
+         *
+         * @param cols String... column name(s)
+         * @return
+         */
+        public Builder order(String... cols) {
+            for (String col : cols) {
+                orderBy.add(col);
+            }
+            return this;
+        }
+
+        /**
          * Build the final query string.
          *
          * @return String
@@ -194,7 +208,12 @@ public class SQLQuery {
                 sql += "GROUP BY " + TypeUtil.join(groupBy, ", ") + " ";
             }
 
-            return new SQLQuery(sql);
+            // Order By
+            if (!orderBy.isEmpty()) {
+                sql += "ORDER BY " + TypeUtil.join(orderBy, ", ") + " ";
+            }
+
+            return new SQLQuery(sql.trim());
         }
 
         /**
@@ -318,6 +337,7 @@ public class SQLQuery {
         }
 
         query.conditions(session.getQuery().getConditions());
+        query.order("created", "y", "x", "z");
 
         return query.build();
     }

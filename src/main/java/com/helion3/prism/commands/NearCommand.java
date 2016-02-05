@@ -45,27 +45,24 @@ public class NearCommand {
         return CommandSpec.builder()
             .description(Text.of("Alias of /pr l r:(default radius)"))
             .permission("prism.lookup")
-            .executor(new CommandExecutor() {
-                @Override
-                public CommandResult execute(CommandSource source, CommandContext args) throws CommandException {
-                    int radius = Prism.getConfig().getNode("commands", "near", "defaultRadius").getInt();
+            .executor((source, args) -> {
+                int radius = Prism.getConfig().getNode("commands", "near", "defaultRadius").getInt();
 
-                    source.sendMessage(Format.heading("Querying records..."));
+                source.sendMessage(Format.heading("Querying records..."));
 
-                    // Create a new query session
-                    final QuerySession session = new QuerySession(source);
-                    session.newQuery().addCondition(ConditionGroup.from(((Player) source).getLocation(), radius));
+                // Create a new query session
+                final QuerySession session = new QuerySession(source);
+                session.newQuery().addCondition(ConditionGroup.from(((Player) source).getLocation(), radius));
 
-                    // Pass off to an async lookup helper
-                    try {
-                        AsyncUtil.lookup(session);
-                    } catch (Exception e) {
-                        source.sendMessage(Format.error(e.getMessage()));
-                        e.printStackTrace();
-                    }
-
-                    return CommandResult.success();
+                // Pass off to an async lookup helper
+                try {
+                    AsyncUtil.lookup(session);
+                } catch (Exception e) {
+                    source.sendMessage(Format.error(e.getMessage()));
+                    e.printStackTrace();
                 }
+
+                return CommandResult.success();
             }).build();
     }
 }

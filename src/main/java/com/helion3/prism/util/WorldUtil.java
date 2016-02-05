@@ -24,7 +24,6 @@
 package com.helion3.prism.util;
 
 import java.util.Collection;
-import java.util.function.Predicate;
 
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -137,23 +136,18 @@ public class WorldUtil {
         int yMin = location.getBlockY() - radius;
         int yMax = location.getBlockY() + radius;
 
-        Collection<Entity> entities = location.getExtent().getEntities(new Predicate<Entity>() {
-            @Override
-            public boolean test(Entity e) {
-                Location<World> loc = e.getLocation();
+        Collection<Entity> entities = location.getExtent().getEntities(e -> {
+            Location<World> loc = e.getLocation();
 
-                return (e.getType().equals(EntityTypes.ITEM) &&
-                        (loc.getX() > xMin && loc.getX() <= xMax) &&
-                        (loc.getY() > yMin && loc.getY() <= yMax) &&
-                        (loc.getZ() > zMin && loc.getZ() <= zMax)
-                );
-            }
+            return (e.getType().equals(EntityTypes.ITEM) &&
+                    (loc.getX() > xMin && loc.getX() <= xMax) &&
+                    (loc.getY() > yMin && loc.getY() <= yMax) &&
+                    (loc.getZ() > zMin && loc.getZ() <= zMax)
+            );
         });
 
         if (!entities.isEmpty()) {
-            for (Entity entity : entities) {
-                entity.remove();
-            }
+            entities.forEach(Entity::remove);
         }
 
         return entities.size();

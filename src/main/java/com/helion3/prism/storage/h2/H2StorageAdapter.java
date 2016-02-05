@@ -83,9 +83,7 @@ public class H2StorageAdapter implements StorageAdapter {
      * @throws SQLException
      */
     protected void createTables() throws SQLException {
-        Connection conn = getConnection();
-
-        try {
+        try (Connection conn = getConnection()) {
             String records = "CREATE TABLE IF NOT EXISTS " + tablePrefix + "records ("
                     + "id int primary key auto_increment, "
                     + DataQueries.Created + " bigint, "
@@ -120,9 +118,6 @@ public class H2StorageAdapter implements StorageAdapter {
 
             String extraIndex = "CREATE INDEX IF NOT EXISTS recordId ON " + tablePrefix + "extra(record_id)";
             conn.prepareStatement(extraIndex).execute();
-        }
-        finally {
-            conn.close();
         }
     }
 

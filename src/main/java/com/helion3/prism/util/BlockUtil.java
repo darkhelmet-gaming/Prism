@@ -44,7 +44,7 @@ public class BlockUtil {
      * @return List<BlockType>
      */
     public static List<BlockType> getLiquidBlockTypes() {
-        List<BlockType> liquids = new ArrayList<BlockType>();
+        List<BlockType> liquids = new ArrayList<>();
 
         Collection<BlockType> types = Prism.getGame().getRegistry().getAllOf(BlockType.class);
         for (BlockType type : types) {

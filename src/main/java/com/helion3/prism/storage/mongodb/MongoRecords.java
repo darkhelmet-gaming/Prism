@@ -83,12 +83,8 @@ public class MongoRecords implements StorageAdapterRecords {
                 String key = query.asString(".");
 
                 if (optional.get() instanceof List) {
-                    List<Object> convertedList = new ArrayList<Object>();
-                    List<?> list = (List<?>) optional.get();
-                    Iterator<?> iterator = list.iterator();
-
-                    while (iterator.hasNext()) {
-                        Object object = iterator.next();
+                    List<Object> convertedList = new ArrayList<>();
+                    for (Object object : (List<?>) optional.get()) {
 
                         if (object instanceof DataView) {
                             convertedList.add(documentFromView((DataView) object));
@@ -155,7 +151,7 @@ public class MongoRecords implements StorageAdapterRecords {
        MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
 
        // Build an array of documents
-       List<WriteModel<Document>> documents = new ArrayList<WriteModel<Document>>();
+       List<WriteModel<Document>> documents = new ArrayList<>();
        for (DataContainer container : containers) {
            Document document = documentFromView(container);
 
@@ -165,7 +161,7 @@ public class MongoRecords implements StorageAdapterRecords {
            document.append("Expires", DateUtil.parseTimeStringToDate(expiration, true));
 
            // Insert
-           documents.add(new InsertOneModel<Document>(document));
+           documents.add(new InsertOneModel<>(document));
        }
 
        // Write
@@ -238,8 +234,8 @@ public class MongoRecords implements StorageAdapterRecords {
        checkNotNull(query);
 
        // Prepare results
-       List<Result> results = new ArrayList<Result>();
-       CompletableFuture<List<Result>> future = new CompletableFuture<List<Result>>();
+       List<Result> results = new ArrayList<>();
+       CompletableFuture<List<Result>> future = new CompletableFuture<>();
 
        // Get collection
        MongoCollection<Document> collection = MongoStorageAdapter.getCollection(MongoStorageAdapter.collectionEventRecordsName);
@@ -284,7 +280,7 @@ public class MongoRecords implements StorageAdapterRecords {
            Document group = new Document("$group", groupHolder);
 
            // Aggregation pipeline
-           List<Document> pipeline = new ArrayList<Document>();
+           List<Document> pipeline = new ArrayList<>();
            pipeline.add(matcher);
            pipeline.add(group);
            pipeline.add(sorter);
@@ -294,7 +290,7 @@ public class MongoRecords implements StorageAdapterRecords {
            Prism.getLogger().debug("MongoDB Query: " + pipeline);
        } else {
            // Aggregation pipeline
-           List<Document> pipeline = new ArrayList<Document>();
+           List<Document> pipeline = new ArrayList<>();
            pipeline.add(matcher);
            pipeline.add(sorter);
            pipeline.add(limit);
@@ -306,9 +302,8 @@ public class MongoRecords implements StorageAdapterRecords {
        session.getCommandSource().get().sendMessage(Format.subduedHeading("Query completed, building snapshots..."));
 
        // Iterate results and build our event record list
-       MongoCursor<Document> cursor = aggregated.iterator();
-       try {
-           List<UUID> uuidsPendingLookup = new ArrayList<UUID>();
+       try (MongoCursor<Document> cursor = aggregated.iterator()) {
+           List<UUID> uuidsPendingLookup = new ArrayList<>();
 
            while (cursor.hasNext()) {
                // Mongo document
@@ -341,14 +336,10 @@ public class MongoRecords implements StorageAdapterRecords {
            }
 
            if (translate && !uuidsPendingLookup.isEmpty()) {
-               DataUtil.translateUuidsToNames(results, uuidsPendingLookup).thenAccept(finalResults -> {
-                   future.complete(finalResults);
-               });
+               DataUtil.translateUuidsToNames(results, uuidsPendingLookup).thenAccept(future::complete);
            } else {
                future.complete(results);
            }
-       } finally {
-           cursor.close();
        }
 
        return future;

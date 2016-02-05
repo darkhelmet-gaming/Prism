@@ -30,9 +30,9 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.living.player.Player;
 
 public class FilterList {
-    private final List<String> blocks = new ArrayList<String>();
-    private final List<String> players = new ArrayList<String>();
-    private final List<Class<?>> sources = new ArrayList<Class<?>>();
+    private final List<String> blocks = new ArrayList<>();
+    private final List<String> players = new ArrayList<>();
+    private final List<Class<?>> sources = new ArrayList<>();
     private final FilterMode mode;
 
     public FilterList(FilterMode mode) {

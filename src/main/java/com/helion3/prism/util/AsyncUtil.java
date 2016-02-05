@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import com.helion3.prism.api.records.Result;
 import org.spongepowered.api.text.Text;
@@ -60,10 +61,7 @@ public class AsyncUtil {
             @Override
             public void success(List<Result> results) {
                 if (results.size() > 5) {
-                    List<Text> messages = new ArrayList<Text>();
-                    for (Result result : results) {
-                        messages.add(Messages.from(result));
-                    }
+                    List<Text> messages = results.stream().map(Messages::from).collect(Collectors.toList());
 
                     Optional<PaginationService> service = Prism.getGame().getServiceManager().provide(PaginationService.class);
                     if (service.isPresent()) {

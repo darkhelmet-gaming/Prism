@@ -333,11 +333,13 @@ public class PrismRecord {
 
         /**
          * Helper method for formatting player container data.
+         * 
          * @param player
          */
         private void writePlayerLocation(Player player) {
             checkNotNull(player);
 
+            data.set(DataQueries.Target, player.getName());
             data.set(DataQueries.Location, player.getLocation().toContainer());
         }
     }

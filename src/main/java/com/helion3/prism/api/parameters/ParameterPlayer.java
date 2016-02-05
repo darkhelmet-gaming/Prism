@@ -67,15 +67,12 @@ public class ParameterPlayer extends SimpleParameterHandler {
     public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
         ListenableFuture<GameProfile> profile = Prism.getGame().getServer().getGameProfileManager().get(value, true);
 
-        profile.addListener(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    query.addCondition(FieldCondition.of(DataQueries.Player, MatchRule.EQUALS, profile.get().getUniqueId().toString()));
-                } catch (InterruptedException | ExecutionException e) {
-                    session.getCommandSource().get().sendMessage(Format.error(String.format("Cannot find profile for user \"%s\"", value)));
-                    e.printStackTrace();
-                }
+        profile.addListener(() -> {
+            try {
+                query.addCondition(FieldCondition.of(DataQueries.Player, MatchRule.EQUALS, profile.get().getUniqueId().toString()));
+            } catch (InterruptedException | ExecutionException e) {
+                session.getCommandSource().get().sendMessage(Format.error(String.format("Cannot find profile for user \"%s\"", value)));
+                e.printStackTrace();
             }
         }, MoreExecutors.sameThreadExecutor());
 

@@ -41,7 +41,7 @@ import javax.annotation.Nullable;
  *
  */
 public class QuerySession {
-    protected List<Flag> flags = new ArrayList<Flag>();
+    protected List<Flag> flags = new ArrayList<>();
     protected final CommandSource commandSource;
     protected Query query;
     protected int radius;
@@ -138,8 +138,6 @@ public class QuerySession {
      */
     public CompletableFuture<Void> newQueryFromArguments(@Nullable String arguments) throws ParameterException {
         CompletableFuture<Query> future = QueryBuilder.fromArguments(this, arguments);
-        return future.thenAccept(query -> {
-            this.query = query;
-        });
+        return future.thenAccept(query -> this.query = query);
     }
 }

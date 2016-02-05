@@ -80,15 +80,15 @@ import com.helion3.prism.storage.mysql.MySQLStorageAdapter;
  */
 @Plugin(id = "Prism", name = "Prism", version = "3.0")
 final public class Prism {
-    private static List<Player> activeWands = new ArrayList<Player>();
+    private static List<Player> activeWands = new ArrayList<>();
     private static final FilterList filterlist = new FilterList(FilterMode.BLACKLIST);
     private static Configuration config;
     private static Game game;
-    private static List<ParameterHandler> handlers = new ArrayList<ParameterHandler>();
-    private static List<FlagHandler> flagHandlers = new ArrayList<FlagHandler>();
-    private static Map<Player, List<ActionableResult>> lastActionResults = new HashMap<Player, List<ActionableResult>>();
+    private static List<ParameterHandler> handlers = new ArrayList<>();
+    private static List<FlagHandler> flagHandlers = new ArrayList<>();
+    private static Map<Player, List<ActionableResult>> lastActionResults = new HashMap<>();
     private static Logger logger;
-    private static Map<String,Class<? extends Result>> resultRecords = new HashMap<String,Class<? extends Result>>();
+    private static Map<String,Class<? extends Result>> resultRecords = new HashMap<>();
     private static File parentDirectory;
     private static Object plugin;
     private static StorageAdapter storageAdapter;

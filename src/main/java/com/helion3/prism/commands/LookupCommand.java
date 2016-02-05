@@ -46,37 +46,34 @@ public class LookupCommand {
             .description(Text.of("Search event records."))
             .permission("prism.lookup")
             .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("arguments"))))
-            .executor(new CommandExecutor() {
-                @Override
-                public CommandResult execute(CommandSource source, CommandContext args) throws CommandException {
-                    // Create a new query session
-                    final QuerySession session = new QuerySession(source);
+            .executor((source, args) -> {
+                // Create a new query session
+                final QuerySession session = new QuerySession(source);
 
-                    String arguments = null;
-                    if (args.<String>getOne("arguments").isPresent()) {
-                        arguments = args.<String>getOne("arguments").get();
-                    }
-
-                    source.sendMessage(Format.heading("Querying records..."));
-
-                    try {
-                        CompletableFuture<Void> future = session.newQueryFromArguments(arguments);
-                        future.thenAccept((v) -> {
-                            // Pass off to an async lookup helper
-                            try {
-                                AsyncUtil.lookup(session);
-                            } catch (Exception e) {
-                                source.sendMessage(Format.error(Text.of(e.getMessage())));
-                                e.printStackTrace();
-                            }
-                        });
-                    } catch(Exception e) {
-                        source.sendMessage(Format.error(Text.of(e.getMessage())));
-                        e.printStackTrace();
-                    }
-
-                    return CommandResult.success();
+                String arguments = null;
+                if (args.<String>getOne("arguments").isPresent()) {
+                    arguments = args.<String>getOne("arguments").get();
                 }
+
+                source.sendMessage(Format.heading("Querying records..."));
+
+                try {
+                    CompletableFuture<Void> future = session.newQueryFromArguments(arguments);
+                    future.thenAccept((v) -> {
+                        // Pass off to an async lookup helper
+                        try {
+                            AsyncUtil.lookup(session);
+                        } catch (Exception e) {
+                            source.sendMessage(Format.error(Text.of(e.getMessage())));
+                            e.printStackTrace();
+                        }
+                    });
+                } catch(Exception e) {
+                    source.sendMessage(Format.error(Text.of(e.getMessage())));
+                    e.printStackTrace();
+                }
+
+                return CommandResult.success();
             }).build();
     }
 }

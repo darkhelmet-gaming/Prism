@@ -69,7 +69,7 @@ public class ApplierCommand {
                     session.getQuery().setLimit(Prism.getConfig().getNode("query", "actionable", "limit").getInt());
 
                     try {
-                        List<ActionableResult> actionResults = new ArrayList<ActionableResult>();
+                        List<ActionableResult> actionResults = new ArrayList<>();
                         // Iterate query results
                         CompletableFuture<List<Result>> futureResults = Prism.getStorageAdapter().records().query(session, false);
                         futureResults.thenAccept(results -> {
@@ -120,7 +120,7 @@ public class ApplierCommand {
                                     }
                                 }
 
-                                Map<String,String> tokens = new HashMap<String, String>();
+                                Map<String, String> tokens = new HashMap<>();
                                 tokens.put("appliedCount", ""+appliedCount);
                                 tokens.put("skippedCount", ""+skippedCount);
 

@@ -29,7 +29,7 @@ import org.spongepowered.api.data.DataContainer;
 
 public class RecordingQueue {
 
-    private static final LinkedBlockingQueue<DataContainer> queue = new LinkedBlockingQueue<DataContainer>();
+    private static final LinkedBlockingQueue<DataContainer> queue = new LinkedBlockingQueue<>();
 
     private RecordingQueue(){}
 

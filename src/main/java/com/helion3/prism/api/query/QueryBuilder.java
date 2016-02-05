@@ -79,13 +79,13 @@ public class QueryBuilder {
         checkNotNull(session);
 
         Query query = new Query();
-        CompletableFuture<Query> future = new CompletableFuture<Query>();
+        CompletableFuture<Query> future = new CompletableFuture<>();
 
         // Track all parameter pairs
-        Map<String, String> definedParameters = new HashMap<String, String>();
+        Map<String, String> definedParameters = new HashMap<>();
 
         if (arguments.length > 0) {
-            List<ListenableFuture<?>> futures = new ArrayList<ListenableFuture<?>>();
+            List<ListenableFuture<?>> futures = new ArrayList<>();
             for (String arg : arguments) {
                 Optional<ListenableFuture<?>> listenable;
 
@@ -109,12 +109,7 @@ public class QueryBuilder {
 
             if (!futures.isEmpty()) {
                 ListenableFuture<List<Object>> combinedFuture = Futures.allAsList(futures);
-                combinedFuture.addListener(new Runnable() {
-                    @Override
-                    public void run() {
-                        future.complete(query);
-                    }
-                }, MoreExecutors.sameThreadExecutor());
+                combinedFuture.addListener(() -> future.complete(query), MoreExecutors.sameThreadExecutor());
             } else {
                 future.complete(query);
             }

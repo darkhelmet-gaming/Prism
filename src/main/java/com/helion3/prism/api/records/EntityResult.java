@@ -83,14 +83,14 @@ public class EntityResult extends ResultComplete implements Actionable {
         // UnsafeData
         DataView unsafe = entity.getView(DataQueries.UnsafeData).get();
 
-        List<Double> coordinates = new ArrayList<Double>();
+        List<Double> coordinates = new ArrayList<>();
         coordinates.add(location.getDouble(DataQueries.X).get());
         coordinates.add(location.getDouble(DataQueries.Y).get());
         coordinates.add(location.getDouble(DataQueries.Z).get());
         unsafe.set(DataQueries.Pos, coordinates);
 
         DataView rotation = entity.getView(DataQueries.Rotation).get();
-        List<Double> rot = new ArrayList<Double>();
+        List<Double> rot = new ArrayList<>();
         rot.add(rotation.getDouble(DataQueries.Y).get());
         rot.add(rotation.getDouble(DataQueries.Z).get());
         unsafe.set(DataQueries.Rotation, rotation);

@@ -89,9 +89,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
      * @throws SQLException
      */
     protected void createTables() throws SQLException {
-        Connection conn = getConnection();
-
-        try {
+        try (Connection conn = getConnection()) {
             String records = "CREATE TABLE IF NOT EXISTS "
                     + tablePrefix + "records ("
                     + "id int(10) unsigned NOT NULL AUTO_INCREMENT, "
@@ -129,9 +127,6 @@ public class MySQLStorageAdapter implements StorageAdapter {
                     + ") ENGINE=InnoDB DEFAULT CHARACTER SET utf8 "
                     + "DEFAULT COLLATE utf8_general_ci;";
             conn.prepareStatement(extra).execute();
-        }
-        finally {
-            conn.close();
         }
     }
 

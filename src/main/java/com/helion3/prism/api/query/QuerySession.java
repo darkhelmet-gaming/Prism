@@ -79,7 +79,7 @@ public class QuerySession {
      * @return CommandSource
      */
     public Optional<CommandSource> getCommandSource(){
-        return Optional.of(commandSource);
+        return Optional.ofNullable(commandSource);
     }
 
     /**
@@ -133,7 +133,7 @@ public class QuerySession {
     /**
      * Create a new Query from the given parameters.
      *
-     * @param parameters String parameters
+     * @param arguments String parameters/flags
      * @return CompletableFuture<Query>
      */
     public CompletableFuture<Void> newQueryFromArguments(@Nullable String arguments) throws ParameterException {

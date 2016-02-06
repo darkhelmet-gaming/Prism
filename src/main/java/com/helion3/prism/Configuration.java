@@ -169,6 +169,11 @@ public class Configuration {
                 defaultRadius.setValue(5);
             }
 
+            ConfigurationNode defaultSince = rootNode.getNode("defaults", "since");
+            if (defaultSince.isVirtual()) {
+                defaultSince.setValue("3d");
+            }
+
             // Limits
             ConfigurationNode limitRadiusMax = rootNode.getNode("limits", "radius", "max");
             if (limitRadiusMax.isVirtual()) {

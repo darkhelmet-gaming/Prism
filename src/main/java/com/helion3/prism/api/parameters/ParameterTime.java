@@ -29,6 +29,9 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
+import com.helion3.prism.Prism;
+import com.helion3.prism.api.query.ConditionGroup;
+import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.command.CommandSource;
 
 import com.google.common.collect.ImmutableList;
@@ -39,6 +42,9 @@ import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.DateUtil;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 public class ParameterTime extends SimpleParameterHandler {
     private final Pattern pattern = Pattern.compile("[\\w,:-]+");
@@ -81,6 +87,21 @@ public class ParameterTime extends SimpleParameterHandler {
         }
 
         query.addCondition(FieldCondition.of(DataQueries.Created, rule, date));
+
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Pair<String, String>> processDefault(QuerySession session, Query query) {
+        String since = Prism.getConfig().getNode("defaults", "since").getString();
+
+        try {
+            Date date = DateUtil.parseTimeStringToDate(since, false);
+            query.addCondition(FieldCondition.of(DataQueries.Created, MatchRule.GREATER_THAN_EQUAL, date));
+            return Optional.of(Pair.of(aliases.get(0), since));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return Optional.empty();
     }

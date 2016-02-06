@@ -23,9 +23,11 @@
  */
 package com.helion3.prism.api.records;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
+import com.helion3.prism.Prism;
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.DateUtil;
 
@@ -36,6 +38,8 @@ import com.helion3.prism.util.DateUtil;
  *
  */
 public class ResultComplete extends Result {
+    private final SimpleDateFormat dateFormatter = new SimpleDateFormat(Prism.getConfig().getNode("display", "dateFormat").getString());
+
     /**
      * Returns a user-friendly relative "time since" value.
      *
@@ -51,5 +55,21 @@ public class ResultComplete extends Result {
         }
 
         return relativeTime;
+    }
+
+    /**
+     * Returns a full timestamp.
+     *
+     * @return String timestamp
+     */
+    public String getTime() {
+        Optional<Object> date = data.get(DataQueries.Created);
+        String time = "";
+
+        if (date.isPresent()) {
+            time = dateFormatter.format((Date) date.get());
+        }
+
+        return time;
     }
 }

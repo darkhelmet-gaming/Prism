@@ -192,6 +192,12 @@ public class Configuration {
                 lQueryMaxLimit.setValue(1000);
             }
 
+            // Displays
+            ConfigurationNode dateFormat = rootNode.getNode("display", "dateFormat");
+            if (dateFormat.isVirtual()) {
+                dateFormat.setValue("d/M/yy hh:mm:ss");
+            }
+
             // Save
             try {
                 configManager.save(rootNode);

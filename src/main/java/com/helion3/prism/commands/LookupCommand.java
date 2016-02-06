@@ -26,12 +26,8 @@ package com.helion3.prism.commands;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 
 import com.helion3.prism.api.query.QuerySession;
@@ -45,20 +41,20 @@ public class LookupCommand {
         return CommandSpec.builder()
             .description(Text.of("Search event records."))
             .permission("prism.lookup")
-            .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("arguments"))))
+            .arguments(GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("parameters"))))
             .executor((source, args) -> {
                 // Create a new query session
                 final QuerySession session = new QuerySession(source);
 
-                String arguments = null;
-                if (args.<String>getOne("arguments").isPresent()) {
-                    arguments = args.<String>getOne("arguments").get();
+                String parameters = null;
+                if (args.<String>getOne("parameters").isPresent()) {
+                    parameters = args.<String>getOne("parameters").get();
                 }
 
                 source.sendMessage(Format.heading("Querying records..."));
 
                 try {
-                    CompletableFuture<Void> future = session.newQueryFromArguments(arguments);
+                    CompletableFuture<Void> future = session.newQueryFromArguments(parameters);
                     future.thenAccept((v) -> {
                         // Pass off to an async lookup helper
                         try {
@@ -69,7 +65,8 @@ public class LookupCommand {
                         }
                     });
                 } catch(Exception e) {
-                    source.sendMessage(Format.error(Text.of(e.getMessage())));
+                    String message = e.getMessage() == null ? "Unknown error. Please check the console." : e.getMessage();
+                    source.sendMessage(Format.error(Text.of(message)));
                     e.printStackTrace();
                 }
 

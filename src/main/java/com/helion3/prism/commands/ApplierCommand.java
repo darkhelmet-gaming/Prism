@@ -59,13 +59,13 @@ public class ApplierCommand {
         .executor((source, args) -> {
             // Create a new query session
             final QuerySession session = new QuerySession(source);
+            session.addFlag(Flag.NO_GROUP);
 
             try {
                 source.sendMessage(Format.heading("Querying records..."));
 
                 CompletableFuture<Void> future = session.newQueryFromArguments(args.<String>getOne("parameters").get());
                 future.thenAccept((v) -> {
-                    session.getQuery().setAggregate(false);
                     session.getQuery().setLimit(Prism.getConfig().getNode("query", "actionable", "limit").getInt());
 
                     try {

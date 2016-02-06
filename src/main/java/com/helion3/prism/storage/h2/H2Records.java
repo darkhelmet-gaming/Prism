@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.records.Result;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -137,7 +138,7 @@ public class H2Records implements StorageAdapterRecords {
             List<UUID> uuidsPendingLookup = new ArrayList<>();
 
             while (rs.next()) {
-                Result result = Result.from(rs.getString(DataQueries.EventName.toString()), session.getQuery().isAggregate());
+                Result result = Result.from(rs.getString(DataQueries.EventName.toString()), !session.hasFlag(Flag.NO_GROUP));
 
                 // Restore the data container
                 DataContainer data = new MemoryDataContainer();
@@ -146,7 +147,7 @@ public class H2Records implements StorageAdapterRecords {
                 String target = rs.getString(DataQueries.Target.toString());
                 data.set(DataQueries.Target, target != null ? target : "");
 
-                if (session.getQuery().isAggregate()) {
+                if (!session.hasFlag(Flag.NO_GROUP)) {
                     data.set(DataQueries.Count, rs.getInt("total"));
                 } else {
                     DataContainer loc = new MemoryDataContainer();

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.helion3.prism.api.flags.Flag;
 import org.spongepowered.api.data.DataQuery;
 
 import com.google.common.collect.Range;
@@ -329,7 +330,7 @@ public class SQLQuery {
      */
     public static SQLQuery from(QuerySession session) {
         Builder query = SQLQuery.builder().select().from(tablePrefix + "records");
-        if (session.getQuery().isAggregate()) {
+        if (!session.hasFlag(Flag.NO_GROUP)) {
             query.col("COUNT(*) AS total").group("eventName", "target", "player", "cause");
         } else {
             query.col("*").leftJoin(tablePrefix + "extra", tablePrefix + "records.id = " + tablePrefix + "extra.record_id");

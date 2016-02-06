@@ -23,6 +23,37 @@
  */
 package com.helion3.prism.api.flags;
 
-public class FlagExtended {
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.helion3.prism.api.query.Query;
+import com.helion3.prism.api.query.QuerySession;
+import org.spongepowered.api.command.CommandSource;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+
+public class FlagExtended extends SimpleFlagHandler {
+    /**
+     * Flag which displays all available data for each record.
+     */
+    public FlagExtended() {
+        super(ImmutableList.of("ex", "extended"));
+    }
+
+    @Override
+    public boolean acceptsSource(@Nullable CommandSource source) {
+        return true;
+    }
+
+    @Override
+    public boolean acceptsValue(String value) {
+        return true;
+    }
+
+    @Override
+    public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, Optional<String> value, Query query) {
+        session.addFlag(Flag.EXTENDED);
+        session.addFlag(Flag.NO_GROUP);
+        return Optional.empty();
+    }
 }

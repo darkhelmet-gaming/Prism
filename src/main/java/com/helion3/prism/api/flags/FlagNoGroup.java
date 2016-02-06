@@ -55,7 +55,6 @@ public class FlagNoGroup extends SimpleFlagHandler {
     @Override
     public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, Optional<String> value, Query query) {
         session.addFlag(Flag.NO_GROUP);
-        query.setAggregate(false);
         return Optional.empty();
     }
 }

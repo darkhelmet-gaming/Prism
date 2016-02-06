@@ -25,11 +25,9 @@ package com.helion3.prism.util;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import com.helion3.prism.api.records.ResultAggregate;
 import com.helion3.prism.api.records.ResultComplete;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -52,7 +50,7 @@ public class Messages {
      * @param result Result
      * @return Text
      */
-    public static Text from(Result result) {
+    public static Text from(Result result, boolean extended) {
         Builder builder = Text.builder().append(Text.of(
             TextColors.DARK_AQUA, result.getSourceName(), " ",
             TextColors.WHITE, result.getEventVerb(), " "
@@ -77,7 +75,7 @@ public class Messages {
                 int y = loc.getInt(DataQueries.Y).get();
                 int z = loc.getInt(DataQueries.Z).get();
 
-                builder.append(Text.of(TextColors.GRAY, "@ ", x, " ", y, " ", z, " "));
+                builder.append(Text.of(TextColors.GRAY, "(x:", x, " y:", y, " z:", z, ") "));
 
                 UUID worldUuid;
                 if (loc.get(DataQueries.WorldUuid).get() instanceof UUID) {
@@ -99,7 +97,11 @@ public class Messages {
                 }
             }
 
-            builder.append(Text.of(TextColors.WHITE, recordComplete.getRelativeTime()));
+            if (extended) {
+                builder.append(Text.of(TextColors.WHITE, "@ ", recordComplete.getTime()));
+            } else {
+                builder.append(Text.of(TextColors.WHITE, recordComplete.getRelativeTime()));
+            }
         }
 
         return builder.build();

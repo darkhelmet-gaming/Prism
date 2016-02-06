@@ -25,6 +25,7 @@ package com.helion3.prism.events.listeners;
 
 import java.util.Optional;
 
+import com.helion3.prism.api.flags.Flag;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.InteractEvent;
@@ -56,8 +57,10 @@ public class RequiredInteractListener {
         if (playerCause.isPresent() && Prism.getActiveWands().contains(playerCause.get())) {
             if (event instanceof InteractBlockEvent) {
                 QuerySession session = new QuerySession(playerCause.get());
+                session.addFlag(Flag.EXTENDED);
+                session.addFlag(Flag.NO_GROUP);
+
                 Query query = session.newQuery();
-                query.setAggregate(false);
 
                 InteractBlockEvent blockEvent = (InteractBlockEvent) event;
 

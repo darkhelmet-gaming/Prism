@@ -36,6 +36,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.records.Result;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -156,7 +157,7 @@ public class MySQLRecords implements StorageAdapterRecords {
 
         // Manually builder a query since we need HEX
         Builder builder = SQLQuery.builder().select().from(tablePrefix + "records");
-        if (session.getQuery().isAggregate()) {
+        if (!session.hasFlag(Flag.NO_GROUP)) {
             builder.group(
                     DataQueries.EventName.toString(),
                     DataQueries.Target.toString(),
@@ -179,7 +180,7 @@ public class MySQLRecords implements StorageAdapterRecords {
         try (Connection conn = MySQLStorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(query.toString()); ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
                 // Build our result object
-                Result result = Result.from(rs.getString(DataQueries.EventName.toString()), session.getQuery().isAggregate());
+                Result result = Result.from(rs.getString(DataQueries.EventName.toString()), !session.hasFlag(Flag.NO_GROUP));
 
                 // Restore the data container
                 DataContainer data = new MemoryDataContainer();
@@ -188,7 +189,7 @@ public class MySQLRecords implements StorageAdapterRecords {
                 String target = rs.getString(DataQueries.Target.toString());
                 data.set(DataQueries.Target, target != null ? target : "");
 
-                if (session.getQuery().isAggregate()) {
+                if (!session.hasFlag(Flag.NO_GROUP)) {
                     data.set(DataQueries.Count, rs.getInt("total"));
                 } else {
                     DataContainer loc = new MemoryDataContainer();

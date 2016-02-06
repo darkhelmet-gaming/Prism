@@ -23,61 +23,32 @@
  */
 package com.helion3.prism.commands;
 
-import java.util.List;
-import java.util.Optional;
-
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.command.CommandCallable;
-import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
 
 import com.helion3.prism.Prism;
 import com.helion3.prism.util.Format;
 
-public class InspectCommand implements CommandCallable {
-    @Override
-    public CommandResult process(CommandSource source, String arguments) throws CommandException {
-        if (source instanceof Player) {
-            Player player = (Player) source;
+public class InspectCommand {
+    private InspectCommand(){}
 
-            if (Prism.getActiveWands().contains(player)) {
-                Prism.getActiveWands().remove(player);
-                source.sendMessage(Format.heading("Inspection wand disabled."));
-            } else {
-                Prism.getActiveWands().add(player);
-                source.sendMessage(Format.heading("Inspection wand enabled."));
+    public static CommandSpec getCommand() {
+        return CommandSpec.builder()
+        .executor((source, args) -> {
+            if (source instanceof Player) {
+                Player player = (Player) source;
+
+                if (Prism.getActiveWands().contains(player)) {
+                    Prism.getActiveWands().remove(player);
+                    source.sendMessage(Format.heading("Inspection wand disabled."));
+                } else {
+                    Prism.getActiveWands().add(player);
+                    source.sendMessage(Format.heading("Inspection wand enabled."));
+                }
             }
-        } else {
-            // @todo handle...
-        }
 
-        return CommandResult.success();
-    }
-
-    @Override
-    public List<String> getSuggestions(CommandSource source, String arguments) throws CommandException {
-        return null;
-    }
-
-    @Override
-    public boolean testPermission(CommandSource source) {
-        return source.hasPermission("prism.lookup");
-    }
-
-    @Override
-    public Optional<Text> getShortDescription(CommandSource source) {
-        return Optional.of(Text.of("Toggle inspection wand."));
-    }
-
-    @Override
-    public Optional<Text> getHelp(CommandSource source) {
-        return Optional.of(Text.of("Left or right-click a location to inspect it."));
-    }
-
-    @Override
-    public Text getUsage(CommandSource source) {
-        return Text.of("/pr i");
+            return CommandResult.empty();
+        }).build();
     }
 }

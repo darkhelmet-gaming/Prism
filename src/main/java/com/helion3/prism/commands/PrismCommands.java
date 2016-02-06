@@ -27,13 +27,9 @@ import java.util.List;
 
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.args.CommandContext;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -49,7 +45,7 @@ public class PrismCommands {
     public static CommandSpec getCommand() {
         // Build child commands
         ImmutableMap.Builder<List<String>, CommandCallable> builder = ImmutableMap.builder();
-        builder.put(ImmutableList.of("i", "wand"), new InspectCommand());
+        builder.put(ImmutableList.of("i", "wand"), InspectCommand.getCommand());
         builder.put(ImmutableList.of("l", "lookup"), LookupCommand.getCommand());
         builder.put(ImmutableList.of("near"), NearCommand.getCommand());
         builder.put(ImmutableList.of("rb", "rollback"), ApplierCommand.getCommand(ApplierCommand.ApplierMode.ROLLBACK));

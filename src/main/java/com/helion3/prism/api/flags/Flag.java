@@ -35,6 +35,11 @@ public enum Flag {
     DRAIN,
 
     /**
+     * Trigger full data display for each record.
+     */
+    EXTENDED,
+
+    /**
      * Prevent aggregation of result records.
      */
     NO_GROUP;

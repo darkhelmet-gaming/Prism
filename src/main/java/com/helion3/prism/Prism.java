@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.helion3.prism.api.flags.FlagClean;
+import com.helion3.prism.api.flags.FlagExtended;
 import com.helion3.prism.api.records.BlockResult;
 import com.helion3.prism.api.records.Result;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -334,6 +335,7 @@ final public class Prism {
     private void registerFlagHandlers() {
         registerFlagHandler(new FlagClean());
         registerFlagHandler(new FlagDrain());
+        registerFlagHandler(new FlagExtended());
         registerFlagHandler(new FlagNoGroup());
     }
 
@@ -361,7 +363,7 @@ final public class Prism {
     /**
      * Register a custom result record for a given event name.
      * @param eventName
-     * @param record
+     * @param clazz
      */
     public void registerResultRecord(String eventName, Class<? extends Result> clazz) {
         if (resultRecords.containsKey(eventName)) {

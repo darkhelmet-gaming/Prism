@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 final public class Query {
-    private boolean isAggregate = true;
     private List<Condition> conditions = new ArrayList<>();
     private int limit = 1000;
 
@@ -50,23 +49,6 @@ final public class Query {
      */
     public List<Condition> getConditions() {
         return conditions;
-    }
-
-    /**
-     * Returns whether records will be aggregated/grouped.
-     *
-     * @return boolean
-     */
-    public boolean isAggregate() {
-        return isAggregate;
-    }
-
-    /**
-     * Toggle aggregate records or complete records.
-     * @param isAggregate boolean Toggle aggregate or complete records
-     */
-    public void setAggregate(boolean isAggregate) {
-        this.isAggregate = isAggregate;
     }
 
     /**

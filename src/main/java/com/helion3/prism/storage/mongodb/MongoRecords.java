@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.records.Result;
 import com.helion3.prism.util.Format;
 import org.bson.Document;
@@ -245,7 +246,6 @@ public class MongoRecords implements StorageAdapterRecords {
 
        // Session configs
        int sortDir = 1; // @todo needs implementation
-       boolean shouldGroup = query.isAggregate();
 
        // Sorting
        Document sortFields = new Document();
@@ -260,7 +260,7 @@ public class MongoRecords implements StorageAdapterRecords {
 
        // Build aggregators
        AggregateIterable<Document> aggregated = null;
-       if (shouldGroup) {
+       if (!session.hasFlag(Flag.NO_GROUP)) {
            // Grouping fields
            Document groupFields = new Document();
            groupFields.put(DataQueries.EventName.toString(), "$" + DataQueries.EventName);
@@ -299,8 +299,6 @@ public class MongoRecords implements StorageAdapterRecords {
            Prism.getLogger().debug("MongoDB Query: " + pipeline);
        }
 
-       session.getCommandSource().get().sendMessage(Format.subduedHeading("Query completed, building snapshots..."));
-
        // Iterate results and build our event record list
        try (MongoCursor<Document> cursor = aggregated.iterator()) {
            List<UUID> uuidsPendingLookup = new ArrayList<>();
@@ -308,16 +306,16 @@ public class MongoRecords implements StorageAdapterRecords {
            while (cursor.hasNext()) {
                // Mongo document
                Document wrapper = cursor.next();
-               Document document = shouldGroup ? (Document) wrapper.get("_id") : wrapper;
+               Document document = session.hasFlag(Flag.NO_GROUP) ? wrapper : (Document) wrapper.get("_id");
 
                DataContainer data = documentToDataContainer(document);
 
-               if (shouldGroup) {
+               if (!session.hasFlag(Flag.NO_GROUP)) {
                    data.set(DataQueries.Count, wrapper.get(DataQueries.Count.toString()));
                }
 
                // Build our result object
-               Result result = Result.from(wrapper.getString(DataQueries.EventName.toString()), session.getQuery().isAggregate());
+               Result result = Result.from(wrapper.getString(DataQueries.EventName.toString()), !session.hasFlag(Flag.NO_GROUP));
 
                // Determine the final name of the event source
                if (document.containsKey(DataQueries.Player.toString())) {

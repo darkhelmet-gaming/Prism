@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.records.Result;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.CommandSource;
@@ -61,7 +62,8 @@ public class AsyncUtil {
             @Override
             public void success(List<Result> results) {
                 if (results.size() > 5) {
-                    List<Text> messages = results.stream().map(Messages::from).collect(Collectors.toList());
+                    List<Text> messages = results.stream()
+                       .map(result -> Messages.from(result, session.hasFlag(Flag.EXTENDED))).collect(Collectors.toList());
 
                     Optional<PaginationService> service = Prism.getGame().getServiceManager().provide(PaginationService.class);
                     if (service.isPresent()) {
@@ -72,7 +74,7 @@ public class AsyncUtil {
                     }
                 } else {
                     for (Result result : results) {
-                        session.getCommandSource().get().sendMessage(Messages.from(result));
+                        session.getCommandSource().get().sendMessage(Messages.from(result, session.hasFlag(Flag.EXTENDED)));
                     }
                 }
             }

@@ -62,7 +62,8 @@ public class QueryBuilder {
     /**
      * Builds a {@link Query} by parsing a string of arguments.
      *
-     * @param parameters String Parameter: value string
+     * @param session QuerySession
+     * @param arguments String Parameter: value string
      * @return {@link Query} Database query object
      */
     public static CompletableFuture<Query> fromArguments(QuerySession session, @Nullable String arguments) throws ParameterException {
@@ -72,7 +73,8 @@ public class QueryBuilder {
     /**
      * Builds a {@link Query} by parsing an array of arguments.
      *
-     * @param parameters String[] Parameter:value list
+     * @param session QuerySession
+     * @param arguments String[] Parameter:value list
      * @return {@link Query} Database query object
      */
     public static CompletableFuture<Query> fromArguments(QuerySession session, @Nullable String[] arguments) throws ParameterException {
@@ -152,7 +154,7 @@ public class QueryBuilder {
      *
      * @param session QuerySession current session.
      * @param query Query query being built.
-     * @param parameter String argument which should be a parameter
+     * @param flag Flag
      * @return Optional<ListenableFuture<?>>
      */
     private static Optional<ListenableFuture<?>> parseFlagFromArgument(QuerySession session, Query query, String flag) throws ParameterException {

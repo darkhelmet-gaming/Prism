@@ -195,22 +195,32 @@ public class MongoRecords implements StorageAdapterRecords {
            } else {
                FieldCondition field = (FieldCondition) fieldOrGroup;
 
+               Document matcher;
+               if (conditions.containsKey(field.getFieldName().toString())) {
+                   matcher = (Document) conditions.get(field.getFieldName().toString());
+               } else {
+                   matcher = new Document();
+               }
+
                // Match an array of items
                if (field.getValue() instanceof List) {
-                   String matchRule = field.getMatchRule().equals(MatchRule.INCLUDES) ? "$in" : "$nin";
-                   conditions.put(field.getFieldName().toString(), new Document(matchRule, field.getValue()));
+                   matcher.append(field.getMatchRule().equals(MatchRule.INCLUDES) ? "$in" : "$nin", field.getValue());
+                   conditions.put(field.getFieldName().toString(), matcher);
                }
 
                else if (field.getMatchRule().equals(MatchRule.EQUALS)) {
-                   conditions.put(field.getFieldName().toString(), field.getValue());
+                   matcher.append("$eq", field.getValue());
+                   conditions.put(field.getFieldName().toString(), matcher);
                }
 
                else if (field.getMatchRule().equals(MatchRule.GREATER_THAN_EQUAL)) {
-                   conditions.put(field.getFieldName().toString(), new Document("$gte", field.getValue()));
+                   matcher.append("$gte", field.getValue());
+                   conditions.put(field.getFieldName().toString(), matcher);
                }
 
                else if (field.getMatchRule().equals(MatchRule.LESS_THAN_EQUAL)) {
-                   conditions.put(field.getFieldName().toString(), new Document("$lte", field.getValue()));
+                   matcher.append("$lte", field.getValue());
+                   conditions.put(field.getFieldName().toString(), matcher);
                }
 
                else if (field.getMatchRule().equals(MatchRule.BETWEEN)) {

@@ -40,11 +40,12 @@ If using Mongo, download the `Prism-(version)-all.jar` file. Otherwise, download
 ## Parameters
 
 - `a:(event)` - "Action". `break`, `place`, etc.
+- `b:(block id)` - "Block" name. Like "grass".
 - `before:(time)` - "Before" time period.
-- `since:(time)` - "Since" time period.
+- `c:(cause)` - Non-player causes, i.e. "environment"
 - `player:(name)` - "Player" name. May be an offline player.
 - `r:(number)` - "Radius" - A distance around you.
-- `b:(block id)` - "Block" name. Like "grass".
+- `since:(time)` - "Since" time period.
 
 ## Flags
 

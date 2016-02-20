@@ -34,6 +34,7 @@ import java.util.Optional;
 
 import com.helion3.prism.api.flags.FlagClean;
 import com.helion3.prism.api.flags.FlagExtended;
+import com.helion3.prism.api.parameters.ParameterCause;
 import com.helion3.prism.api.records.BlockResult;
 import com.helion3.prism.api.records.Result;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -354,6 +355,7 @@ final public class Prism {
      */
     private void registerParameterHandlers() {
         registerParameterHandler(new ParameterBlock());
+        registerParameterHandler(new ParameterCause());
         registerParameterHandler(new ParameterEventName());
         registerParameterHandler(new ParameterPlayer());
         registerParameterHandler(new ParameterRadius());

@@ -42,7 +42,7 @@ public class ParameterBlock extends SimpleParameterHandler {
     private final Pattern pattern = Pattern.compile("[\\w,:-]+");
 
     /**
-     * Parameter handling a radius around a single location.
+     * Parameter for filtering block types.
      */
     public ParameterBlock() {
         super(ImmutableList.of("b", "block"));

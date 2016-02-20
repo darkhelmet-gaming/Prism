@@ -28,6 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ import java.util.concurrent.CompletableFuture;
 
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.records.Result;
+import com.helion3.prism.util.DateUtil;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -46,7 +48,6 @@ import org.spongepowered.api.data.MemoryDataContainer;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.query.SQLQuery;
 import com.helion3.prism.api.query.SQLQuery.Builder;
@@ -86,7 +87,7 @@ public class MySQLRecords implements StorageAdapterRecords {
                     playerUUID = TypeUtil.uuidStringToDbString(player.get());
                 }
 
-                statement.setLong( 1, System.currentTimeMillis() / 1000L );
+                statement.setLong(1, System.currentTimeMillis() / 1000L);
                 statement.setObject(2, container.getString(DataQueries.EventName).get());
                 statement.setString(3, TypeUtil.uuidStringToDbString(location.getString(DataQueries.WorldUuid).get()));
                 statement.setInt(4, location.getInt(DataQueries.X).get());
@@ -218,9 +219,24 @@ public class MySQLRecords implements StorageAdapterRecords {
     }
 
     @Override
-    public StorageDeleteResult delete(Query query) throws Exception {
-        // @todo implement
-        return null;
+    public StorageDeleteResult delete() throws Exception {
+        final String expiration = Prism.getConfig().getNode("storage", "expireRecords").getString();
+        int rowsAffected = 0;
+
+        String sql = String.format("DELETE FROM %srecords WHERE %s < ? LIMIT 1000 ORDER BY created",
+                tablePrefix, DataQueries.Created);
+
+        try (
+                Connection conn = MySQLStorageAdapter.getConnection();
+                PreparedStatement statement = conn.prepareStatement(sql)
+        ) {
+            Date date = DateUtil.parseTimeStringToDate(expiration, false);
+
+            statement.setLong(1, date.getTime() / 1000L);
+            rowsAffected = statement.executeUpdate();
+        }
+
+        return new StorageDeleteResult(rowsAffected);
     }
 }
 

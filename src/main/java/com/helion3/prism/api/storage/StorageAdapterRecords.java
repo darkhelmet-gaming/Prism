@@ -55,9 +55,8 @@ public interface StorageAdapterRecords {
     /**
      * Given a {@link Query} this will remove all matching records.
      *
-     * @param query Query conditions indicating what we're purging
      * @return {@link StorageDeleteResult}
      * @throws Exception Abstract DB or query/handler exceptions
      */
-    StorageDeleteResult delete(Query query) throws Exception;
+    StorageDeleteResult delete() throws Exception;
 }

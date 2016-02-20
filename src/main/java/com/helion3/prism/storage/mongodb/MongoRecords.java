@@ -341,15 +341,8 @@ public class MongoRecords implements StorageAdapterRecords {
        return future;
    }
 
-   /**
-    * Given a list of parameters, will remove all matching records.
-    *
-    * @param query Query conditions indicating what we're purging
-    * @return
-    */
-   // @todo implement
    @Override
-   public StorageDeleteResult delete(Query query) {
-       return new StorageDeleteResult();
+   public StorageDeleteResult delete() {
+       return new StorageDeleteResult(0);
    }
 }

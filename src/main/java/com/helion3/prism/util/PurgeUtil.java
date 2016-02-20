@@ -1,4 +1,4 @@
-/*
+/**
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -21,16 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.storage;
+package com.helion3.prism.util;
 
-public class StorageDeleteResult implements StorageResult {
-    private final int rowsAffected;
+import com.helion3.prism.Prism;
+import com.helion3.prism.api.storage.StorageDeleteResult;
 
-    public StorageDeleteResult(int rowsAffected) {
-        this.rowsAffected = rowsAffected;
-    }
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
-    public int getRowsAffected() {
-        return rowsAffected;
+public class PurgeUtil {
+    private PurgeUtil() {}
+    private static int totalAffected = 0;
+
+    public static void run(Consumer<Integer> callback) {
+        // Run async
+        Prism.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
+            try {
+                StorageDeleteResult result = Prism.getStorageAdapter().records().delete();
+
+                // Schedule ourselves again if rows were removed
+                if (result.getRowsAffected() > 0) {
+                    totalAffected += result.getRowsAffected();
+                    run(callback);
+                } else {
+                    callback.accept(totalAffected);
+                    totalAffected = 0;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).delay(5L, TimeUnit.SECONDS).submit(Prism.getPlugin());
     }
 }

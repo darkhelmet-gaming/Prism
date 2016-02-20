@@ -61,11 +61,6 @@ public class MongoStorageAdapter implements StorageAdapter {
         records = new MongoRecords();
     }
 
-    /**
-     * Establish connections to the database
-     *
-     * @return Whether we could connect properly
-     */
     @Override
     public boolean connect() throws Exception {
         ServerAddress address = new ServerAddress(
@@ -133,22 +128,11 @@ public class MongoStorageAdapter implements StorageAdapter {
        return null;
    }
 
-    /**
-     * Close connections.
-     */
     @Override
     public void close() {
         mongoClient.close();
     }
 
-    /**
-     * Test the connection, returns true if valid and ready, false if
-     * error/null.
-     *
-     * @return
-     * @throws Exception If connection fails
-     */
-    // @todo implement
     @Override
     public boolean testConnection() throws Exception {
         return false;

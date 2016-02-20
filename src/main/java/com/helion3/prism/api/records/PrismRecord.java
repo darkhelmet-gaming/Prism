@@ -239,10 +239,10 @@ public class PrismRecord {
             data.set(DataQueries.OriginalBlock, formatBlockDataContainer(transaction.getOriginal()));
             data.set(DataQueries.ReplacementBlock, formatBlockDataContainer(transaction.getFinal()));
 
-            if (this.eventName.equals("break")) {
-                data.set(DataQueries.Target, data.getString(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType)).get().replace("_", " "));
-            } else {
+            if (this.eventName.equals("place")) {
                 data.set(DataQueries.Target, data.getString(DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType)).get().replace("_", " "));
+            } else {
+                data.set(DataQueries.Target, data.getString(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType)).get().replace("_", " "));
             }
         }
 

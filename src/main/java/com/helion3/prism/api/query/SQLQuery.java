@@ -337,7 +337,11 @@ public class SQLQuery {
         }
 
         query.conditions(session.getQuery().getConditions());
-        query.order("created", "y", "x", "z");
+        query.order("created");
+
+        if (session.hasFlag(Flag.NO_GROUP)) {
+            query.order("y", "x", "z");
+        }
 
         return query.build();
     }

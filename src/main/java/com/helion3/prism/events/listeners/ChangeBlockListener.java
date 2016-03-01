@@ -46,6 +46,10 @@ public class ChangeBlockListener {
     @Listener
     public void onChangeBlock(final ChangeBlockEvent event) {
         for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
+            if (!transaction.isValid()) {
+                continue;
+            }
+
             PrismRecordEventBuilder record = PrismRecord.create().source(event.getCause());
 
             BlockType original = transaction.getOriginal().getState().getType();

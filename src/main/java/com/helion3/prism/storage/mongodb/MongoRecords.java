@@ -209,8 +209,7 @@ public class MongoRecords implements StorageAdapterRecords {
                }
 
                else if (field.getMatchRule().equals(MatchRule.EQUALS)) {
-                   matcher.append("$eq", field.getValue());
-                   conditions.put(field.getFieldName().toString(), matcher);
+                   conditions.put(field.getFieldName().toString(), field.getValue());
                }
 
                else if (field.getMatchRule().equals(MatchRule.GREATER_THAN_EQUAL)) {

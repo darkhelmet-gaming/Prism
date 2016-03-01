@@ -40,8 +40,8 @@ import com.helion3.prism.Prism;
  * Super simple SQL query builder.
  */
 public class SQLQuery {
-    private final static String tablePrefix = Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString();
-    private final String query;
+    protected final static String tablePrefix = Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString();
+    protected final String query;
 
     /**
      * Supported SQL query modes.
@@ -71,6 +71,7 @@ public class SQLQuery {
         private Map<String, String> joins = new HashMap<>();
         private List<Condition> conditions = new ArrayList<>();
         private Map<DataQuery, QueryValueMutator> valueMutators = new HashMap<>();
+        private Map<DataQuery, QueryValueMutator> columnMutators = new HashMap<>();
 
         public Builder select() {
             mode = Mode.SELECT;
@@ -85,6 +86,18 @@ public class SQLQuery {
          */
         public Builder col(String col) {
             columns.add(col);
+            return this;
+        }
+
+        /**
+         * Add a value mutator.
+         *
+         * @param path DataQuery
+         * @param mutator QueryValueMutator mutator
+         * @return Builder
+         */
+        public Builder columnMutator(DataQuery path, QueryValueMutator mutator) {
+            columnMutators.put(path, mutator);
             return this;
         }
 
@@ -186,8 +199,19 @@ public class SQLQuery {
         public SQLQuery build() {
             String sql = mode.name() + " ";
 
+            List<String> finalCols = new ArrayList<>();
+            // Allow db-specific mutations
+            for (String col : columns) {
+                QueryValueMutator mutator = valueMutators.get(col);
+                if (mutator != null) {
+                    finalCols.add(mutator.mutate(col));
+                } else {
+                    finalCols.add(col);
+                }
+            }
+
             // Columns
-            sql += String.join(", ", columns) + " ";
+            sql += String.join(", ", finalCols) + " ";
 
             // Tables
             sql += "FROM " + table + " ";
@@ -223,7 +247,7 @@ public class SQLQuery {
          * @param conditions List<Condition>
          * @return List of String conditions to append to a query.
          */
-        private List<String> buildConditions(List<Condition> conditions) {
+        protected List<String> buildConditions(List<Condition> conditions) {
             List<String> queryConditions = new ArrayList<>();
             for (Condition fieldOrGroup : conditions) {
                 if (fieldOrGroup instanceof ConditionGroup) {
@@ -271,7 +295,7 @@ public class SQLQuery {
          * @param condition FieldCondition
          * @return String
          */
-        private String getFieldComparator(FieldCondition condition) {
+        protected String getFieldComparator(FieldCondition condition) {
             String fieldComparator = "";
             String field = popDataQuery(condition.getFieldName().toString());
 
@@ -307,7 +331,7 @@ public class SQLQuery {
         }
 
         // @todo Pending DataQuery.last in sponge
-        private String popDataQuery(String query) {
+        protected String popDataQuery(String query) {
             String[] split = query.split("\\.");
             return split[split.length - 1];
         }
@@ -320,30 +344,6 @@ public class SQLQuery {
      */
     public static Builder builder() {
         return new Builder();
-    }
-
-    /**
-     * Constructs an SQL query from a given QuerySession.
-     *
-     * @param session QuerySession
-     * @return SQLQuery
-     */
-    public static SQLQuery from(QuerySession session) {
-        Builder query = SQLQuery.builder().select().from(tablePrefix + "records");
-        if (!session.hasFlag(Flag.NO_GROUP)) {
-            query.col("COUNT(*) AS total").group("eventName", "target", "player", "cause");
-        } else {
-            query.col("*").leftJoin(tablePrefix + "extra", tablePrefix + "records.id = " + tablePrefix + "extra.record_id");
-        }
-
-        query.conditions(session.getQuery().getConditions());
-        query.order("created");
-
-        if (session.hasFlag(Flag.NO_GROUP)) {
-            query.order("y", "x", "z");
-        }
-
-        return query.build();
     }
 
     @Override

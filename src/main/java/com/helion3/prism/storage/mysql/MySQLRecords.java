@@ -152,29 +152,10 @@ public class MySQLRecords implements StorageAdapterRecords {
         // Prepare results
         List<Result> results = new ArrayList<>();
         CompletableFuture<List<Result>> future = new CompletableFuture<>();
-
         List<UUID> uuidsPendingLookup = new ArrayList<>();
 
-        // Manually builder a query since we need HEX
-        Builder builder = SQLQuery.builder().select().from(tablePrefix + "records");
-        if (!session.hasFlag(Flag.NO_GROUP)) {
-            builder.group(
-                    DataQueries.EventName.toString(),
-                    DataQueries.Target.toString(),
-                    DataQueries.Player.toString(),
-                    DataQueries.Cause.toString()
-            ).col("COUNT(*) AS total");
-        } else {
-            builder.col("*").leftJoin(tablePrefix + "extra", tablePrefix + "records.id = " + tablePrefix + "extra.record_id");
-        }
-
-        builder.hex(DataQueries.Player.toString(), DataQueries.WorldUuid.toString()).conditions(session.getQuery().getConditions());
-        builder.valueMutator(DataQueries.Player, value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
-        builder.valueMutator(DataQueries.Location.then(DataQueries.WorldUuid), value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
-        builder.order("created", "y", "x", "z");
-
         // Build query
-        SQLQuery query = builder.build();
+        SQLQuery query = MySQLQuery.from(session);
         Prism.getLogger().debug("MySQL Query: " + query);
 
         try (Connection conn = MySQLStorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(query.toString()); ResultSet rs = statement.executeQuery()) {
@@ -185,6 +166,7 @@ public class MySQLRecords implements StorageAdapterRecords {
                 // Restore the data container
                 DataContainer data = new MemoryDataContainer();
                 data.set(DataQueries.EventName, rs.getString(DataQueries.EventName.toString()));
+                data.set(DataQueries.Created, rs.getLong(DataQueries.Created.toString()));
 
                 String target = rs.getString(DataQueries.Target.toString());
                 data.set(DataQueries.Target, target != null ? target : "");

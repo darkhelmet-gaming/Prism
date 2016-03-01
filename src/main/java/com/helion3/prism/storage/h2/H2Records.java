@@ -131,7 +131,7 @@ public class H2Records implements StorageAdapterRecords {
         List<Result> results = new ArrayList<>();
         CompletableFuture<List<Result>> future = new CompletableFuture<>();
 
-        SQLQuery query = SQLQuery.from(session);
+        SQLQuery query = H2SQLQuery.from(session);
         Prism.getLogger().debug("H2 SQL Query: " + query);
 
         try (Connection conn = H2StorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(query.toString()); ResultSet rs = statement.executeQuery()) {
@@ -143,6 +143,7 @@ public class H2Records implements StorageAdapterRecords {
                 // Restore the data container
                 DataContainer data = new MemoryDataContainer();
                 data.set(DataQueries.EventName, rs.getString(DataQueries.EventName.toString()));
+                data.set(DataQueries.Created, rs.getLong(DataQueries.Created.toString()));
 
                 String target = rs.getString(DataQueries.Target.toString());
                 data.set(DataQueries.Target, target != null ? target : "");

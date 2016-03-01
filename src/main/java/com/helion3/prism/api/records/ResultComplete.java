@@ -50,8 +50,18 @@ public class ResultComplete extends Result {
         String relativeTime = "";
 
         if (date.isPresent()) {
-            Date created = (Date) date.get();
-            relativeTime = DateUtil.getTimeSince(created);
+            Date created = null;
+
+            if (date.get() instanceof Date) {
+                created = (Date) date.get();
+            }
+            else if (date.get() instanceof Long) {
+                created = new Date(((Long) date.get()) * 1000);
+            }
+
+            if (created != null) {
+                relativeTime = DateUtil.getTimeSince(created);
+            }
         }
 
         return relativeTime;
@@ -67,7 +77,12 @@ public class ResultComplete extends Result {
         String time = "";
 
         if (date.isPresent()) {
-            time = dateFormatter.format((Date) date.get());
+            if (date.get() instanceof Date) {
+                time = dateFormatter.format((Date) date.get());
+            }
+            else if (date.get() instanceof Long) {
+                time = dateFormatter.format(new Date(((Long) date.get()) * 1000));
+            }
         }
 
         return time;

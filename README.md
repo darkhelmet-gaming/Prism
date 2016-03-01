@@ -87,6 +87,8 @@ H2 is a file-based storage engine which does not require any servers or setup on
 
 Unfortunately, H2 does not fully support batch inserts the way Prism needs -  this impacts Prism's performance as it either prevents us from using batches, or prevents us from utilizing table relationships.
 
+Also, H2 doesn't seem to have a way of grouping by formatted data - in this case the date. It has to group on the column itself which would defeat the purpose. For now, records are grouped but without dates.
+
 ###Others?
 
 Prism can be extended with support for additional storage engines. We always are open to PRs if you would like to submit further support.

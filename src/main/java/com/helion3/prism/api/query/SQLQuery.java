@@ -71,7 +71,6 @@ public class SQLQuery {
         private Map<String, String> joins = new HashMap<>();
         private List<Condition> conditions = new ArrayList<>();
         private Map<DataQuery, QueryValueMutator> valueMutators = new HashMap<>();
-        private Map<DataQuery, QueryValueMutator> columnMutators = new HashMap<>();
 
         public Builder select() {
             mode = Mode.SELECT;
@@ -86,18 +85,6 @@ public class SQLQuery {
          */
         public Builder col(String col) {
             columns.add(col);
-            return this;
-        }
-
-        /**
-         * Add a value mutator.
-         *
-         * @param path DataQuery
-         * @param mutator QueryValueMutator mutator
-         * @return Builder
-         */
-        public Builder columnMutator(DataQuery path, QueryValueMutator mutator) {
-            columnMutators.put(path, mutator);
             return this;
         }
 
@@ -198,20 +185,9 @@ public class SQLQuery {
          */
         public SQLQuery build() {
             String sql = mode.name() + " ";
-
-            List<String> finalCols = new ArrayList<>();
-            // Allow db-specific mutations
-            for (String col : columns) {
-                QueryValueMutator mutator = valueMutators.get(col);
-                if (mutator != null) {
-                    finalCols.add(mutator.mutate(col));
-                } else {
-                    finalCols.add(col);
-                }
-            }
-
+            
             // Columns
-            sql += String.join(", ", finalCols) + " ";
+            sql += String.join(", ", columns) + " ";
 
             // Tables
             sql += "FROM " + table + " ";

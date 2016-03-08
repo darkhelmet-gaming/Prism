@@ -28,8 +28,6 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.block.GrowBlockEvent;
-import org.spongepowered.api.event.world.ExplosionEvent.Detonate;
 
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.records.PrismRecord;
@@ -72,11 +70,6 @@ public class ChangeBlockListener {
             else if (event instanceof ChangeBlockEvent.Decay) {
                 if (Prism.listening.DECAY) {
                     record.decayedBlock(transaction).save();
-                }
-            }
-            else if (event instanceof GrowBlockEvent) {
-                if (Prism.listening.GROW) {
-                    record.grewBlock(transaction).save();
                 }
             }
         }

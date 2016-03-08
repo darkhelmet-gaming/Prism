@@ -59,7 +59,7 @@ repositories {
 
 // Project dependencies
 dependencies {
-    compile 'org.spongepowered:spongeapi:3.1.0-SNAPSHOT'
+    compile 'org.spongepowered:spongeapi:4.1.0-SNAPSHOT'
     compile 'org.mongodb:mongo-java-driver:3.2.0'
     compile 'com.zaxxer:HikariCP:2.4.3'
 }
@@ -109,8 +109,8 @@ configure([compileJava, compileTestJava]) {
 
 // JAR manifest configuration
 jar.manifest.mainAttributes(
-        "Built-By": System.properties['user.name'],
-        "Created-By": System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
-        "Implementation-Title": name,
-        "Implementation-Version": version + "+" + ciSystem + "-b" + buildNumber + ".git-" + commit,
-        "Implementation-Vendor": url)
+    "Built-By": System.properties['user.name'],
+    "Created-By": System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
+    "Implementation-Title": name,
+    "Implementation-Version": version + "+" + ciSystem + "-b" + buildNumber + ".git-" + commit,
+    "Implementation-Vendor": url)

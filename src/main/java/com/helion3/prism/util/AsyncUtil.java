@@ -23,7 +23,6 @@
  */
 package com.helion3.prism.util;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -31,9 +30,9 @@ import java.util.stream.Collectors;
 
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.records.Result;
+import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.pagination.PaginationBuilder;
 import org.spongepowered.api.service.pagination.PaginationService;
 
 import com.helion3.prism.Prism;
@@ -68,9 +67,10 @@ public class AsyncUtil {
                     Optional<PaginationService> service = Prism.getGame().getServiceManager().provide(PaginationService.class);
                     if (service.isPresent()) {
                         // Build paginated content
-                        PaginationBuilder builder = service.get().builder();
+                        PaginationList.Builder builder = service.get().builder();
                         builder.contents(messages);
                         builder.sendTo(session.getCommandSource().get());
+                        builder.linesPerPage(5);
                     }
                 } else {
                     for (Result result : results) {

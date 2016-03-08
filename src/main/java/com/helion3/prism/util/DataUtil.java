@@ -25,12 +25,8 @@ package com.helion3.prism.util;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 import java.util.Map.Entry;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.helion3.prism.api.records.Result;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -192,27 +188,29 @@ public class DataUtil {
         return json;
     }
 
-
+    /**
+     * Helper method to translate Player UUIDs to names.
+     *
+     * @param results List of results
+     * @param uuidsPendingLookup Lists of UUIDs pending lookup
+     * @return CompletableFuture
+     */
     public static CompletableFuture<List<Result>> translateUuidsToNames(List<Result> results, List<UUID> uuidsPendingLookup) {
         CompletableFuture<List<Result>> future = new CompletableFuture<>();
 
-        ListenableFuture<Collection<GameProfile>> profiles = Prism.getGame().getServer().getGameProfileManager().getAllById(uuidsPendingLookup, true);
-        profiles.addListener(() -> {
-            try {
-                for (GameProfile profile : profiles.get()) {
-                    for (Result r : results) {
-                        Optional<Object> cause = r.data.get(DataQueries.Cause);
-                        if (cause.isPresent() && cause.get().equals(profile.getUniqueId().toString())) {
-                            r.data.set(DataQueries.Cause, profile.getName());
-                        }
+        CompletableFuture<Collection<GameProfile>> futures = Prism.getGame().getServer().getGameProfileManager().getAllById(uuidsPendingLookup, true);
+        futures.thenAccept((profiles) -> {
+            for (GameProfile profile : profiles) {
+                for (Result r : results) {
+                    Optional<Object> cause = r.data.get(DataQueries.Cause);
+                    if (cause.isPresent() && cause.get().equals(profile.getUniqueId().toString())) {
+                        r.data.set(DataQueries.Cause, profile.getName().orElse("unknown"));
                     }
                 }
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
             }
 
             future.complete(results);
-        }, MoreExecutors.sameThreadExecutor());
+        });
 
         return future;
     }

@@ -24,13 +24,13 @@
 package com.helion3.prism.api.flags;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import org.spongepowered.api.command.CommandSource;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class FlagExtended extends SimpleFlagHandler {
     /**
@@ -51,7 +51,7 @@ public class FlagExtended extends SimpleFlagHandler {
     }
 
     @Override
-    public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, Optional<String> value, Query query) {
+    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, Optional<String> value, Query query) {
         session.addFlag(Flag.EXTENDED);
         session.addFlag(Flag.NO_GROUP);
         return Optional.empty();

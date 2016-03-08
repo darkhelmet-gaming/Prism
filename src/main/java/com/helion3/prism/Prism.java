@@ -80,7 +80,7 @@ import com.helion3.prism.storage.mysql.MySQLStorageAdapter;
  *
  * @author viveleroi
  */
-@Plugin(id = "Prism", name = "Prism", version = "3.0")
+@Plugin(id = "prism", name = "Prism", version = "3.2")
 final public class Prism {
     private static List<Player> activeWands = new ArrayList<>();
     private static final FilterList filterlist = new FilterList(FilterMode.BLACKLIST);

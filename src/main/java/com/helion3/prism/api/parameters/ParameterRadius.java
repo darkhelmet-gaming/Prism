@@ -24,6 +24,7 @@
 package com.helion3.prism.api.parameters;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -35,7 +36,6 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.ConditionGroup;
 import com.helion3.prism.api.query.Query;
@@ -63,7 +63,7 @@ public class ParameterRadius extends SimpleParameterHandler {
     }
 
     @Override
-    public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
+    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
         if (session.getCommandSource().get() instanceof Player) {
             Location<World> location = ((Player) session.getCommandSource().get()).getLocation();
 

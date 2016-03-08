@@ -24,6 +24,7 @@
 package com.helion3.prism.api.parameters;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 
@@ -31,7 +32,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.command.CommandSource;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 
@@ -78,7 +78,7 @@ public interface ParameterHandler {
      * @param value String value(s) given with parameter
      * @param query Query Current query object
      */
-    Optional<ListenableFuture<?>> process(QuerySession session, String parameter, String value, Query query);
+    Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query);
 
     /**
      * Called when this handler's aliases were not defined.

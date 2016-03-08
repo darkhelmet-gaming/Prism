@@ -25,26 +25,22 @@ package com.helion3.prism.api.parameters;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
 import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.ConditionGroup;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.command.CommandSource;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.helion3.prism.api.query.FieldCondition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.DateUtil;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 public class ParameterTime extends SimpleParameterHandler {
     private final Pattern pattern = Pattern.compile("[\\w,:-]+");
@@ -77,7 +73,7 @@ public class ParameterTime extends SimpleParameterHandler {
     }
 
     @Override
-    public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
+    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
         Date date = DateUtil.parseTimeStringToDate(value, false);
 
         // Determine match rule based on before/since

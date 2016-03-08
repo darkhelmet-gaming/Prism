@@ -24,6 +24,7 @@
 package com.helion3.prism.api.parameters;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -31,7 +32,6 @@ import javax.annotation.Nullable;
 import org.spongepowered.api.command.CommandSource;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.helion3.prism.api.query.FieldCondition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
@@ -61,7 +61,7 @@ public class ParameterEventName extends SimpleParameterHandler {
     }
 
     @Override
-    public Optional<ListenableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
+    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
         query.addCondition(new FieldCondition(DataQueries.EventName, MatchRule.EQUALS, value));
 
         return Optional.empty();

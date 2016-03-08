@@ -87,9 +87,9 @@ public class QueryBuilder {
         Map<String, String> definedParameters = new HashMap<>();
 
         if (arguments.length > 0) {
-            List<ListenableFuture<?>> futures = new ArrayList<>();
+            List<CompletableFuture<?>> futures = new ArrayList<>();
             for (String arg : arguments) {
-                Optional<ListenableFuture<?>> listenable;
+                Optional<CompletableFuture<?>> listenable;
 
                 if (flagPattern.matcher(arg).matches()) {
                     listenable = parseFlagFromArgument(session, query, arg);
@@ -110,8 +110,8 @@ public class QueryBuilder {
             }
 
             if (!futures.isEmpty()) {
-                ListenableFuture<List<Object>> combinedFuture = Futures.allAsList(futures);
-                combinedFuture.addListener(() -> future.complete(query), MoreExecutors.sameThreadExecutor());
+                CompletableFuture<Void> combinedFuture = CompletableFuture.<Void>allOf(futures.toArray(new CompletableFuture[futures.size()]));
+                combinedFuture.thenAccept((q) -> future.complete(query));
             } else {
                 future.complete(query);
             }
@@ -155,9 +155,9 @@ public class QueryBuilder {
      * @param session QuerySession current session.
      * @param query Query query being built.
      * @param flag Flag
-     * @return Optional<ListenableFuture<?>>
+     * @return Optional<CompletableFuture<?>>
      */
-    private static Optional<ListenableFuture<?>> parseFlagFromArgument(QuerySession session, Query query, String flag) throws ParameterException {
+    private static Optional<CompletableFuture<?>> parseFlagFromArgument(QuerySession session, Query query, String flag) throws ParameterException {
         flag = flag.substring(1);
 
         // Determine the true alias and value
@@ -218,10 +218,10 @@ public class QueryBuilder {
      * @param session QuerySession current session.
      * @param query Query query being built.
      * @param parameter String argument which should be a parameter
-     * @return Optional<ListenableFuture<?>>
+     * @return Optional<CompletableFuture<?>>
      * @throws ParameterException
      */
-    private static Optional<ListenableFuture<?>> parseParameterFromArgument(QuerySession session, Query query, Pair<String, String> parameter) throws ParameterException {
+    private static Optional<CompletableFuture<?>> parseParameterFromArgument(QuerySession session, Query query, Pair<String, String> parameter) throws ParameterException {
         // Simple validation
         if (parameter.getKey().length() <= 0 || parameter.getValue().length() <= 0) {
             throw new ParameterException("Invalid empty value for parameter \"" + parameter.getKey() + "\".");

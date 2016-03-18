@@ -225,9 +225,6 @@ public class PrismRecord {
         private void writeBlockTransaction(Transaction<BlockSnapshot> transaction) {
             checkNotNull(transaction);
 
-//            Prism.getLogger().debug(DataUtil.jsonFromDataView(transaction.getOriginal().toContainer()).toString());
-//            Prism.getLogger().debug(DataUtil.jsonFromDataView(transaction.getFinal().toContainer()).toString());
-
             // Location
             DataContainer location = transaction.getOriginal().getLocation().get().toContainer();
             location.remove(DataQueries.BlockType);
@@ -239,10 +236,11 @@ public class PrismRecord {
             data.set(DataQueries.OriginalBlock, formatBlockDataContainer(transaction.getOriginal()));
             data.set(DataQueries.ReplacementBlock, formatBlockDataContainer(transaction.getFinal()));
 
+            // Use the transaction data directly, so we never worry about different data formats
             if (this.eventName.equals("place")) {
-                data.set(DataQueries.Target, data.getString(DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType)).get().replace("_", " "));
+                data.set(DataQueries.Target, transaction.getFinal().getState().getType().getId().replace("_", " "));
             } else {
-                data.set(DataQueries.Target, data.getString(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType)).get().replace("_", " "));
+                data.set(DataQueries.Target, transaction.getOriginal().getState().getType().getId().replace("_", " "));
             }
         }
 
@@ -252,7 +250,6 @@ public class PrismRecord {
          */
         private void writeEntity(Entity entity) {
             checkNotNull(entity);
-//            Prism.getLogger().debug(DataUtil.jsonFromDataView(entity.toContainer()).toString());
 
             DataContainer entityData = entity.toContainer();
 

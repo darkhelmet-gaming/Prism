@@ -96,14 +96,17 @@ public class BlockResult extends ResultComplete implements Actionable {
         finalBlock.set(DataQueries.Position, position);
         finalBlock.set(DataQueries.WorldUuid, location.get(DataQueries.WorldUuid).get());
 
-        // Unsafe data includes coordinates
-        Optional<Object> optionalUnsafeData = finalBlock.get(DataQueries.UnsafeData);
-        if (optionalUnsafeData.isPresent()) {
-            DataView unsafeData = (DataView) optionalUnsafeData.get();
-            unsafeData.set(DataQueries.X, location.get(DataQueries.X).get());
-            unsafeData.set(DataQueries.Y, location.get(DataQueries.Y).get());
-            unsafeData.set(DataQueries.Z, location.get(DataQueries.Z).get());
-            finalBlock.set(DataQueries.UnsafeData, unsafeData);
+        int blockStateVersion = finalBlock.getInt(DataQueries.BlockState.then(DataQueries.ContentVersion)).orElse(1);
+        if (blockStateVersion == 1) {
+            // Unsafe data includes coordinates
+            Optional<Object> optionalUnsafeData = finalBlock.get(DataQueries.UnsafeData);
+            if (optionalUnsafeData.isPresent()) {
+                DataView unsafeData = (DataView) optionalUnsafeData.get();
+                unsafeData.set(DataQueries.X, location.get(DataQueries.X).get());
+                unsafeData.set(DataQueries.Y, location.get(DataQueries.Y).get());
+                unsafeData.set(DataQueries.Z, location.get(DataQueries.Z).get());
+                finalBlock.set(DataQueries.UnsafeData, unsafeData);
+            }
         }
 
         return finalBlock;

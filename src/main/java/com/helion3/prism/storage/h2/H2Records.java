@@ -143,8 +143,6 @@ public class H2Records implements StorageAdapterRecords {
                 // Restore the data container
                 DataContainer data = new MemoryDataContainer();
                 data.set(DataQueries.EventName, rs.getString(DataQueries.EventName.toString()));
-                data.set(DataQueries.Created, rs.getLong(DataQueries.Created.toString()));
-
                 String target = rs.getString(DataQueries.Target.toString());
                 data.set(DataQueries.Target, target != null ? target : "");
 
@@ -157,6 +155,8 @@ public class H2Records implements StorageAdapterRecords {
                     loc.set(DataQueries.Z, rs.getInt(DataQueries.Z.toString()));
                     loc.set(DataQueries.WorldUuid, rs.getString(DataQueries.WorldUuid.toString()));
                     data.set(DataQueries.Location, loc);
+
+                    data.set(DataQueries.Created, rs.getLong(DataQueries.Created.toString()));
 
                     JsonObject json = new JsonParser().parse(rs.getString("json")).getAsJsonObject();
                     DataView extra = DataUtil.dataViewFromJson(json);

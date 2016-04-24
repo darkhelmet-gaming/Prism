@@ -26,6 +26,7 @@ package com.helion3.prism.events.listeners;
 import java.util.Optional;
 
 import com.helion3.prism.api.flags.Flag;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.InteractEvent;
@@ -63,6 +64,10 @@ public class RequiredInteractListener {
                 Query query = session.newQuery();
 
                 InteractBlockEvent blockEvent = (InteractBlockEvent) event;
+
+                if (blockEvent.getTargetBlock().equals(BlockSnapshot.NONE)) {
+                    return;
+                }
 
                 // Location of block
                 Location<World> location = blockEvent.getTargetBlock().getLocation().get();

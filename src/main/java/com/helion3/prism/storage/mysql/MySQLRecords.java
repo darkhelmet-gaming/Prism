@@ -178,7 +178,7 @@ public class MySQLRecords implements StorageAdapterRecords {
                     loc.set(DataQueries.X, rs.getInt(DataQueries.X.toString()));
                     loc.set(DataQueries.Y, rs.getInt(DataQueries.Y.toString()));
                     loc.set(DataQueries.Z, rs.getInt(DataQueries.Z.toString()));
-                    loc.set(DataQueries.WorldUuid, TypeUtil.uuidFromDbString(rs.getString("worldUuidHexed")));
+                    loc.set(DataQueries.WorldUuid, TypeUtil.uuidStringFromDbString(rs.getString("worldUuidHexed")));
                     data.set(DataQueries.Location, loc);
 
                     JsonObject json = new JsonParser().parse(rs.getString("json")).getAsJsonObject();

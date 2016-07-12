@@ -109,13 +109,21 @@ public class TypeUtil {
      * @param uuid String
      */
     public static UUID uuidFromDbString(String uuid) {
+        return UUID.fromString(uuidStringFromDbString(uuid));
+    }
+
+    /**
+     * Converts an unhyphenated UUID string to a UUID String.
+     *
+     * @param uuid String
+     */
+    public  static String uuidStringFromDbString(String uuid) {
         // Positions need to be -2
         String completeUuid = uuid.substring(0, 8);
         completeUuid += "-" + uuid.substring(8,12);
         completeUuid += "-" + uuid.substring(12,16);
         completeUuid += "-" + uuid.substring(16,20);
         completeUuid += "-" + uuid.substring(20, uuid.length());
-        completeUuid = completeUuid.toLowerCase();
-        return UUID.fromString(completeUuid);
+        return completeUuid.toLowerCase();
     }
 }

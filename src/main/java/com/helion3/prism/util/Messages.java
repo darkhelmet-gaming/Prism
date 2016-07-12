@@ -81,7 +81,7 @@ public class Messages {
                 if (loc.get(DataQueries.WorldUuid).get() instanceof UUID) {
                     worldUuid = (UUID) loc.get(DataQueries.WorldUuid).get();
                 } else {
-                    worldUuid = UUID.fromString((String) loc.get(DataQueries.WorldUuid).get());
+                    worldUuid = UUID.fromString(loc.getString(DataQueries.WorldUuid).get());
                 }
 
                 // Allow teleportation on click

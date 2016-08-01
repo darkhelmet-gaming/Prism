@@ -104,13 +104,6 @@ public class BlockUtil {
             (a.equals(BlockTypes.LAVA) && b.equals(BlockTypes.FLOWING_LAVA)) ||
             (a.equals(BlockTypes.FLOWING_LAVA) && b.equals(BlockTypes.LAVA)) ||
 
-            // Natural flow.
-            // Note: If moved back to EventUtil these will allow tracking player-caused flow
-            // on a per-block basis. This would allow rollbacks of every single flow block.
-            // However, it's incredibly heavy on the database and usually satisfied by a drain.
-            // This will still allow liquids which break non-air blocks to be tracked
-            (a.equals(BlockTypes.AIR) && (b.equals(BlockTypes.FLOWING_WATER) || b.equals(BlockTypes.FLOWING_LAVA))) ||
-
             // Crap that fell into lava
             (a.equals(BlockTypes.LAVA) && b.equals(BlockTypes.GRAVEL)) ||
             (a.equals(BlockTypes.FLOWING_LAVA) && b.equals(BlockTypes.GRAVEL)) ||

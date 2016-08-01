@@ -82,6 +82,14 @@ public class EventUtil {
             return (a.equals(BlockTypes.AIR));
         }
 
+        // Natural flow.
+        // Note: This only allows tracking on the source block set by a player using
+        // buckets, and blocks that are broken by liquids. Full flow tracking would
+        // be very hard on the database and is generally unnecessary when drain is used.
+        if (!cause.first(Player.class).isPresent()) {
+            return (a.equals(BlockTypes.AIR) && (b.equals(BlockTypes.FLOWING_LAVA) || b.equals(BlockTypes.FLOWING_WATER)));
+        }
+
         return false;
     }
 }

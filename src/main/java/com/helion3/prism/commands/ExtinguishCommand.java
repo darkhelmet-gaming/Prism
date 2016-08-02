@@ -47,7 +47,7 @@ public class ExtinguishCommand {
                 }
 
                 int radius = args.<Integer>getOne("radius").get();
-                int changes = WorldUtil.removeAroundFromLocation(BlockTypes.FIRE, ((Player) source).getLocation(), radius);
+                int changes = WorldUtil.removeAroundFromLocation(source, BlockTypes.FIRE, ((Player) source).getLocation(), radius);
 
                 source.sendMessage(Format.message(String.format("Removed %d matches within %d blocks", changes, radius)));
 

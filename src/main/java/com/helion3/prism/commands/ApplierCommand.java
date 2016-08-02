@@ -97,12 +97,12 @@ public class ApplierCommand {
                                     int changes = 0;
 
                                     if (session.hasFlag(Flag.CLEAN)) {
-                                        changes += WorldUtil.removeIllegalBlocks(((Player) source).getLocation(), session.getRadius());
+                                        changes += WorldUtil.removeIllegalBlocks(source, ((Player) source).getLocation(), session.getRadius());
                                         changes += WorldUtil.removeItemEntitiesAroundLocation(((Player) source).getLocation(), session.getRadius());
                                     }
 
                                     if (session.hasFlag(Flag.DRAIN)) {
-                                        changes += WorldUtil.removeLiquidsAroundLocation(((Player) source).getLocation(), session.getRadius());
+                                        changes += WorldUtil.removeLiquidsAroundLocation(source, ((Player) source).getLocation(), session.getRadius());
                                     }
 
                                     if (changes > 0) {

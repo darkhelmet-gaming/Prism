@@ -35,6 +35,7 @@ import org.spongepowered.api.block.BlockSnapshot.Builder;
 import com.helion3.prism.Prism;
 import com.helion3.prism.util.BlockUtil;
 import com.helion3.prism.util.DataQueries;
+import org.spongepowered.api.world.BlockChangeFlag;
 
 /**
  * Represents a block change event record.
@@ -77,7 +78,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         BlockSnapshot original = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
 
         // Actually restore!
-        if (!optionalSnapshot.get().restore(true, false)) {
+        if (!optionalSnapshot.get().restore(true, BlockChangeFlag.NONE)) {
             return ActionableResult.skipped(SkipReason.UNKNOWN);
         }
 
@@ -148,7 +149,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         BlockSnapshot original = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
 
         // Actually restore!
-        if (!optionalSnapshot.get().restore(true, false)) {
+        if (!optionalSnapshot.get().restore(true, BlockChangeFlag.NONE)) {
             return ActionableResult.skipped(SkipReason.UNKNOWN);
         }
 

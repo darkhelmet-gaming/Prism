@@ -25,10 +25,14 @@ package com.helion3.prism.util;
 
 import java.util.Collection;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -36,7 +40,7 @@ public class WorldUtil {
     private WorldUtil() {}
 
 
-    public static int removeIllegalBlocks(Location<World> location, int radius) {
+    public static int removeIllegalBlocks(CommandSource source, Location<World> location, int radius) {
         final World world = location.getExtent();
 
         int xMin = location.getBlockX() - radius;
@@ -64,7 +68,7 @@ public class WorldUtil {
                 for (int y = yMin; y <= yMax; y++) {
                     BlockType existing = world.getBlock(x, y, z).getType();
                     if (existing.equals(BlockTypes.FIRE) || existing.equals(BlockTypes.TNT)) {
-                        world.setBlockType(x, y, z, BlockTypes.AIR, false);
+                        world.setBlockType(x, y, z, BlockTypes.AIR, Cause.source(Sponge.getPluginManager().getPlugin("prism").get()).named(NamedCause.notifier(source)).build());
                         changeCount++;
                     }
                 }
@@ -82,7 +86,7 @@ public class WorldUtil {
      * @param radius Integer radius around location
      * @return integer Count of removals
      */
-    public static int removeAroundFromLocation(BlockType type, Location<World> location, int radius) {
+    public static int removeAroundFromLocation(CommandSource source, BlockType type, Location<World> location, int radius) {
         final World world = location.getExtent();
 
         int xMin = location.getBlockX() - radius;
@@ -109,7 +113,7 @@ public class WorldUtil {
             for (int z = zMin; z <= zMax; z++) {
                 for (int y = yMin; y <= yMax; y++) {
                     if (world.getBlock(x, y, z).getType().equals(type)) {
-                        world.setBlockType(x, y, z, BlockTypes.AIR, false);
+                        world.setBlockType(x, y, z, BlockTypes.AIR, Cause.source(Sponge.getPluginManager().getPlugin("prism").get()).named(NamedCause.notifier(source)).build());
                         changeCount++;
                     }
                 }
@@ -160,10 +164,10 @@ public class WorldUtil {
      * @param radius Integer radius around location
      * @return integer Count of removals
      */
-    public static int removeLiquidsAroundLocation(Location<World> location, int radius) {
+    public static int removeLiquidsAroundLocation(CommandSource source, Location<World> location, int radius) {
         int changeCount = 0;
         for (BlockType liquid : BlockUtil.getLiquidBlockTypes()) {
-            changeCount = removeAroundFromLocation(liquid, location, radius);
+            changeCount = removeAroundFromLocation(source, liquid, location, radius);
         }
 
         return changeCount;

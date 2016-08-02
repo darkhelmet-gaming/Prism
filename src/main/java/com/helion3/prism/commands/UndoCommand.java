@@ -39,6 +39,7 @@ import com.helion3.prism.api.records.ActionableResult;
 import com.helion3.prism.util.Format;
 import com.helion3.prism.util.Template;
 import com.helion3.prism.util.Translation;
+import org.spongepowered.api.world.BlockChangeFlag;
 
 public class UndoCommand {
     private UndoCommand() {}
@@ -66,7 +67,7 @@ public class UndoCommand {
                         Object rawFinal = result.getTransaction().get().getFinal();
 
                         if (rawOriginal instanceof BlockSnapshot) {
-                            if (((BlockSnapshot)rawOriginal).restore(true, false)) {
+                            if (((BlockSnapshot)rawOriginal).restore(true, BlockChangeFlag.NONE)) {
                                 applied++;
                             } else {
                                 skipped++;

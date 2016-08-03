@@ -23,7 +23,7 @@
  */
 package com.helion3.prism.util;
 
-import com.helion3.prism.Prism;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
@@ -32,7 +32,7 @@ public class CauseUtil {
     private CauseUtil() {}
 
     public static Cause causeByCommand(CommandSource source) {
-        // Sponge.getPluginManager().getPlugin("prism").get()
-        return Cause.source(Prism.getPlugin()).named(NamedCause.notifier(source)).build();
+        // Ask Sponge for the plugin, to avoid error: PluginContainer must be at the ROOT of a cause!
+        return Cause.source(Sponge.getPluginManager().getPlugin("prism").get()).named(NamedCause.notifier(source)).build();
     }
 }

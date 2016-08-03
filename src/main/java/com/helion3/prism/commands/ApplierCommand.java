@@ -29,10 +29,7 @@ import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.records.Actionable;
 import com.helion3.prism.api.records.ActionableResult;
 import com.helion3.prism.api.records.Result;
-import com.helion3.prism.util.Format;
-import com.helion3.prism.util.Template;
-import com.helion3.prism.util.Translation;
-import com.helion3.prism.util.WorldUtil;
+import com.helion3.prism.util.*;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -97,12 +94,14 @@ public class ApplierCommand {
                                     int changes = 0;
 
                                     if (session.hasFlag(Flag.CLEAN)) {
-                                        changes += WorldUtil.removeIllegalBlocks(((Player) source).getLocation(), session.getRadius());
+                                        changes += WorldUtil.removeIllegalBlocks(
+                                                ((Player) source).getLocation(), session.getRadius(), CauseUtil.causeByCommand(source));
                                         changes += WorldUtil.removeItemEntitiesAroundLocation(((Player) source).getLocation(), session.getRadius());
                                     }
 
                                     if (session.hasFlag(Flag.DRAIN)) {
-                                        changes += WorldUtil.removeLiquidsAroundLocation(((Player) source).getLocation(), session.getRadius());
+                                        changes += WorldUtil.removeLiquidsAroundLocation(
+                                                ((Player) source).getLocation(), session.getRadius(), CauseUtil.causeByCommand(source));
                                     }
 
                                     if (changes > 0) {

@@ -23,6 +23,7 @@
  */
 package com.helion3.prism.commands;
 
+import com.helion3.prism.util.CauseUtil;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -47,7 +48,8 @@ public class ExtinguishCommand {
                 }
 
                 int radius = args.<Integer>getOne("radius").get();
-                int changes = WorldUtil.removeAroundFromLocation(BlockTypes.FIRE, ((Player) source).getLocation(), radius);
+                int changes = WorldUtil.removeAroundFromLocation(
+                        BlockTypes.FIRE, ((Player) source).getLocation(), radius, CauseUtil.causeByCommand(source));
 
                 source.sendMessage(Format.message(String.format("Removed %d matches within %d blocks", changes, radius)));
 

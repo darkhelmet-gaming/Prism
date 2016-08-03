@@ -23,9 +23,12 @@
  */
 package com.helion3.prism.events.listeners;
 
+import java.util.Optional;
+
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Transaction;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 
@@ -43,6 +46,12 @@ public class ChangeBlockListener {
      */
     @Listener
     public void onChangeBlock(final ChangeBlockEvent event) {
+        Optional<Player> playerCause = event.getCause().first(Player.class);
+        if (playerCause.isPresent() && Prism.getActiveWands().contains(playerCause.get())) {
+            // Cancel and exit event here, not supposed to place/track a block with an active wand.
+            event.setCancelled(true);
+            return;
+        }
         for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
             if (!transaction.isValid()) {
                 continue;

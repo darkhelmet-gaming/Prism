@@ -52,9 +52,9 @@ If using Mongo, download the `Prism-(version)-all.jar` file. Otherwise, download
 
 ## Flags
 
-- `clean` - Clean dangerous blocks and item drops from the rollback area.
-- `drain` - Drain liquids within a rollback area.
-- `--no-group` - Prevent record grouping in lookups. Clicking on a single record will teleport you to those coordinates.
+- `-clean` - Clean dangerous blocks and item drops from the rollback area.
+- `-drain` - Drain liquids within a rollback area.
+- `-no-group` - Prevent record grouping in lookups. Clicking on a single record will teleport you to those coordinates.
 
 ## Permissions
 

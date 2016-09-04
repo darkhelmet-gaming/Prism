@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.Lists;
+import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -39,7 +41,6 @@ import com.helion3.prism.api.records.ActionableResult;
 import com.helion3.prism.util.Format;
 import com.helion3.prism.util.Template;
 import com.helion3.prism.util.Translation;
-import org.spongepowered.api.world.BlockChangeFlag;
 
 public class UndoCommand {
     private UndoCommand() {}
@@ -57,6 +58,8 @@ public class UndoCommand {
                     source.sendMessage(Format.error("You have no valid actions to undo."));
                     return CommandResult.empty();
                 }
+                // Reverse the order of the list to undo last action.
+                results = Lists.reverse(results);
 
                 int applied = 0;
                 int skipped = 0;
@@ -83,6 +86,9 @@ public class UndoCommand {
                                 skipped++;
                             }
                         }
+                    }
+                    else {
+                        skipped++;
                     }
                 }
 

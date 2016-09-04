@@ -34,6 +34,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import com.helion3.prism.api.flags.Flag;
+import com.helion3.prism.api.query.*;
 import com.helion3.prism.api.records.Result;
 import com.helion3.prism.util.Format;
 import org.bson.Document;
@@ -44,12 +45,6 @@ import org.spongepowered.api.data.MemoryDataContainer;
 
 import com.google.common.collect.Range;
 import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.FieldCondition;
-import com.helion3.prism.api.query.Condition;
-import com.helion3.prism.api.query.ConditionGroup;
-import com.helion3.prism.api.query.MatchRule;
-import com.helion3.prism.api.query.Query;
-import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.query.ConditionGroup.Operator;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageDeleteResult;
@@ -253,15 +248,9 @@ public class MongoRecords implements StorageAdapterRecords {
        // Append all conditions
        Document matcher = new Document("$match", buildConditions(query.getConditions()));
 
-       // Session configs
-       int sortDir = 1; // @todo needs implementation
-
-       // Sorting
+       // Sorting. Newest first for rollback and oldest first for restore.
        Document sortFields = new Document();
-       sortFields.put(DataQueries.Created.toString(), sortDir);
-       sortFields.put(DataQueries.Y.toString(), 1);
-       sortFields.put(DataQueries.X.toString(), 1);
-       sortFields.put(DataQueries.Z.toString(), 1);
+       sortFields.put(DataQueries.Created.toString(), session.getSortBy().getValue());
        Document sorter = new Document("$sort", sortFields);
 
        // Offset/Limit

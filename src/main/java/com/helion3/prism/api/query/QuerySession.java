@@ -45,6 +45,7 @@ public class QuerySession {
     protected final CommandSource commandSource;
     protected Query query;
     protected int radius;
+    protected Sort sort = Sort.NEWEST_FIRST;
 
     /**
      * Constructs a new session without any command source.
@@ -139,5 +140,20 @@ public class QuerySession {
     public CompletableFuture<Void> newQueryFromArguments(@Nullable String arguments) throws ParameterException {
         CompletableFuture<Query> future = QueryBuilder.fromArguments(this, arguments);
         return future.thenAccept(query -> this.query = query);
+    }
+
+    /**
+     * Sets the sort order to be used for the query.
+     */
+    public void setSortBy(Sort sort) {
+        this.sort = sort;
+    }
+
+    /**
+     * Gets the Sort order to be used for the query.
+     * @return ApplierMode
+     */
+    public Sort getSortBy() {
+        return sort;
     }
 }

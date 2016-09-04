@@ -32,8 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.helion3.prism.api.flags.FlagClean;
-import com.helion3.prism.api.flags.FlagExtended;
+import com.helion3.prism.api.flags.*;
 import com.helion3.prism.api.parameters.ParameterCause;
 import com.helion3.prism.api.records.BlockResult;
 import com.helion3.prism.api.records.Result;
@@ -52,9 +51,6 @@ import org.spongepowered.api.config.DefaultConfig;
 import com.google.inject.Inject;
 import com.helion3.prism.api.filters.FilterList;
 import com.helion3.prism.api.filters.FilterMode;
-import com.helion3.prism.api.flags.FlagDrain;
-import com.helion3.prism.api.flags.FlagHandler;
-import com.helion3.prism.api.flags.FlagNoGroup;
 import com.helion3.prism.api.parameters.ParameterBlock;
 import com.helion3.prism.api.parameters.ParameterEventName;
 import com.helion3.prism.api.parameters.ParameterHandler;
@@ -338,6 +334,7 @@ final public class Prism {
         registerFlagHandler(new FlagDrain());
         registerFlagHandler(new FlagExtended());
         registerFlagHandler(new FlagNoGroup());
+        registerFlagHandler(new FlagOrder());
     }
 
     /**

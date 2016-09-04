@@ -21,40 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.flags;
+package com.helion3.prism.api.query;
 
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
+public enum Sort {
+    // Set sorting values for MongoDB/MySQL/H2 sorting.
+    NEWEST_FIRST(-1, "DESC"),
+    OLDEST_FIRST(1, "ASC");
 
-import javax.annotation.Nullable;
+    private int sortVal;
+    private String sortString;
 
-import org.spongepowered.api.command.CommandSource;
+    Sort(int sortVal, String sortString) {
+        this.sortVal = sortVal;
+        this.sortString = sortString;
+    }
 
-import com.google.common.collect.ImmutableList;
-import com.helion3.prism.api.query.Query;
-import com.helion3.prism.api.query.QuerySession;
-
-public class FlagNoGroup extends SimpleFlagHandler {
     /**
-     * Flag which disables record grouping.
+     * Gets the value for sorting order for MongoDB.
+     * @return int Sorting value.
      */
-    public FlagNoGroup() {
-        super(ImmutableList.of("ng", "no-group"));
+    public int getValue() {
+        return sortVal;
     }
 
-    @Override
-    public boolean acceptsSource(@Nullable CommandSource source) {
-        return true;
-    }
-
-    @Override
-    public boolean acceptsValue(String value) {
-        return true;
-    }
-
-    @Override
-    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, Optional<String> value, Query query) {
-        session.addFlag(Flag.NO_GROUP);
-        return Optional.empty();
+    /**
+     * Gets the Sorting order to be used in H2/MySQL.
+     * @return String Sorting order string.
+     */
+    public String getString() {
+        return sortString;
     }
 }

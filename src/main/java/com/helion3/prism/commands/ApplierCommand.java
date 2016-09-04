@@ -26,6 +26,7 @@ package com.helion3.prism.commands;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.query.QuerySession;
+import com.helion3.prism.api.query.Sort;
 import com.helion3.prism.api.records.Actionable;
 import com.helion3.prism.api.records.ActionableResult;
 import com.helion3.prism.api.records.Result;
@@ -45,11 +46,7 @@ import java.util.concurrent.CompletableFuture;
 public class ApplierCommand {
     private ApplierCommand() {}
 
-    public enum ApplierMode {
-        ROLLBACK, RESTORE
-    }
-
-    public static CommandSpec getCommand(ApplierMode mode) {
+    public static CommandSpec getCommand(Sort sort) {
         return CommandSpec.builder()
         .permission("prism.rollback")
         .arguments(GenericArguments.remainingJoinedStrings(Text.of("parameters")))
@@ -62,6 +59,8 @@ public class ApplierCommand {
                 source.sendMessage(Format.heading("Querying records..."));
 
                 CompletableFuture<Void> future = session.newQueryFromArguments(args.<String>getOne("parameters").get());
+                // Ignore user order flag, if used, for proper rollback/restore order to be used.
+                session.setSortBy(sort);
                 future.thenAccept((v) -> {
                     session.getQuery().setLimit(Prism.getConfig().getNode("query", "actionable", "limit").getInt());
 
@@ -79,7 +78,7 @@ public class ApplierCommand {
                                         if (result instanceof Actionable) {
                                             Actionable actionable = (Actionable) result;
 
-                                            if (mode.equals(ApplierMode.ROLLBACK)) {
+                                            if (sort.equals(Sort.NEWEST_FIRST)) {
                                                 actionResults.add(actionable.rollback());
                                             } else {
                                                 actionResults.add(actionable.restore());

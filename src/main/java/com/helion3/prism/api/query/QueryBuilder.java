@@ -166,7 +166,7 @@ public class QueryBuilder {
             // Split the parameter: values
             String[] split = flag.split("=");
             flag = split[0];
-            if (!split[1].trim().isEmpty()) {
+            if (split.length == 2 && !split[1].trim().isEmpty()) {
                 optionalValue = Optional.of(split[1]);
             }
         }

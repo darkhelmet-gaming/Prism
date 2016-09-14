@@ -26,6 +26,7 @@ package com.helion3.prism.storage.mysql;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.query.SQLQuery;
+import com.helion3.prism.api.query.Sort;
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.TypeUtil;
 
@@ -41,7 +42,7 @@ public class MySQLQuery extends SQLQuery {
      * @return SQLQuery
      */
     public static SQLQuery from(QuerySession session) {
-        Builder builder = SQLQuery.builder().select().from(tablePrefix + "records");
+        Builder builder = SQLQuery.builder().select().from(tablePrefix + "records AS r");
         if (!session.hasFlag(Flag.NO_GROUP)) {
             builder.group(
                     DataQueries.EventName.toString(),
@@ -51,19 +52,15 @@ public class MySQLQuery extends SQLQuery {
                     "DATE_FORMAT(created, '%Y-%m-%d')"
             ).col("COUNT(*) AS total").col("DATE_FORMAT(created, '%Y-%m-%d') as created");
         } else {
-            builder.col("*").leftJoin(tablePrefix + "extra", tablePrefix + "records.id = " + tablePrefix + "extra.record_id");
+            builder.col("*").leftJoin(tablePrefix + "extra AS e", "r.id = e.record_id");
         }
 
         builder.hex(DataQueries.Player.toString(), DataQueries.WorldUuid.toString()).conditions(session.getQuery().getConditions());
         builder.valueMutator(DataQueries.Player, value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
         builder.valueMutator(DataQueries.Location.then(DataQueries.WorldUuid), value -> "UNHEX('" + TypeUtil.uuidStringToDbString(value) + "')");
-        builder.order("created");
 
-        if (session.hasFlag(Flag.NO_GROUP)) {
-            builder.order("y", "x", "z");
-        }
-
-        builder.conditions(session.getQuery().getConditions());
+        // Get Sorting order.
+        builder.order("created " + session.getSortBy().getString());
 
         return builder.build();
     }

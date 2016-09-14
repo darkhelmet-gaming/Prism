@@ -21,31 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.api.parameters;
-
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.regex.Pattern;
-
-import javax.annotation.Nullable;
-
-import org.spongepowered.api.command.CommandSource;
+package com.helion3.prism.api.flags;
 
 import com.google.common.collect.ImmutableList;
-import com.helion3.prism.api.query.FieldCondition;
-import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.util.DataQueries;
+import com.helion3.prism.api.query.Sort;
+import org.spongepowered.api.command.CommandSource;
 
-public class ParameterBlock extends SimpleParameterHandler {
-    private final Pattern pattern = Pattern.compile("[\\w,:-]+");
+import javax.annotation.Nullable;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+public class FlagOrder extends SimpleFlagHandler {
     /**
-     * Parameter for filtering block types.
+     * Flag which sets the sort order.
      */
-    public ParameterBlock() {
-        super(ImmutableList.of("b", "block"));
+    public FlagOrder() {
+        super(ImmutableList.of("ord", "order"));
     }
 
     @Override
@@ -55,13 +48,38 @@ public class ParameterBlock extends SimpleParameterHandler {
 
     @Override
     public boolean acceptsValue(String value) {
-        return pattern.matcher(value).matches();
+        switch (value) {
+            case "new":
+            case "newest":
+            case "desc":
+            case "old":
+            case "oldest":
+            case "asc":
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override
-    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
-        query.addCondition(FieldCondition.of(DataQueries.Target, MatchRule.EQUALS, Pattern.compile(value.replace('_', ' '))));
-
+    public Optional<CompletableFuture<?>> process(QuerySession session, String flag, Optional<String> value, Query query) {
+        if (value.isPresent()) {
+            switch (value.get()) {
+                case "new":
+                case "newest":
+                case "desc":
+                    session.setSortBy(Sort.NEWEST_FIRST);
+                    break;
+                case "old":
+                case "oldest":
+                case "asc":
+                default:
+                    session.setSortBy(Sort.OLDEST_FIRST);
+            }
+        }
+        else {
+            session.setSortBy(Sort.OLDEST_FIRST);
+        }
         return Optional.empty();
     }
 }

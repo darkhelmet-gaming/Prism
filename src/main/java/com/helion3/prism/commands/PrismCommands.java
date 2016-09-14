@@ -25,6 +25,7 @@ package com.helion3.prism.commands;
 
 import java.util.List;
 
+import com.helion3.prism.api.query.Sort;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -48,8 +49,9 @@ public class PrismCommands {
         builder.put(ImmutableList.of("i", "wand"), InspectCommand.getCommand());
         builder.put(ImmutableList.of("l", "lookup"), LookupCommand.getCommand());
         builder.put(ImmutableList.of("near"), NearCommand.getCommand());
-        builder.put(ImmutableList.of("rb", "rollback"), ApplierCommand.getCommand(ApplierCommand.ApplierMode.ROLLBACK));
-        builder.put(ImmutableList.of("rs", "restore"), ApplierCommand.getCommand(ApplierCommand.ApplierMode.RESTORE));
+        // Sort order newest first for rollback, and oldest first for restore.
+        builder.put(ImmutableList.of("rb", "rollback"), ApplierCommand.getCommand(Sort.NEWEST_FIRST));
+        builder.put(ImmutableList.of("rs", "restore"), ApplierCommand.getCommand(Sort.OLDEST_FIRST));
         builder.put(ImmutableList.of("undo"), UndoCommand.getCommand());
         builder.put(ImmutableList.of("ext"), ExtinguishCommand.getCommand());
         builder.put(ImmutableList.of("?", "help"), HelpCommand.getCommand());

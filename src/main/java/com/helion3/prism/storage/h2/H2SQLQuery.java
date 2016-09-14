@@ -26,6 +26,7 @@ package com.helion3.prism.storage.h2;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.query.SQLQuery;
+import com.helion3.prism.api.query.Sort;
 
 public class H2SQLQuery extends SQLQuery {
     public H2SQLQuery(String query) {
@@ -39,19 +40,18 @@ public class H2SQLQuery extends SQLQuery {
      * @return SQLQuery
      */
     public static SQLQuery from(QuerySession session) {
-        Builder query = SQLQuery.builder().select().from(tablePrefix + "records");
+        Builder query = SQLQuery.builder().select().from(tablePrefix + "records AS r");
         if (!session.hasFlag(Flag.NO_GROUP)) {
             query.col("COUNT(*) AS total");
             query.group("eventName", "target", "player", "cause");
         } else {
-            query.col("*").leftJoin(tablePrefix + "extra", tablePrefix + "records.id = " + tablePrefix + "extra.record_id");
+            query.col("*").leftJoin(tablePrefix + "extra AS e", "r.id = e.record_id");
         }
 
         query.conditions(session.getQuery().getConditions());
 
-        if (session.hasFlag(Flag.NO_GROUP)) {
-            query.order("created", "y", "x", "z");
-        }
+        // Get Sorting order.
+        query.order("created " + session.getSortBy().getString());
 
         return query.build();
     }

@@ -112,7 +112,6 @@ public class BlockUtil {
 
             // It's fire (which didn't burn anything)
             (a.equals(BlockTypes.FIRE) && b.equals(BlockTypes.AIR)) ||
-            (a.equals(BlockTypes.AIR) && b.equals(BlockTypes.FIRE)) ||
 
             // Piston
             a.equals(BlockTypes.PISTON_EXTENSION) || b.equals(BlockTypes.PISTON_EXTENSION) ||

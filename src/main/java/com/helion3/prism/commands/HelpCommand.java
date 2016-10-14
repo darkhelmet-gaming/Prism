@@ -34,6 +34,7 @@ public class HelpCommand {
 
     public static CommandSpec getCommand() {
         return CommandSpec.builder()
+            .permission("prism.help")
             .executor((source, args) -> {
                 source.sendMessage(Format.message("/pr [l|lookup] (params)", TextColors.GRAY, " - Query the database."));
                 source.sendMessage(Format.message("/pr [rb|rollback] (params)", TextColors.GRAY, " - Reverse changes, limited by parameters."));

@@ -58,8 +58,12 @@ If using Mongo, download the `Prism-(version)-all.jar` file. Otherwise, download
 
 ## Permissions
 
+- `prism.info` - Can view informations about Prism.
+- `prism.help` - Can view help.
+- `prism.inspect` - Can use inspection wand.
 - `prism.lookup` - Can query records (via lookup or near).
 - `prism.rollback` - Can perform a rollback.
+- `prism.undo` - Can undo a rollback.
 - `prism.override.radius` - Can exceed the maximum radius in the config.
 
 ## Configuration

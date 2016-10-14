@@ -47,6 +47,7 @@ public class UndoCommand {
 
     public static CommandSpec getCommand() {
         return CommandSpec.builder()
+            .permission("prism.undo")
             .executor((source, args) -> {
                 if (!(source instanceof Player)) {
                     source.sendMessage(Format.error("You must be a player to use this command."));

@@ -57,6 +57,7 @@ public class PrismCommands {
         builder.put(ImmutableList.of("?", "help"), HelpCommand.getCommand());
 
         return CommandSpec.builder()
+            .permission("prism.info")
             .executor((source, args) -> {
                 source.sendMessage(Text.of(
                     Format.heading(TextColors.GRAY, "By ", TextColors.GOLD, "viveleroi.\n"),

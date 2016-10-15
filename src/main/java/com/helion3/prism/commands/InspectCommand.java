@@ -35,6 +35,7 @@ public class InspectCommand {
 
     public static CommandSpec getCommand() {
         return CommandSpec.builder()
+        .permission("prism.inspect")
         .executor((source, args) -> {
             if (source instanceof Player) {
                 Player player = (Player) source;

@@ -50,8 +50,10 @@ public class H2SQLQuery extends SQLQuery {
 
         query.conditions(session.getQuery().getConditions());
 
-        // Get Sorting order.
-        query.order("created " + session.getSortBy().getString());
+        // Sort by timestamp if we're not grouping
+        if (session.hasFlag(Flag.NO_GROUP)) {
+            query.order("created " + session.getSortBy().getString());
+        }
 
         return query.build();
     }

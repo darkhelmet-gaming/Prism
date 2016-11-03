@@ -217,7 +217,7 @@ final public class Prism {
 
     /**
      * Returns a specific handler for a given parameter
-     * @param parameter String parameter name
+     * @param flag String flag name
      * @return
      */
     public static Optional<FlagHandler> getFlagHandler(String flag) {

@@ -21,28 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism;
+package com.helion3.prism.events.listeners;
 
-public class Listening {
-    public final boolean BREAK;
-    public final boolean DEATH;
-    public final boolean DECAY;
-    public final boolean DROP;
-    public final boolean GROW;
-    public final boolean JOIN;
-    public final boolean PICKUP;
-    public final boolean PLACE;
-    public final boolean QUIT;
+import com.helion3.prism.api.records.PrismRecord;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
+import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.item.inventory.DropItemEvent;
 
-    public Listening() {
-        BREAK = Prism.getConfig().getNode("events", "break").getBoolean();
-        DEATH = Prism.getConfig().getNode("events", "death").getBoolean();
-        DECAY = Prism.getConfig().getNode("events", "decay").getBoolean();
-        DROP = Prism.getConfig().getNode("events", "drop").getBoolean();
-        GROW = Prism.getConfig().getNode("events", "grow").getBoolean();
-        JOIN = Prism.getConfig().getNode("events", "join").getBoolean();
-        PICKUP = Prism.getConfig().getNode("events", "pickup").getBoolean();
-        PLACE = Prism.getConfig().getNode("events", "place").getBoolean();
-        QUIT = Prism.getConfig().getNode("events", "quit").getBoolean();
+public class DropItemListener {
+    /**
+     * Saves event records when a player drops an item.
+     *
+     * @param event Dispense event.
+     */
+    @Listener(order = Order.POST)
+    public void onDrop(final DropItemEvent.Dispense event, @Root EntitySpawnCause spawncause) {
+        if (spawncause.getEntity() instanceof User) {
+            for (Entity entity : event.getEntities()) {
+                PrismRecord.create().entity(spawncause.getEntity()).dropped(entity).save();
+            }
+        }
     }
 }

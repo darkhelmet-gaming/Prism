@@ -36,6 +36,7 @@ import com.helion3.prism.api.flags.*;
 import com.helion3.prism.api.parameters.ParameterCause;
 import com.helion3.prism.api.records.BlockResult;
 import com.helion3.prism.api.records.Result;
+import com.helion3.prism.events.listeners.*;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
@@ -61,11 +62,6 @@ import com.helion3.prism.api.records.ActionableResult;
 import com.helion3.prism.api.records.EntityResult;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
-import com.helion3.prism.events.listeners.ChangeBlockListener;
-import com.helion3.prism.events.listeners.DeathListener;
-import com.helion3.prism.events.listeners.RequiredInteractListener;
-import com.helion3.prism.events.listeners.JoinListener;
-import com.helion3.prism.events.listeners.QuitListener;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.h2.H2StorageAdapter;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
@@ -384,8 +380,16 @@ final public class Prism {
             eventManager.registerListeners(this, new DeathListener());
         }
 
+        if (listening.DROP) {
+            eventManager.registerListeners(this, new DropItemListener());
+        }
+
         if (listening.JOIN) {
             eventManager.registerListeners(this, new JoinListener());
+        }
+
+        if (listening.PICKUP) {
+            eventManager.registerListeners(this, new ChangeInventoryListener());
         }
 
         if (listening.QUIT) {

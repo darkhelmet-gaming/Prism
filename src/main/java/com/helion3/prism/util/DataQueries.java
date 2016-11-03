@@ -44,6 +44,7 @@ public class DataQueries {
     public static final DataQuery OriginalBlock = of("Original");
     public static final DataQuery Player = of("Player");
     public static final DataQuery Position = of("Position");
+    public static final DataQuery Quantity = of("Quantity");
     public static final DataQuery ReplacementBlock = of("Replacement");
     public static final DataQuery Rotation = of("Rotation");
     public static final DataQuery Target = of("Target");

@@ -133,9 +133,19 @@ public class Configuration {
                 eventBlockDecay.setValue(true);
             }
 
+            ConfigurationNode eventItemDrop = rootNode.getNode("events", "drop");
+            if (eventItemDrop.isVirtual()) {
+                eventItemDrop.setValue(false);
+            }
+
             ConfigurationNode eventBlockGrow = rootNode.getNode("events", "grow");
             if (eventBlockGrow.isVirtual()) {
                 eventBlockGrow.setValue(true);
+            }
+
+            ConfigurationNode eventItemPickup = rootNode.getNode("events", "pickup");
+            if (eventItemPickup.isVirtual()) {
+                eventItemPickup.setValue(false);
             }
 
             ConfigurationNode eventBlockPlace = rootNode.getNode("events", "place");

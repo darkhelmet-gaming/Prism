@@ -26,6 +26,7 @@ package com.helion3.prism.api.records;
 import java.util.Date;
 import java.util.Optional;
 
+import com.helion3.prism.util.DataUtil;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -33,6 +34,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -180,6 +182,18 @@ public class PrismRecord {
         }
 
         /**
+         * Describes a single item entity drop.
+         *
+         * @param entity Item Entity dropped.
+         * @return PrismRecord
+         */
+        public PrismRecord dropped(Entity entity) {
+            this.eventName = "dropped";
+            writeItem((Item) entity);
+            return new PrismRecord(source, this);
+        }
+
+        /**
          * Describes a single block break at a given Location.
          *
          * @param transaction Block broken.
@@ -188,6 +202,18 @@ public class PrismRecord {
         public PrismRecord grewBlock(Transaction<BlockSnapshot> transaction){
             this.eventName = "grow";
             writeBlockTransaction(transaction);
+            return new PrismRecord(source, this);
+        }
+
+        /**
+         * Describes a single item entity pickup.
+         *
+         * @param entity Item Entity picked up.
+         * @return PrismRecord
+         */
+        public PrismRecord pickedUp(Entity entity) {
+            this.eventName = "picked up";
+            writeItem((Item) entity);
             return new PrismRecord(source, this);
         }
 
@@ -272,6 +298,35 @@ public class PrismRecord {
 
             data.set(DataQueries.Target, entity.getType().getId().replace("_", " "));
             data.set(DataQueries.Entity, entityData);
+        }
+
+        /**
+         * Helper method for formatting item container data.
+         *
+         * @param item
+         */
+        private void writeItem(Item item) {
+            checkNotNull(item);
+
+            DataContainer itemData = item.toContainer();
+
+            // Because item actions are not currently actionable, copy only what we need
+            Optional<DataView> position = itemData.getView(DataQueries.Position);
+            if (position.isPresent()) {
+                position.get().set(DataQueries.WorldUuid, itemData.get(DataQueries.WorldUuid).get());
+                data.set(DataQueries.Location, position.get());
+            }
+
+            String itemId = "";
+            int itemQty = 1;
+            Optional<DataView> optionalItem = itemData.getView(DataQueries.UnsafeData.then("Item"));
+            if (optionalItem.isPresent()) {
+                itemId = optionalItem.get().getString(DataQuery.of("id")).orElse("item");
+                itemQty = optionalItem.get().getInt(DataQuery.of("Count")).orElse(1);
+            }
+
+            data.set(DataQueries.Target, itemId);
+            data.set(DataQueries.Quantity, itemQty);
         }
 
         /**

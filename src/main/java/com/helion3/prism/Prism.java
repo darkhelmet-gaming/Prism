@@ -392,6 +392,10 @@ final public class Prism {
             eventManager.registerListeners(this, new DropItemListener());
         }
 
+        if (listening.INSERT) {
+            eventManager.registerListeners(this, new ClickInventoryListener());
+        }
+
         if (listening.JOIN) {
             eventManager.registerListeners(this, new JoinListener());
         }
@@ -403,6 +407,10 @@ final public class Prism {
         if (listening.QUIT) {
             eventManager.registerListeners(this, new QuitListener());
         }
+
+//        if (listening.REMOVE) {
+//            eventManager.registerListeners(this, new ClickInventoryListener());
+//        }
 
         // Events required for internal operation
         eventManager.registerListeners(this, new RequiredInteractListener());

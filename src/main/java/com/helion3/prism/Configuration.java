@@ -80,6 +80,16 @@ public class Configuration {
                 dbMongoPort.setValue(27017);
             }
 
+            ConfigurationNode dbMongoUser = rootNode.getNode("db", "mongo", "user");
+            if (dbMongoUser.isVirtual()) {
+                dbMongoUser.setValue("");
+            }
+
+            ConfigurationNode dbMongoPass = rootNode.getNode("db", "mongo", "pass");
+            if (dbMongoPass.isVirtual()) {
+                dbMongoPass.setValue("");
+            }
+
             // MySQL
             ConfigurationNode dbMysqlSchema = rootNode.getNode("db", "mysql", "schemaVersion");
             if (dbMysqlSchema.isVirtual()) {

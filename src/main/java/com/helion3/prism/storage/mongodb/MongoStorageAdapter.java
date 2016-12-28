@@ -28,11 +28,15 @@ import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageAdapterSettings;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 
 import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.bson.Document;
 
@@ -64,10 +68,24 @@ public class MongoStorageAdapter implements StorageAdapter {
      */
     @Override
     public boolean connect() throws Exception {
-        String host = Prism.getConfig().getNode("db", "mongo", "host").getString();
-        int port = Prism.getConfig().getNode("db", "mongo", "port").getInt();
+        ServerAddress address = new ServerAddress(
+            Prism.getConfig().getNode("db", "mongo", "host").getString(),
+            Prism.getConfig().getNode("db", "mongo", "port").getInt()
+        );
+        List<MongoCredential> credentials = new ArrayList<>();
 
-        mongoClient = new MongoClient(host, port);
+        String user = Prism.getConfig().getNode("db", "mongo", "user").getString();
+
+        if (user != null && !user.isEmpty()) {
+            credentials.add(
+                MongoCredential.createCredential(
+                    user,
+                    databaseName,
+                    Prism.getConfig().getNode("db", "mongo", "pass").getString().toCharArray()
+                )
+            );
+        }
+        mongoClient = new MongoClient(address, credentials);
 
         // @todo support auth: boolean auth = db.authenticate(myUserName, myPassword);
 

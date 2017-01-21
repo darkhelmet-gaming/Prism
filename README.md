@@ -36,6 +36,7 @@ If using Mongo, download the `Prism-(version)-all.jar` file. Otherwise, download
 ## Commands
 
 - `/pr l (parameters)` - Lookup records, filtering by parameters.
+- `/pr near` - Query nearby records.
 - `/pr rb (parameters)` - Rollback, filtering by parameters.
 - `/pr rs (parameters)` - Restore, filtering by parameters.
 - `/pr undo` - Undo your last rollback/restore action.

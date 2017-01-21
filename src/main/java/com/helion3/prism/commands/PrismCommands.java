@@ -57,15 +57,17 @@ public class PrismCommands {
         builder.put(ImmutableList.of("?", "help"), HelpCommand.getCommand());
 
         return CommandSpec.builder()
-            .permission("prism.info")
             .executor((source, args) -> {
-                source.sendMessage(Text.of(
-                    Format.heading(TextColors.GRAY, "By ", TextColors.GOLD, "viveleroi.\n"),
-                    TextColors.DARK_AQUA, "Tracking so good the NSA stole our name.\n",
-                    TextColors.GRAY, "Help: ", TextColors.WHITE, "/pr ?\n",
-                    TextColors.GRAY, "IRC: ", TextColors.WHITE, "irc.esper.net #prism\n",
-                    TextColors.GRAY, "Site: ", TextColors.WHITE, "http://discover-prism.com"
-                ));
+                // Check permission here, so the node doesn't apply to all child commands
+                if (source.hasPermission("prism.info")) {
+                    source.sendMessage(Text.of(
+                            Format.heading(TextColors.GRAY, "By ", TextColors.GOLD, "viveleroi.\n"),
+                            TextColors.DARK_AQUA, "Tracking so good the NSA stole our name.\n",
+                            TextColors.GRAY, "Help: ", TextColors.WHITE, "/pr ?\n",
+                            TextColors.GRAY, "IRC: ", TextColors.WHITE, "irc.esper.net #prism\n",
+                            TextColors.GRAY, "Site: ", TextColors.WHITE, "http://discover-prism.com"
+                    ));
+                }
                 return CommandResult.empty();
             })
             .children(builder.build()).build();

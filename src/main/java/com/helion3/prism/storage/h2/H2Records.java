@@ -158,11 +158,13 @@ public class H2Records implements StorageAdapterRecords {
 
                     data.set(DataQueries.Created, rs.getLong(DataQueries.Created.toString()));
 
-                    JsonObject json = new JsonParser().parse(rs.getString("json")).getAsJsonObject();
-                    DataView extra = DataUtil.dataViewFromJson(json);
+                    if (rs.getString("json") != null) {
+                        JsonObject json = new JsonParser().parse(rs.getString("json")).getAsJsonObject();
+                        DataView extra = DataUtil.dataViewFromJson(json);
 
-                    for (DataQuery key : extra.getKeys(false)) {
-                        data.set(key, extra.get(key).get());
+                        for (DataQuery key : extra.getKeys(false)) {
+                            data.set(key, extra.get(key).get());
+                        }
                     }
                 }
 

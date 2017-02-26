@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -31,6 +31,12 @@ import org.spongepowered.api.event.cause.NamedCause;
 public class CauseUtil {
     private CauseUtil() {}
 
+    /**
+     * Gets a {@link Cause} with Prism as the root and including a {@link CommandSource}
+     *
+     * @param source The {@link CommandSource} to include
+     * @return The {@link Cause} with Prism and the command source
+     */
     public static Cause causeByCommand(CommandSource source) {
         // Ask Sponge for the plugin, to avoid error: PluginContainer must be at the ROOT of a cause!
         return Cause.source(Sponge.getPluginManager().getPlugin("prism").get()).named(NamedCause.notifier(source)).build();

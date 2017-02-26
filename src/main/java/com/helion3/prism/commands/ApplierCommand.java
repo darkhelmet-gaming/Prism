@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -122,7 +122,7 @@ public class ApplierCommand {
                                 tokens.put("appliedCount", ""+appliedCount);
                                 tokens.put("skippedCount", ""+skippedCount);
 
-                                String messageTemplate = null;
+                                final String messageTemplate;
                                 if (skippedCount > 0) {
                                     messageTemplate = Translation.from("rollback.success.withskipped");
                                 } else {
@@ -135,7 +135,7 @@ public class ApplierCommand {
                                 ));
 
                                 if (source instanceof Player) {
-                                    Prism.getLastActionResults().put((Player) source, actionResults);
+                                    Prism.getLastActionResults().put(((Player) source).getUniqueId(), actionResults);
                                 }
                             }
                         });

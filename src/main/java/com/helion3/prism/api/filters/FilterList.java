@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -42,7 +42,7 @@ public class FilterList {
     /**
      * Adds a specific source class to the list.
      *
-     * @param sourceType Class
+     * @param sourceType The class to add
      */
     public void addSource(Class<?> sourceType) {
         sources.add(sourceType);
@@ -51,8 +51,8 @@ public class FilterList {
     /**
      * Check if this list will allow a given source.
      *
-     * @param object Object source;
-     * @return If list allows this source.
+     * @param object The object source to check
+     * @return If the list allows this source
      */
     public boolean allowsSource(Object object) {
         boolean contains = false;
@@ -68,9 +68,9 @@ public class FilterList {
     }
 
     /**
-     * A block type to the list.
+     * Add a block type to the list.
      *
-     * @param block BlockType
+     * @param block The block type to add
      */
     public void add(BlockType block) {
         addBlock(block.getId());
@@ -79,7 +79,7 @@ public class FilterList {
     /**
      * Add a block type string to the list.
      *
-     * @param block String Block type string.
+     * @param blockType The block type represented as a string to add
      */
     public void addBlock(String blockType) {
         blocks.add(blockType);
@@ -88,17 +88,17 @@ public class FilterList {
     /**
      * Add a player uuid string to the list.
      *
-     * @param block String Player uuid string.
+     * @param uuid The player's UUID represented as a string
      */
     public void addPlayer(String uuid) {
         players.add(uuid);
     }
 
     /**
-     * Get if list contains a given BlockType.
+     * Get if the list contains a given {@link BlockType}.
      *
-     * @param blockType BlockType
-     * @return boolean If list contains block type.
+     * @param blockType The block type to check
+     * @return boolean If the list contains block type
      */
     public boolean allows(BlockType blockType) {
         return allowsBlock(blockType.toString());
@@ -107,8 +107,8 @@ public class FilterList {
     /**
      * Get if list contains a player's UUID.
      *
-     * @param player
-     * @return boolean If list contains player uuid.
+     * @param player The player to check
+     * @return boolean If the list contains player uuid
      */
     public boolean allows(Player player) {
         if (mode.equals(FilterMode.WHITELIST)) {
@@ -121,8 +121,8 @@ public class FilterList {
     /**
      * Get if list contains a given block type.
      *
-     * @param blockType String block type string
-     * @return boolean If list contains block type.
+     * @param blockType The block type to check represented as a string
+     * @return boolean If the list contains block type
      */
     public boolean allowsBlock(String blockType) {
         if (mode.equals(FilterMode.WHITELIST)) {

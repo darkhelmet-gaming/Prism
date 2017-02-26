@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -30,7 +30,8 @@ public abstract class SimpleParameterHandler implements ParameterHandler {
 
     /**
      * Super constructor for most parameter handlers.
-     * @param aliases ImmutableList<String> Command aliases which match this handler
+     *
+     * @param aliases The command aliases which match this handler as an immutable list
      */
     public SimpleParameterHandler(ImmutableList<String> aliases) {
         this.aliases = aliases;

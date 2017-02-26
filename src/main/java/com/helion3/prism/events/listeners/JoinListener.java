@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -23,8 +23,10 @@
  */
 package com.helion3.prism.events.listeners;
 
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent.Join;
+import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import com.helion3.prism.api.records.PrismRecord;
 
@@ -32,10 +34,11 @@ public class JoinListener {
     /**
      * Saves event records when a player joins.
      *
-     * @param event Join event.
+     * @param event The join event
+     * @param player The {@link Player} involved in the event
      */
     @Listener
-    public void onJoin(final Join event) {
-        PrismRecord.create().player(event.getTargetEntity()).joined().save();
+    public void onJoin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
+        PrismRecord.create().player(player).joined().save();
     }
 }

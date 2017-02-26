@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -36,28 +36,28 @@ public interface StorageAdapterRecords {
     /**
      * Writes a collection of events to storage
      *
-     * @param containers List<DataContainers></DataContainers> to persist
-     * @return {@link StorageWriteResult}
-     * @throws Exception
+     * @param containers All {@link DataContainer}s to persist
+     * @return The {@link StorageWriteResult} of the write
+     * @throws Exception Abstract database exceptions
      */
     StorageWriteResult write(List<DataContainer> containers) throws Exception;
 
     /**
      * Execute a query session for a list of resulting actions
      *
-     * @param session QuerySession
-     * @param translate Translate player UUIDs -> Last known names
-     * @return List of {@link Result}
-     * @throws Exception Abstract DB or query/handler exceptions
+     * @param session The {@link QuerySession}
+     * @param translate Whether or not to translate player UUIDs to last known names
+     * @return A completable future of a list of all {@link Result}
+     * @throws Exception Abstract database or query/handler exceptions
      */
     CompletableFuture<List<Result>> query(QuerySession session, boolean translate) throws Exception;
 
     /**
      * Given a {@link Query} this will remove all matching records.
      *
-     * @param query Query conditions indicating what we're purging
-     * @return {@link StorageDeleteResult}
-     * @throws Exception Abstract DB or query/handler exceptions
+     * @param query The {@link Query} conditions indicating what we're purging
+     * @return The {@link StorageDeleteResult}
+     * @throws Exception Abstract database or query/handler exceptions
      */
     StorageDeleteResult delete(Query query) throws Exception;
 }

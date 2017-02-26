@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -50,7 +50,7 @@ public class MongoStorageAdapter implements StorageAdapter {
     protected static String collectionEventRecordsName;
 
     /**
-     *
+     * Creates a new instance of the Mongo storage adapter.
      */
     public MongoStorageAdapter() {
         databaseName = Prism.getConfig().getNode("db", "name").getString();
@@ -64,7 +64,7 @@ public class MongoStorageAdapter implements StorageAdapter {
     /**
      * Establish connections to the database
      *
-     * @return Whether we could connect properly
+     * @return Whether or not we could connect properly
      */
     @Override
     public boolean connect() throws Exception {
@@ -120,9 +120,11 @@ public class MongoStorageAdapter implements StorageAdapter {
     }
 
    /**
+    * Gets a {@link MongoCollection} of {@link Document}s
+    * that has the specified name.
     *
-    * @param collectionName
-    * @return
+    * @param collectionName The name of the collection to get
+    * @return A {@link MongoCollection} of {@link Document}s
     */
    protected static MongoCollection<Document> getCollection(String collectionName) {
        try {
@@ -145,7 +147,7 @@ public class MongoStorageAdapter implements StorageAdapter {
      * Test the connection, returns true if valid and ready, false if
      * error/null.
      *
-     * @return
+     * @return Whether or not the connection is valid and ready
      * @throws Exception If connection fails
      */
     // @todo implement

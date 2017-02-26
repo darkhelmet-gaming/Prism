@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -30,7 +30,8 @@ public abstract class SimpleFlagHandler implements FlagHandler {
 
     /**
      * Super constructor for most flag handlers.
-     * @param aliases ImmutableList<String> Flags which match this handler
+     *
+     * @param aliases The flags which match this handler as an immutable list
      */
     public SimpleFlagHandler(ImmutableList<String> aliases) {
         this.aliases = aliases;

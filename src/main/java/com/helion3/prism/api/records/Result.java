@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -35,7 +35,7 @@ abstract public class Result {
     /**
      * Returns a verb variant of the event group name.
      *
-     * @return String verb variant of event group.
+     * @return The verb variant of the event group
      */
     public String getEventVerb() {
         return TypeUtil.translateToPastTense(getEventName());
@@ -44,7 +44,7 @@ abstract public class Result {
     /**
      * Returns the event name.
      *
-     * @return String event name.
+     * @return The event name
      */
     public String getEventName() {
         return data.getString(DataQueries.EventName).orElse("unknown");
@@ -53,7 +53,7 @@ abstract public class Result {
     /**
      * Returns a user-friendly string describing the source.
      *
-     * @return String source name.
+     * @return The name of the source
      */
     public String getSourceName() {
         return data.getString(DataQueries.Cause).orElse("unknown");
@@ -63,7 +63,7 @@ abstract public class Result {
      * Returns a user-friendly name of the target item,
      * block, or entity of this event record.
      *
-     * @return String target name.
+     * @return The name of the target
      */
     public String getTargetName() {
         return formatId(data.getString(DataQueries.Target).orElse(""));
@@ -72,8 +72,8 @@ abstract public class Result {
     /**
      * Strips ID prefixes, like "minecraft:".
      *
-     * @param id String ID
-     * @return String
+     * @param id The ID
+     * @return The stripped ID
      */
     private String formatId(String id) {
         if (id.contains(":")) {
@@ -84,16 +84,17 @@ abstract public class Result {
     }
 
     /**
-     * Instantiate an appropriate Result for the event.
-     * @param eventName String name of event
-     * @param isAggregate boolean if aggregate
-     * @return Result
-     * @throws IllegalAccessException
-     * @throws InstantiationException
+     * Instantiate an appropriate {@link Result} for the event.
+     *
+     * @param eventName The name of the event
+     * @param isAggregate whether or not it is aggregated
+     * @return The {@link} Result for the event
+     * @throws IllegalAccessException If we're not allowed to instantiate a new instance of a {@link Result}
+     * @throws InstantiationException If we fail to instantiate a new instance of a {@link Result}
      */
     public static Result from(String eventName, boolean isAggregate) throws IllegalAccessException, InstantiationException {
         // Build our result object
-        Result result = null;
+        final Result result;
         if (isAggregate) {
             result = new ResultAggregate();
         } else {

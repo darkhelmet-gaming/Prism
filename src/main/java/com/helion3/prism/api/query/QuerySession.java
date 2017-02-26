@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -38,7 +38,6 @@ import javax.annotation.Nullable;
 /**
  * Represents a record query session, which includes the actual
  * {@link Query} as well as the source, and result set meta data.
- *
  */
 public class QuerySession {
     protected List<Flag> flags = new ArrayList<>();
@@ -60,7 +59,7 @@ public class QuerySession {
      * Queries may behave differently based on a user - for example a Player
      * may lookup a radius but a console command or API call has no location.
      *
-     * @param commandSource CommandSource this session belongs to.
+     * @param commandSource The {@link CommandSource} this session belongs to
      */
     public QuerySession(CommandSource commandSource) {
         this.commandSource = commandSource;
@@ -68,7 +67,8 @@ public class QuerySession {
 
     /**
      * Add a flag to this query session.
-     * @param flag Flag
+     *
+     * @param flag The {@link Flag} to add
      */
     public void addFlag(Flag flag) {
         flags.add(flag);
@@ -77,7 +77,7 @@ public class QuerySession {
     /**
      * Returns the command source this session belongs to, if any.
      *
-     * @return CommandSource
+     * @return The {@link CommandSource} of this session, if available
      */
     public Optional<CommandSource> getCommandSource(){
         return Optional.ofNullable(commandSource);
@@ -86,7 +86,7 @@ public class QuerySession {
     /**
      * Get the query defined for this session.
      *
-     * @return {@link Query}
+     * @return The {@link Query} for this session
      */
     public Query getQuery(){
         return query;
@@ -96,7 +96,7 @@ public class QuerySession {
      * Check if a given flag is present.
      *
      * @param flag Flag
-     * @return
+     * @return True if the query has the specified flag
      */
     public boolean hasFlag(Flag flag) {
         return flags.contains(flag);
@@ -105,7 +105,7 @@ public class QuerySession {
     /**
      * Create a new Query for this session.
      *
-     * @return Query
+     * @return The newly constructed {@link Query}
      */
     public Query newQuery() {
         query = new Query();
@@ -116,7 +116,7 @@ public class QuerySession {
      * For reference reasons, we need to know whether this was
      * limited to a radius around the player (if any).
      *
-     * @return int Radius
+     * @return The radius around the player
      */
     public int getRadius() {
         return radius;
@@ -125,17 +125,18 @@ public class QuerySession {
     /**
      * Set the radius used for the query.
      *
-     * @param radius
+     * @param radius The radius the query should use
      */
     public void setRadius(int radius) {
         this.radius = radius;
     }
 
     /**
-     * Create a new Query from the given parameters.
+     * Create a new {@link Query} from the given parameters.
      *
-     * @param arguments String parameters/flags
-     * @return CompletableFuture<Query>
+     * @param arguments The string parameters/flags
+     * @return The {@link CompletableFuture} of the query
+     * @throws ParameterException If the flag cannot be parsed from the flag argument
      */
     public CompletableFuture<Void> newQueryFromArguments(@Nullable String arguments) throws ParameterException {
         CompletableFuture<Query> future = QueryBuilder.fromArguments(this, arguments);
@@ -144,14 +145,17 @@ public class QuerySession {
 
     /**
      * Sets the sort order to be used for the query.
+     *
+     * @param sort The desired sort order
      */
     public void setSortBy(Sort sort) {
         this.sort = sort;
     }
 
     /**
-     * Gets the Sort order to be used for the query.
-     * @return ApplierMode
+     * Gets the sort order to be used for the query.
+     *
+     * @return The sort order
      */
     public Sort getSortBy() {
         return sort;

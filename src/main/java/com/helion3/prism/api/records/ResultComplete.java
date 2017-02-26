@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -35,7 +35,6 @@ import com.helion3.prism.util.DateUtil;
  * Represents a complete copy of event record data from
  * a query result. Used for displaying individual entries
  * or for non-lookup actions.
- *
  */
 public class ResultComplete extends Result {
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat(Prism.getConfig().getNode("display", "dateFormat").getString());
@@ -43,7 +42,7 @@ public class ResultComplete extends Result {
     /**
      * Returns a user-friendly relative "time since" value.
      *
-     * @return String "time since" value.
+     * @return The "time since" value as a string
      */
     public String getRelativeTime() {
         Optional<Object> date = data.get(DataQueries.Created);
@@ -70,7 +69,7 @@ public class ResultComplete extends Result {
     /**
      * Returns a full timestamp.
      *
-     * @return String timestamp
+     * @return The timestamp as a string
      */
     public String getTime() {
         Optional<Object> date = data.get(DataQueries.Created);

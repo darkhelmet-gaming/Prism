@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -30,38 +30,27 @@ import org.spongepowered.api.data.DataContainer;
 
 import com.helion3.prism.Prism;
 
-public class RecordingQueueManager extends Thread {
+public class RecordingQueueManager implements Runnable {
 
     @Override
     public void run() {
+        List<DataContainer> eventsSaveBatch = new ArrayList<>();
 
-        while (true) {
+        // Assume we're iterating everything in the queue
+        while (!RecordingQueue.getQueue().isEmpty()) {
 
-            List<DataContainer> eventsSaveBatch = new ArrayList<>();
-
-            // Assume we're iterating everything in the queue
-            while (!RecordingQueue.getQueue().isEmpty()) {
-
-                // Poll the next event, append to list
-                DataContainer event = RecordingQueue.getQueue().poll();
-                if (event != null) {
-                    eventsSaveBatch.add(event);
-                }
+            // Poll the next event, append to list
+            DataContainer event = RecordingQueue.getQueue().poll();
+            if (event != null) {
+                eventsSaveBatch.add(event);
             }
+        }
 
-            if (eventsSaveBatch.size() > 0) {
-                try {
-                    Prism.getStorageAdapter().records().write(eventsSaveBatch);
-                } catch (Exception e) {
-                    // @todo handle failures
-                    e.printStackTrace();
-                }
-            }
-
-            // Delay next execution
+        if (eventsSaveBatch.size() > 0) {
             try {
-                sleep(1000);
-            } catch (InterruptedException e) {
+                Prism.getStorageAdapter().records().write(eventsSaveBatch);
+            } catch (Exception e) {
+                // @todo handle failures
                 e.printStackTrace();
             }
         }

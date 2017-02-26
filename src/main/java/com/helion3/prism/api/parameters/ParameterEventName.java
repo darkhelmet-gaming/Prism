@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -45,7 +45,7 @@ public class ParameterEventName extends SimpleParameterHandler {
      * Parameter handling the event name field.
      */
     public ParameterEventName() {
-        // For backwards-compat, we're still using "a" for action.
+        // For backwards-compatibility, we're still using "a" for action.
         // "e" is likely reserved for entity
         super(ImmutableList.of("a", "event"));
     }

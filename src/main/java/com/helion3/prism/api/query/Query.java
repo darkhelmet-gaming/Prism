@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -31,21 +31,22 @@ final public class Query {
     private int limit = 1000;
 
     public void addConditions(List<Condition> conditions) {
-        conditions.addAll(conditions);
+        this.conditions.addAll(conditions);
     }
 
     /**
      * Convenience method to add a single AND condition.
      *
-     * @param condition FieldCondition
+     * @param condition The {@link Condition} to add to the query
      */
     public void addCondition(Condition condition) {
         conditions.add(condition);
     }
 
     /**
+     * Get a list of all conditions in the query
      *
-     * @return
+     * @return All conditions within the query
      */
     public List<Condition> getConditions() {
         return conditions;
@@ -54,7 +55,7 @@ final public class Query {
     /**
      * Get the record limit.
      *
-     * @return Result limit.
+     * @return The limit of records
      */
     public int getLimit() {
         return limit;
@@ -63,7 +64,7 @@ final public class Query {
     /**
      * Set the record limit.
      *
-     * @param limit int Result limit
+     * @param limit The desired result limit
      */
     public void setLimit(int limit) {
         this.limit = limit;

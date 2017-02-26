@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -26,7 +26,6 @@ package com.helion3.prism.storage.mysql;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.query.SQLQuery;
-import com.helion3.prism.api.query.Sort;
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.TypeUtil;
 
@@ -36,10 +35,10 @@ public class MySQLQuery extends SQLQuery {
     }
 
     /**
-     * Constructs a MySQL SQL query from a given QuerySession.
+     * Constructs a MySQL SQL query from a given {@link QuerySession}.
      *
-     * @param session QuerySession
-     * @return SQLQuery
+     * @param session The {@link QuerySession} to construct the {@link SQLQuery} from
+     * @return The {@link SQLQuery} from the query session
      */
     public static SQLQuery from(QuerySession session) {
         Builder builder = SQLQuery.builder().select().from(tablePrefix + "records AS r");

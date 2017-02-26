@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -36,10 +36,10 @@ public class Template {
      *
      * @param text String template with placeholder tokens
      * @param replacements Map of named tokens and their values
-     * @return String Final result
+     * @return The final result string
      */
-    public static String parseTemplate( String text, Map<String,String> replacements ) {
-        Pattern pattern = Pattern.compile("\\{(.+?)\\}");
+    public static String parseTemplate(String text, Map<String,String> replacements) {
+        Pattern pattern = Pattern.compile("\\{(.+?)}");
         Matcher matcher = pattern.matcher(text);
         StringBuilder builder = new StringBuilder();
         int i = 0;

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -26,6 +26,7 @@ package com.helion3.prism.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.spongepowered.api.block.BlockType;
@@ -41,7 +42,7 @@ public class BlockUtil {
     /**
      * Get a list of all LIQUID block types.
      *
-     * @return List<BlockType>
+     * @return A list of {@link BlockType}s
      */
     public static List<BlockType> getLiquidBlockTypes() {
         List<BlockType> liquids = new ArrayList<>();
@@ -49,7 +50,7 @@ public class BlockUtil {
         Collection<BlockType> types = Prism.getGame().getRegistry().getAllOf(BlockType.class);
         for (BlockType type : types) {
             Optional<MatterProperty> property = type.getProperty(MatterProperty.class);
-            if (property.isPresent() && property.get().equals(Matter.LIQUID)) {
+            if (property.isPresent() && Objects.equals(property.get().getValue(), Matter.LIQUID)) {
                 liquids.add(type);
             }
         }
@@ -66,8 +67,8 @@ public class BlockUtil {
     /**
      * Reject specific blocks from an applier because they're 99% going to do more harm.
      *
-     * @param type BlockType
-     * @return
+     * @param type A {@link BlockType} to check is blocked
+     * @return Whether or not the {@link BlockType} is rejected from an applier
      */
     public static boolean rejectIllegalApplierBlock(BlockType type) {
         return (type.equals(BlockTypes.FIRE) ||
@@ -80,9 +81,9 @@ public class BlockUtil {
      * Sponge's ChangeBlockEvent.Place covers a lot, but it also includes a lot
      * we don't want. So here we can setup checks to filter out block combinations.
      *
-     * @param a BlockType original
-     * @param b BlockType final
-     * @return boolean True if combo should be rejected
+     * @param a The original {@link BlockType}
+     * @param b The final {@link BlockType}
+     * @return boolean Whether or not the combo should be rejected
      */
     public static boolean rejectPlaceCombination(BlockType a, BlockType b) {
         return (
@@ -126,9 +127,9 @@ public class BlockUtil {
      * Sponge's ChangeBlockEvent.Break covers a lot, but it also includes a lot
      * we don't want. So here we can setup checks to filter out block combinations.
      *
-     * @param a BlockType original
-     * @param b BlockType final
-     * @return boolean True if combo should be rejected
+     * @param a The original {@link BlockType}
+     * @param b The final {@link BlockType}
+     * @return boolean Whether or not the combo should be rejected
      */
     public static boolean rejectBreakCombination(BlockType a, BlockType b) {
         return (

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -34,7 +34,8 @@ public class ChangeInventoryListener {
     /**
      * Saves event records when a player picks up an item.
      *
-     * @param event Pickup event.
+     * @param event The pickup event
+     * @param player The {@link Player} involved in the event
      */
     @Listener(order = Order.POST)
     public void onItemPickup(final ChangeInventoryEvent.Pickup event, @Root Player player) {

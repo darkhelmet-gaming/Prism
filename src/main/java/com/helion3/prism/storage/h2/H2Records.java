@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -108,10 +108,10 @@ public class H2Records implements StorageAdapterRecords {
     /**
      * Writes extra JSON to a separate table because we don't always need it.
      *
-     * @param recordId Primary key of the parent record.
-     * @param json
-     * @return
-     * @throws Exception
+     * @param recordId The primary key of the parent record
+     * @param json The JSON to set
+     * @return The result of the storage write
+     * @throws Exception If there was a problem with SQL
      */
     protected StorageWriteResult writeExtraData(int recordId, String json) throws Exception {
         String sql = "INSERT INTO " + tablePrefix + "extra(record_id, json) values(?, ?)";

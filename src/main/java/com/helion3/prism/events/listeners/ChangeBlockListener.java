@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -42,12 +42,12 @@ public class ChangeBlockListener {
     /**
      * Listens to the base change block event.
      *
-     * @param event
+     * @param event The change block event
      */
     @Listener
     public void onChangeBlock(final ChangeBlockEvent event) {
         Optional<Player> playerCause = event.getCause().first(Player.class);
-        if (playerCause.isPresent() && Prism.getActiveWands().contains(playerCause.get())) {
+        if (playerCause.isPresent() && Prism.getActiveWands().contains(playerCause.get().getUniqueId())) {
             // Cancel and exit event here, not supposed to place/track a block with an active wand.
             event.setCancelled(true);
             return;

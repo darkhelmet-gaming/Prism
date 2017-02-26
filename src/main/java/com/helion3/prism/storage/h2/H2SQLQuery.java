@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -26,7 +26,6 @@ package com.helion3.prism.storage.h2;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.query.SQLQuery;
-import com.helion3.prism.api.query.Sort;
 
 public class H2SQLQuery extends SQLQuery {
     public H2SQLQuery(String query) {
@@ -36,8 +35,8 @@ public class H2SQLQuery extends SQLQuery {
     /**
      * Constructs an H2 SQL query from a given QuerySession.
      *
-     * @param session QuerySession
-     * @return SQLQuery
+     * @param session The {@link QuerySession} to construct the query with
+     * @return The {@link SQLQuery} built
      */
     public static SQLQuery from(QuerySession session) {
         Builder query = SQLQuery.builder().select().from(tablePrefix + "records AS r");

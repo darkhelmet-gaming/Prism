@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -36,7 +36,14 @@ import org.spongepowered.api.world.World;
 public class WorldUtil {
     private WorldUtil() {}
 
-
+    /**
+     * Removes illegal blocks around a location using the given {@link Cause}.
+     *
+     * @param location The center to start removing from
+     * @param radius The amount of blocks around the center to look through
+     * @param cause The {@link Cause} to include when changing block type
+     * @return How many blocks were removed
+     */
     public static int removeIllegalBlocks(Location<World> location, int radius, Cause cause) {
         final World world = location.getExtent();
 
@@ -78,11 +85,11 @@ public class WorldUtil {
     /**
      * Remove a specific block from a given radius around a region.
      *
-     * @param type BlockType to remove.
-     * @param location Location center
-     * @param radius Integer radius around location
-     * @param cause Cause
-     * @return integer Count of removals
+     * @param type The {@link BlockType} to remove
+     * @param location The center to start removing from
+     * @param radius The amount of blocks around the center to look through
+     * @param cause The {@link Cause} to include when changing block type
+     * @return How many blocks were removed
      */
     public static int removeAroundFromLocation(BlockType type, Location<World> location, int radius, Cause cause) {
         final World world = location.getExtent();
@@ -124,9 +131,9 @@ public class WorldUtil {
     /**
      * Removes all item entities in a radius around a given a location.
      *
-     * @param location Location center
-     * @param radius Integer radius around location
-     * @return integer Count of removals
+     * @param location The center to start removing from
+     * @param radius The amount of blocks around the center to look through
+     * @return How many blocks were removed
      */
     public static int removeItemEntitiesAroundLocation(Location<World> location, int radius) {
         int xMin = location.getBlockX() - radius;
@@ -158,9 +165,9 @@ public class WorldUtil {
     /**
      * Drain all liquids from a radius around a given location.
      *
-     * @param location Location center
-     * @param radius Integer radius around location
-     * @param cause Cause
+     * @param location The center to start removing from
+     * @param radius The amount of blocks around the center to look through
+     * @param cause The {@link Cause} to include when changing block type
      * @return integer Count of removals
      */
     public static int removeLiquidsAroundLocation(Location<World> location, int radius, Cause cause) {

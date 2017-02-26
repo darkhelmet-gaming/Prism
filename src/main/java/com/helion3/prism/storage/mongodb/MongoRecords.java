@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -26,7 +26,6 @@ package com.helion3.prism.storage.mongodb;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,7 +35,6 @@ import java.util.concurrent.CompletableFuture;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.query.*;
 import com.helion3.prism.api.records.Result;
-import com.helion3.prism.util.Format;
 import org.bson.Document;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -64,10 +62,10 @@ public class MongoRecords implements StorageAdapterRecords {
     private final String expiration = Prism.getConfig().getNode("storage", "expireRecords").getString();
 
     /**
-     * Converts a DataView to a Document, recursively if needed.
+     * Converts a {@link DataView} to a {@link Document}, recursively if needed.
      *
-     * @param view Data view/container.
-     * @return Document for Mongo storage.
+     * @param view The data view to convert to a {@link Document}
+     * @return The {@link Document} for Mongo storage
      */
     private Document documentFromView(DataView view) {
         Document document = new Document();
@@ -121,9 +119,10 @@ public class MongoRecords implements StorageAdapterRecords {
     }
 
     /**
-     * Convert a mongo Document to a DataContainer.
-     * @param document Mongo document.
-     * @return Data container.
+     * Convert a Mongo {@link Document} to a {@link DataContainer}.
+     *
+     * @param document The Mongo document to convert to a {@link DataContainer}
+     * @return The resulting {@link DataContainer}
      */
     private DataContainer documentToDataContainer(Document document) {
         DataContainer result = new MemoryDataContainer();
@@ -171,8 +170,8 @@ public class MongoRecords implements StorageAdapterRecords {
    /**
     * Recursive method of building condition documents.
     *
-    * @param fieldsOrGroups List<Condition>
-    * @return Document
+    * @param fieldsOrGroups The list of {@link Condition}s to build the document with
+    * @return The conditions {@link Document}
     */
    private Document buildConditions(List<Condition> fieldsOrGroups) {
        Document conditions = new Document();
@@ -180,12 +179,12 @@ public class MongoRecords implements StorageAdapterRecords {
        for (Condition fieldOrGroup : fieldsOrGroups) {
            if (fieldOrGroup instanceof ConditionGroup) {
                ConditionGroup group = (ConditionGroup) fieldOrGroup;
-               Document subdoc = buildConditions(group.getConditions());
+               Document subDoc = buildConditions(group.getConditions());
 
                if (group.getOperator().equals(Operator.OR)) {
-                   conditions.append("$or", subdoc);
+                   conditions.append("$or", subDoc);
                } else {
-                   conditions.putAll(subdoc);
+                   conditions.putAll(subDoc);
                }
            } else {
                FieldCondition field = (FieldCondition) fieldOrGroup;
@@ -257,7 +256,7 @@ public class MongoRecords implements StorageAdapterRecords {
        Document limit = new Document("$limit", query.getLimit());
 
        // Build aggregators
-       AggregateIterable<Document> aggregated = null;
+       final AggregateIterable<Document> aggregated;
        if (!session.hasFlag(Flag.NO_GROUP)) {
            // Grouping fields
            Document groupFields = new Document();
@@ -344,8 +343,8 @@ public class MongoRecords implements StorageAdapterRecords {
    /**
     * Given a list of parameters, will remove all matching records.
     *
-    * @param query Query conditions indicating what we're purging
-    * @return
+    * @param query {@link Query} conditions indicating what we're purging
+    * @return The result of the storage deletion
     */
    // @todo implement
    @Override

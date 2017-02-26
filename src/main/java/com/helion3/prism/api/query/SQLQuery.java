@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -24,13 +24,13 @@
 package com.helion3.prism.api.query;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.helion3.prism.api.flags.Flag;
 import org.spongepowered.api.data.DataQuery;
 
 import com.google.common.collect.Range;
@@ -51,8 +51,9 @@ public class SQLQuery {
     }
 
     /**
-     * Create a new SQLQuery with a query stirng.
-     * @param query String query
+     * Create a new SQLQuery with a query string.
+     *
+     * @param query The query string
      */
     public SQLQuery(String query) {
         this.query = query;
@@ -80,8 +81,8 @@ public class SQLQuery {
         /**
          * Add a column.
          *
-         * @param col String column name.
-         * @return Builder
+         * @param col The column name
+         * @return This builder
          */
         public Builder col(String col) {
             columns.add(col);
@@ -91,8 +92,8 @@ public class SQLQuery {
         /**
          * Set the "from" table.
          *
-         * @param table String table name
-         * @return Builder
+         * @param table The table name
+         * @return This builder
          */
         public Builder from(String table) {
             this.table = table;
@@ -102,9 +103,9 @@ public class SQLQuery {
         /**
          * Join another table.
          *
-         * @param table String table name
-         * @param on String condition
-         * @return Builder
+         * @param table The table name
+         * @param on The condition
+         * @return This builder
          */
         public Builder leftJoin(String table, String on) {
             joins.put(table, on);
@@ -116,7 +117,7 @@ public class SQLQuery {
          * the column name to the selected column list.
          *
          * @param cols String... column name(s)
-         * @return Builder
+         * @return This builder
          */
         public Builder group(String... cols) {
             for (String col : cols) {
@@ -129,8 +130,8 @@ public class SQLQuery {
         /**
          * HEX the result of a column.
          *
-         * @param cols String... column name(s)
-         * @return Builder
+         * @param cols The column names
+         * @return This builder
          */
         public Builder hex(String... cols) {
             for (String col : cols) {
@@ -145,8 +146,8 @@ public class SQLQuery {
         /**
          * Add field/group conditions.
          *
-         * @param conditions List<Condition>
-         * @return Builder
+         * @param conditions The list of conditions to add
+         * @return This builder
          */
         public Builder conditions(List<Condition> conditions) {
             this.conditions.addAll(conditions);
@@ -156,9 +157,9 @@ public class SQLQuery {
         /**
          * Add a value mutator.
          *
-         * @param path DataQuery
-         * @param mutator QueryValueMutator mutator
-         * @return Builder
+         * @param path The data query to mutate
+         * @param mutator The query value mutator
+         * @return This builder
          */
         public Builder valueMutator(DataQuery path, QueryValueMutator mutator) {
             valueMutators.put(path, mutator);
@@ -168,13 +169,11 @@ public class SQLQuery {
         /**
          * Add order by columns.
          *
-         * @param cols String... column name(s)
-         * @return
+         * @param cols The column names
+         * @return This builder
          */
         public Builder order(String... cols) {
-            for (String col : cols) {
-                orderBy.add(col);
-            }
+            orderBy.addAll(Arrays.asList(cols));
             return this;
         }
 
@@ -184,44 +183,44 @@ public class SQLQuery {
          * @return String
          */
         public SQLQuery build() {
-            String sql = mode.name() + " ";
+            StringBuilder sql = new StringBuilder(mode.name() + " ");
             
             // Columns
-            sql += String.join(", ", columns) + " ";
+            sql.append(String.join(", ", columns)).append(" ");
 
             // Tables
-            sql += "FROM " + table + " ";
+            sql.append("FROM ").append(table).append(" ");
 
             // Joins
             for (Entry<String, String> entry : joins.entrySet()) {
-                sql += "LEFT JOIN " + entry.getKey() + " ON " + entry.getValue() + " ";
+                sql.append("LEFT JOIN ").append(entry.getKey()).append(" ON ").append(entry.getValue()).append(" ");
             }
 
             // Where
             List<String> queryConditions = buildConditions(conditions);
             if (!queryConditions.isEmpty()) {
-                sql += "WHERE " + String.join(" ", queryConditions).replaceFirst("AND ", "").replaceFirst("OR ", "") + " ";
+                sql.append("WHERE ").append(String.join(" ", queryConditions).replaceFirst("AND ", "").replaceFirst("OR ", "")).append(" ");
             }
 
             // Group By
             if (!groupBy.isEmpty()) {
-                sql += "GROUP BY " + String.join(", ", groupBy) + " ";
+                sql.append("GROUP BY ").append(String.join(", ", groupBy)).append(" ");
             }
 
             // Order By
             if (!orderBy.isEmpty()) {
-                sql += "ORDER BY " + String.join(", ", orderBy) + " ";
+                sql.append("ORDER BY ").append(String.join(", ", orderBy)).append(" ");
             }
 
-            return new SQLQuery(sql.trim());
+            return new SQLQuery(sql.toString().trim());
         }
 
+        // @todo Needs some work, tests
         /**
          * Recursive method to build AND/OR condition groups.
-         * @todo Needs some more work, tests
          *
-         * @param conditions List<Condition>
-         * @return List of String conditions to append to a query.
+         * @param conditions The list of conditions to build the condition groups from
+         * @return List of string conditions to append to a query
          */
         protected List<String> buildConditions(List<Condition> conditions) {
             List<String> queryConditions = new ArrayList<>();
@@ -229,12 +228,12 @@ public class SQLQuery {
                 if (fieldOrGroup instanceof ConditionGroup) {
                     ConditionGroup group = (ConditionGroup) fieldOrGroup;
 
-                    String query = "AND (";
+                    StringBuilder query = new StringBuilder("AND (");
 
                     List<String> inner = new ArrayList<>();
                     for (Object obj : group.getConditions()) {
                         if (obj instanceof ConditionGroup) {
-                            query += buildConditions(((ConditionGroup) obj).getConditions());
+                            query.append(buildConditions(((ConditionGroup) obj).getConditions()));
                         }
                         else if (obj instanceof FieldCondition) {
                             FieldCondition condition = (FieldCondition) obj;
@@ -248,10 +247,10 @@ public class SQLQuery {
                     }
 
                     if (!inner.isEmpty()) {
-                        query += String.join(group.getOperator().name() + " ", inner);
+                        query.append(String.join(group.getOperator().name() + " ", inner));
                     }
 
-                    queryConditions.add(query + ")");
+                    queryConditions.add(query.append(")").toString());
                 } else {
                     FieldCondition condition = (FieldCondition) fieldOrGroup;
                     String fieldComparator = getFieldComparator(condition);
@@ -268,8 +267,8 @@ public class SQLQuery {
         /**
          * Builder a specific field comparator query fragment.
          *
-         * @param condition FieldCondition
-         * @return String
+         * @param condition The {@link FieldCondition} to build the field comparator for
+         * @return The field comparator as a string
          */
         protected String getFieldComparator(FieldCondition condition) {
             String fieldComparator = "";
@@ -314,9 +313,9 @@ public class SQLQuery {
     }
 
     /**
-     * Creates a new builder.
+     * Creates a new {@link SQLQuery} builder.
      *
-     * @return Builder
+     * @return The new builder
      */
     public static Builder builder() {
         return new Builder();

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -49,7 +49,6 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.query.SQLQuery;
-import com.helion3.prism.api.query.SQLQuery.Builder;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageDeleteResult;
 import com.helion3.prism.api.storage.StorageWriteResult;
@@ -127,6 +126,13 @@ public class MySQLRecords implements StorageAdapterRecords {
         return null;
     }
 
+    /**
+     * Writes extra data to a separate table.
+     *
+     * @param extraDataMap The map of {@link Integer} to {@link String} containing the extra dat
+     * @return The result of the storage write
+     * @throws Exception If there was a problem with SQL
+     */
     protected StorageWriteResult writeExtraData(Map<Integer, String> extraDataMap) throws Exception {
         if (extraDataMap.isEmpty()) {
             throw new IllegalArgumentException("Extra data map must not be empty.");

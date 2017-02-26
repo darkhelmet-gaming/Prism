@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -40,8 +40,8 @@ public interface ParameterHandler {
      * Returns whether this parameter is allowed for the current
      * command source. Example: radius parameter only for Player.
      *
-     * @param source CommandSource of current parameter.
-     * @return boolean Whether this command source may use this parameter.
+     * @param source The {@link CommandSource} of the current parameter
+     * @return boolean Whether or not this command source may use this parameter
      */
     boolean acceptsSource(@Nullable CommandSource source);
 
@@ -50,7 +50,7 @@ public interface ParameterHandler {
      * are acceptable.
      *
      * @param value String Value/input for the parameter
-     * @return boolean Whether this value is legal for this parameter.
+     * @return boolean Whether this value is legal for this parameter
      */
     boolean acceptsValue(String value);
 
@@ -73,17 +73,20 @@ public interface ParameterHandler {
      * Processes the given value into conditions which are then
      * appended to the query.
      *
-     * @param session Current Query Session
-     * @param parameter String parameter used
-     * @param value String value(s) given with parameter
-     * @param query Query Current query object
+     * @param session The current {@link QuerySession}
+     * @param parameter The parameter as a string
+     * @param value The value(s) given with parameter
+     * @param query The current query object
+     * @return A {@link CompletableFuture} of the process, if available
      */
     Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query);
 
     /**
      * Called when this handler's aliases were not defined.
      *
-     * @param session QuerySession
+     * @param session The query session
+     * @param query The query
+     * @return The pair of strings from the process, if available
      */
     default Optional<Pair<String, String>> processDefault(QuerySession session, Query query) {
         return Optional.empty();

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -48,8 +48,8 @@ public class DataUtil {
     /**
      * Checks an object against known primitive object types.
      *
-     * @param object
-     * @return boolean If object is a primitive type
+     * @param object The object to check
+     * @return boolean If an object is a primitive type
      */
     public static boolean isPrimitiveType(Object object) {
         return (object instanceof Boolean ||
@@ -65,8 +65,9 @@ public class DataUtil {
 
     /**
      * Build a DataView from provided JSON.
-     * @param json JsonObject
-     * @return DataView
+     *
+     * @param json The {@link JsonObject} to convert to a {@link DataView}
+     * @return The {@link DataView} built from a {@link JsonObject}
      */
     public static DataView dataViewFromJson(JsonObject json) {
         DataContainer data = new MemoryDataContainer();
@@ -83,10 +84,10 @@ public class DataUtil {
     }
 
     /**
-     * Attempts to convert a JsonElement to an a known type.
+     * Attempts to convert a {@link JsonElement} to an a known type.
      *
-     * @param element JsonElement
-     * @return Optional<Object>
+     * @param element The {@link JsonObject} to convert
+     * @return The known type as an {@link Object}, if available
      */
     private static Optional<Object> jsonElementToObject(JsonElement element) {
         Object result = null;
@@ -119,10 +120,10 @@ public class DataUtil {
     }
 
     /**
-     * Converts a DataView object into a JsonObject.
+     * Converts a {@link DataView} object into a {@link JsonObject}.
      *
-     * @param view DataView
-     * @return JsonObject JsonObject representation of the DataView
+     * @param view The {@link DataView} to convert
+     * @return The {@link JsonObject} representation of the {@link DataView}
      */
     public static JsonObject jsonFromDataView(DataView view) {
         JsonObject json = new JsonObject();
@@ -193,7 +194,7 @@ public class DataUtil {
      *
      * @param results List of results
      * @param uuidsPendingLookup Lists of UUIDs pending lookup
-     * @return CompletableFuture
+     * @return A {@link CompletableFuture} with the list of {@link Result}s
      */
     public static CompletableFuture<List<Result>> translateUuidsToNames(List<Result> results, List<UUID> uuidsPendingLookup) {
         CompletableFuture<List<Result>> future = new CompletableFuture<>();

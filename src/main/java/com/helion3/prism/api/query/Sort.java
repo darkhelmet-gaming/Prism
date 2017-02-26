@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -38,15 +38,17 @@ public enum Sort {
 
     /**
      * Gets the value for sorting order for MongoDB.
-     * @return int Sorting value.
+     *
+     * @return The sorting value int
      */
     public int getValue() {
         return sortVal;
     }
 
     /**
-     * Gets the Sorting order to be used in H2/MySQL.
-     * @return String Sorting order string.
+     * Gets the sorting order to be used in H2/MySQL.
+     *
+     * @return The sorting order string
      */
     public String getString() {
         return sortString;

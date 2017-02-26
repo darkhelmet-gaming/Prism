@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -44,9 +44,9 @@ public class AsyncUtil {
     /**
      * Helper utility for running a lookup asynchronously.
      *
-     * @param session QuerySession running this lookup.
+     * @param session The {@link QuerySession} running this lookup
      */
-    public static void lookup(final QuerySession session) throws Exception {
+    public static void lookup(final QuerySession session) {
         if (!session.getCommandSource().isPresent()) {
             // @todo handle this.
             return;
@@ -74,7 +74,7 @@ public class AsyncUtil {
                     }
                 } else {
                     for (Result result : results) {
-                        session.getCommandSource().get().sendMessage(Messages.from(result, session.hasFlag(Flag.EXTENDED)));
+                        session.getCommandSource().ifPresent(p -> p.sendMessage(Messages.from(result, session.hasFlag(Flag.EXTENDED))));
                     }
                 }
             }
@@ -96,8 +96,8 @@ public class AsyncUtil {
     /**
      * Internal helper for executing database queries asynchronously.
      *
-     * @param session QuerySession
-     * @param callback AsyncCallback describing the success, empty, and error callbacks.
+     * @param session The {@link QuerySession} to query with
+     * @param callback An {@link AsyncCallback} describing the success, empty, and error callbacks
      */
     private static void async(final QuerySession session, AsyncCallback callback) {
         Prism.getGame().getScheduler().createTaskBuilder().async().execute(() -> {
@@ -111,7 +111,7 @@ public class AsyncUtil {
                             callback.success(results);
                         }
                     } catch(Exception e) {
-                        session.getCommandSource().get().sendMessage(Format.error(e.getMessage()));
+                        session.getCommandSource().ifPresent(p -> p.sendMessage(Format.error(e.getMessage())));
                         e.printStackTrace();
                     }
                 });

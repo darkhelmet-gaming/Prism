@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -46,7 +46,7 @@ final public class ConditionGroup implements Condition {
 
     /**
      * Create a new group with a specific operator.
-     * @param operator
+     * @param operator The operator
      */
     public ConditionGroup(Operator operator) {
         this.operator = operator;
@@ -55,7 +55,7 @@ final public class ConditionGroup implements Condition {
     /**
      * Add a condition.
      *
-     * @param condition Condition
+     * @param condition The condition to add
      */
     public void add(Condition condition) {
         conditions.add(condition);
@@ -64,7 +64,7 @@ final public class ConditionGroup implements Condition {
     /**
      * Add a list of conditions.
      *
-     * @param conditions List of conditions.
+     * @param conditions List of conditions to add
      */
     public void add(List<Condition> conditions) {
         this.conditions.addAll(conditions);
@@ -73,7 +73,7 @@ final public class ConditionGroup implements Condition {
     /**
      * Get all conditions.
      *
-     * @return List<Condition>
+     * @return Every condition as a list
      */
     public List<Condition> getConditions() {
         return conditions;
@@ -82,7 +82,7 @@ final public class ConditionGroup implements Condition {
     /**
      * Get the operator for this groups rules.
      *
-     * @return Operator
+     * @return The operator for this group
      */
     public Operator getOperator() {
         return operator;
@@ -91,8 +91,8 @@ final public class ConditionGroup implements Condition {
     /**
      * Convenience method to build conditions for a single location.
      *
-     * @param location Location<?>
-     * @return ConditionGroup
+     * @param location The {@link Location} to build conditions for
+     * @return The {@link ConditionGroup} built from the location
      */
     public static ConditionGroup from(Location<?> location) {
         ConditionGroup conditions = new ConditionGroup(Operator.AND);
@@ -108,9 +108,9 @@ final public class ConditionGroup implements Condition {
     /**
      * Convenience method to build conditions for a region of radius around a central location.
      *
-     * @param location Location<?>
-     * @param radius Integer
-     * @return ConditionGroup
+     * @param location The center of the region
+     * @param radius The radius around the center to build the conditions within
+     * @return The {@link ConditionGroup} built from the center and radius
      */
     public static ConditionGroup from(Location<?> location, int radius) {
         ConditionGroup conditions = new ConditionGroup(Operator.AND);

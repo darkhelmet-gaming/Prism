@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -38,9 +38,6 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.text.Text;
 
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.flags.FlagHandler;
 import com.helion3.prism.api.parameters.ParameterException;
@@ -53,7 +50,8 @@ public class QueryBuilder {
 
     /**
      * Return an empty query.
-     * @return
+     *
+     * @return A new empty query
      */
     public static Query empty() {
         return new Query();
@@ -62,9 +60,10 @@ public class QueryBuilder {
     /**
      * Builds a {@link Query} by parsing a string of arguments.
      *
-     * @param session QuerySession
+     * @param session The {@link QuerySession} to build the Query with
      * @param arguments String Parameter: value string
      * @return {@link Query} Database query object
+     * @throws ParameterException If the flag cannot be parsed from the flag argument
      */
     public static CompletableFuture<Query> fromArguments(QuerySession session, @Nullable String arguments) throws ParameterException {
         return fromArguments(session, (arguments != null ? arguments.split(" ") : new String[]{}));
@@ -73,9 +72,10 @@ public class QueryBuilder {
     /**
      * Builds a {@link Query} by parsing an array of arguments.
      *
-     * @param session QuerySession
-     * @param arguments String[] Parameter:value list
-     * @return {@link Query} Database query object
+     * @param session The {@link QuerySession} to build the query from
+     * @param arguments An array of the parameter values as strings
+     * @return The database {@link Query} object
+     * @throws ParameterException If the flag cannot be parsed from the flag argument
      */
     public static CompletableFuture<Query> fromArguments(QuerySession session, @Nullable String[] arguments) throws ParameterException {
         checkNotNull(session);
@@ -86,7 +86,7 @@ public class QueryBuilder {
         // Track all parameter pairs
         Map<String, String> definedParameters = new HashMap<>();
 
-        if (arguments.length > 0) {
+        if (arguments != null && arguments.length > 0) {
             List<CompletableFuture<?>> futures = new ArrayList<>();
             for (String arg : arguments) {
                 Optional<CompletableFuture<?>> listenable;
@@ -104,13 +104,11 @@ public class QueryBuilder {
                     definedParameters.put(pair.getKey(), pair.getValue());
                 }
 
-                if (listenable.isPresent()) {
-                    futures.add(listenable.get());
-                }
+                listenable.ifPresent(futures::add);
             }
 
             if (!futures.isEmpty()) {
-                CompletableFuture<Void> combinedFuture = CompletableFuture.<Void>allOf(futures.toArray(new CompletableFuture[futures.size()]));
+                CompletableFuture<Void> combinedFuture = CompletableFuture.<Void>allOf(futures.toArray(new CompletableFuture<?>[futures.size()]));
                 combinedFuture.thenAccept((q) -> future.complete(query));
             } else {
                 future.complete(query);
@@ -121,7 +119,7 @@ public class QueryBuilder {
 
         if (Prism.getConfig().getNode("defaults", "enabled").getBoolean()) {
             // Require any parameter defaults
-            String defaultsUsed = "";
+            StringBuilder defaultsUsed = new StringBuilder();
             for (ParameterHandler handler : Prism.getParameterHandlers()) {
                 boolean aliasFound = false;
 
@@ -133,16 +131,14 @@ public class QueryBuilder {
                 }
 
                 if (!aliasFound) {
-                    Optional<Pair<String, String>> pair = handler.processDefault(session, query);
-                    if (pair.isPresent()) {
-                        defaultsUsed += pair.get().getKey() + ":" + pair.get().getValue() + " ";
-                    }
+                    handler.processDefault(session, query).ifPresent(pair -> defaultsUsed.append(pair.getKey()).append(":").append(pair.getValue())
+                        .append(" "));
                 }
             }
 
             // @todo should move this
-            if (!defaultsUsed.isEmpty()) {
-                session.getCommandSource().get().sendMessage(Format.subduedHeading(Text.of(String.format("Defaults used: %s", defaultsUsed))));
+            if (defaultsUsed.length() > 0) {
+                session.getCommandSource().ifPresent(s-> s.sendMessage(Format.subduedHeading(Text.of(String.format("Defaults used: %s", defaultsUsed.toString())))));
             }
         }
 
@@ -152,22 +148,22 @@ public class QueryBuilder {
     /**
      * Parses a flag argument.
      *
-     * @param session QuerySession current session.
-     * @param query Query query being built.
-     * @param flag Flag
-     * @return Optional<CompletableFuture<?>>
+     * @param session The current {@link QuerySession}
+     * @param query The {@link Query} being built
+     * @param flag The flag as a string
+     * @return The {@link CompletableFuture} if available
      */
     private static Optional<CompletableFuture<?>> parseFlagFromArgument(QuerySession session, Query query, String flag) throws ParameterException {
         flag = flag.substring(1);
 
         // Determine the true alias and value
-        Optional<String> optionalValue = Optional.empty();
+        String value = null;
         if (flag.contains("=")) {
             // Split the parameter: values
             String[] split = flag.split("=");
             flag = split[0];
             if (split.length == 2 && !split[1].trim().isEmpty()) {
-                optionalValue = Optional.of(split[1]);
+                value = split[1];
             }
         }
 
@@ -180,20 +176,23 @@ public class QueryBuilder {
         FlagHandler handler = optionalHandler.get();
 
         // Allows this command source?
-        if (!handler.acceptsSource(session.getCommandSource().get())) {
+        if (session.getCommandSource().isPresent() || !handler.acceptsSource(session.getCommandSource().get())) {
             throw new ParameterException("This command source may not use the \"" + flag + "\" flag.");
         }
 
         // Validate value
-        if (optionalValue.isPresent() && !handler.acceptsValue(optionalValue.get())) {
-            throw new ParameterException("Invalid value \"" + optionalValue.get() + "\" for parameter \"" + flag + "\".");
+        if (value != null && !handler.acceptsValue(value)) {
+            throw new ParameterException("Invalid value \"" + value + "\" for parameter \"" + flag + "\".");
         }
 
-        return handler.process(session, flag, optionalValue, query);
+        return handler.process(session, flag, value, query);
     }
 
     /**
      * Returns a key/value pair parsed from a parameter string.
+     *
+     * @param parameter The parameter to parse
+     * @return The key/value pair parsed from the parameter
      */
     private static Pair<String, String> getParameterKeyValue(String parameter) {
         String alias;
@@ -215,11 +214,11 @@ public class QueryBuilder {
     /**
      * Parses a parameter argument.
      *
-     * @param session QuerySession current session.
-     * @param query Query query being built.
-     * @param parameter String argument which should be a parameter
-     * @return Optional<CompletableFuture<?>>
-     * @throws ParameterException
+     * @param session The current {@link QuerySession}
+     * @param query The {@link Query} being built
+     * @param parameter A string argument as a pair parameter
+     * @return The {@link CompletableFuture<>} if available
+     * @throws ParameterException if an invalid or empty parameter was used
      */
     private static Optional<CompletableFuture<?>> parseParameterFromArgument(QuerySession session, Query query, Pair<String, String> parameter) throws ParameterException {
         // Simple validation

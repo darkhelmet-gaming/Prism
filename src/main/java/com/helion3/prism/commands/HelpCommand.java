@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -42,7 +42,7 @@ public class HelpCommand {
                 source.sendMessage(Format.message("/pr [rs|restore] (params)", TextColors.GRAY, " - Re-apply changes, limited by parameters."));
                 source.sendMessage(Format.message("/pr undo", TextColors.GRAY, " - Reverse your last rollback/restore."));
                 source.sendMessage(Format.message("/pr i", TextColors.GRAY, " - Toggle the inspection wand."));
-                return CommandResult.empty();
+                return CommandResult.success();
             }).build();
     }
 }

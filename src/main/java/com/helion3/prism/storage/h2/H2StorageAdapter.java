@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -39,7 +39,7 @@ import com.helion3.prism.api.storage.StorageAdapterSettings;
 public class H2StorageAdapter implements StorageAdapter {
     private final String tablePrefix = Prism.getConfig().getNode("db", "h2", "tablePrefix").getString();
     private final SqlService sql = Prism.getGame().getServiceManager().provide(SqlService.class).get();
-    private final String dbPath = Prism.getParentDirectory().getAbsolutePath().toString() + "/" + Prism.getConfig().getNode("db", "name").getString();
+    private final String dbPath = Prism.getParentDirectory().getAbsolutePath() + "/" + Prism.getConfig().getNode("db", "name").getString();
     private final StorageAdapterRecords records;
     private static DataSource db;
 
@@ -53,8 +53,8 @@ public class H2StorageAdapter implements StorageAdapter {
     /**
      * Get the connection.
      *
-     * @return Connection
-     * @throws SQLException
+     * @return The SQL {@link Connection}
+     * @throws SQLException If the connection fails to be created
      */
     protected static Connection getConnection() throws SQLException {
         return db.getConnection();
@@ -80,7 +80,7 @@ public class H2StorageAdapter implements StorageAdapter {
     /**
      * Create table structure if none present.
      *
-     * @throws SQLException
+     * @throws SQLException If there was a problem with SQL creating the tables
      */
     protected void createTables() throws SQLException {
         try (Connection conn = getConnection()) {

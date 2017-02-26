@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -32,12 +32,13 @@ import org.spongepowered.api.data.Transaction;
 public class ActionableResult {
     private final boolean changeWasApplied;
     private final SkipReason skipReason;
-    private final Optional<Transaction<?>> transaction;
+    private final Transaction<?> transaction;
 
     /**
      * Build a skipped actionable result.
-     * @param skipReason Reason for skip.
-     * @return ActionableResult
+     *
+     * @param skipReason The reason for the skip
+     * @return The skipped {@link ActionableResult}
      */
     public static ActionableResult skipped(SkipReason skipReason) {
         return new ActionableResult(skipReason);
@@ -45,28 +46,30 @@ public class ActionableResult {
 
     /**
      * Build a successful actionable result.
-     * @param transaction
-     * @return
+     *
+     * @param transaction The transaction to build the result from
+     * @return The successful {@link ActionableResult}
      */
     public static ActionableResult success(@Nullable Transaction<?> transaction) {
         return new ActionableResult(transaction);
     }
 
     private ActionableResult(@Nullable Transaction<?> transaction) {
-        this.transaction = Optional.ofNullable(transaction);
+        this.transaction = transaction;
         this.changeWasApplied = true;
         this.skipReason = null;
     }
 
     private ActionableResult(SkipReason skipReason) {
-        this.transaction = Optional.empty();
+        this.transaction = null;
         this.changeWasApplied = false;
         this.skipReason = skipReason;
     }
 
     /**
      * Get if actionable was applied.
-     * @return If actionable was applied.
+     *
+     * @return Whether or not actionable was applied
      */
     public boolean applied() {
         return changeWasApplied;
@@ -74,15 +77,17 @@ public class ActionableResult {
 
     /**
      * Get any resulting transaction, useful for reversals.
-     * @return Optional transaction.
+     *
+     * @return The transaction, if available
      */
     public Optional<Transaction<?>> getTransaction() {
-        return transaction;
+        return Optional.ofNullable(transaction);
     }
 
     /**
      * Returns the skip reason, if any.
-     * @return SKIP_REASON Reason a change was skipped.
+     *
+     * @return The reason a change was skipped
      */
     public SkipReason getSkipReason() {
         return skipReason;

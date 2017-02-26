@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -37,8 +37,8 @@ public class Configuration {
 
     /**
      * Loads (creates new if needed) Prism configuration file.
-     * @param defaultConfig
-     * @param configManager
+     * @param defaultConfig The file location of where the configuration file should be/go
+     * @param configManager The configuration manager for Prism
      */
     public Configuration(File defaultConfig, ConfigurationLoader<CommentedConfigurationNode> configManager) {
         try {
@@ -239,8 +239,8 @@ public class Configuration {
     /**
      * Shortcut to rootNode.getNode().
      *
-     * @param path Object[] Paths to desired node
-     * @return ConfigurationNode
+     * @param path Object[] paths to desired node
+     * @return The node based on the specified path
      */
     public ConfigurationNode getNode(Object... path) {
         return rootNode.getNode(path);

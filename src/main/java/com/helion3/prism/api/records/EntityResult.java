@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -40,7 +40,7 @@ import com.helion3.prism.util.DataQueries;
 
 public class EntityResult extends ResultComplete implements Actionable {
     @Override
-    public ActionableResult rollback() throws Exception {
+    public ActionableResult rollback() {
         DataView entityData = formatEntityData();
 
         Optional<EntitySnapshot> snapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(entityData);
@@ -63,11 +63,11 @@ public class EntityResult extends ResultComplete implements Actionable {
         HealthData health = entity.get().get(HealthData.class).get();
         entity.get().offer(health.health().set(health.maxHealth().get()));
 
-        return ActionableResult.success(new Transaction<>(new SerializableNonExistant(), entity.get()));
+        return ActionableResult.success(new Transaction<>(new SerializableNonExistent(), entity.get()));
     }
 
     @Override
-    public ActionableResult restore() throws Exception {
+    public ActionableResult restore() {
         return ActionableResult.skipped(SkipReason.UNIMPLEMENTED);
     }
 
@@ -90,9 +90,10 @@ public class EntityResult extends ResultComplete implements Actionable {
         unsafe.set(DataQueries.Pos, coordinates);
 
         DataView rotation = entity.getView(DataQueries.Rotation).get();
-        List<Double> rot = new ArrayList<>();
-        rot.add(rotation.getDouble(DataQueries.Y).get());
-        rot.add(rotation.getDouble(DataQueries.Z).get());
+        // What is this code supposed to do?
+        // List<Double> rot = new ArrayList<>();
+        // rot.add(rotation.getDouble(DataQueries.Y).get());
+        // rot.add(rotation.getDouble(DataQueries.Z).get());
         unsafe.set(DataQueries.Rotation, rotation);
 
         entity.set(DataQueries.UnsafeData, unsafe);

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -25,25 +25,27 @@ package com.helion3.prism.api.storage;
 
 public interface StorageAdapter {
     /**
-     * Establishes an active connection to the storage engine. Any DB
-     * setup/initialization code will run here.
+     * Establishes an active connection to the storage engine. Any
+     * database setup/initialization code will run here.
      *
      * @return Whether or not we connected properly
-     * @throws Exception Abstract DB exceptions
+     * @throws Exception Abstract database exceptions
      */
     boolean connect() throws Exception;
 
     /**
      * Holder for the storage adapter handling
      * event records.
-     * @return StorageAdapterRecords Storage adapter for records
+     *
+     * @return The storage adapter for records
      */
     StorageAdapterRecords records();
 
     /**
      * Holder for the storage adapter handling
      * per-player settings.
-     * @return StorageAdapterSettings Storage adapter for settings
+     *
+     * @return The storage adapter settings
      */
     StorageAdapterSettings settings();
 
@@ -56,7 +58,7 @@ public interface StorageAdapter {
      * Test the connection, returns true if valid and ready, false if
      * error/null.
      *
-     * @return
+     * @return Whether or not the connection is valid and ready
      * @throws Exception If connection fails
      */
     boolean testConnection() throws Exception;

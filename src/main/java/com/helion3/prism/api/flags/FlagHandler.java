@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -37,24 +37,24 @@ public interface FlagHandler {
     /**
      * Returns whether this flag is allowed for the current command source.
      *
-     * @param source CommandSource of current flag.
-     * @return boolean Whether this command source may use this flag.
+     * @param source The command source of the current flag
+     * @return Whether or not this command source may use this flag
      */
     boolean acceptsSource(@Nullable CommandSource source);
 
     /**
      * Returns whether the given value(s) for the handler are acceptable.
      *
-     * @param value String Value/input for the parameter
-     * @return boolean Whether this value is legal for this parameter.
+     * @param value The string value/input for the parameter
+     * @return Whether or not this value is legal for this parameter.
      */
     boolean acceptsValue(String value);
 
     /**
      * Returns whether this handler responds to the given flag.
      *
-     * @param flag String Flag to check against
-     * @return boolean Whether this handler responds to an flag.
+     * @param flag The flag to check against as a string
+     * @return Whether or not this handler responds to an flag
      */
     boolean handles(String flag);
 
@@ -62,10 +62,11 @@ public interface FlagHandler {
      * Processes the given value into conditions which are then
      * appended to the query.
      *
-     * @param session Current Query Session
-     * @param flag String flag used
-     * @param value String value(s) given with flag
-     * @param query Query Current query object
+     * @param session The current {@link QuerySession}
+     * @param flag The flag used as a string
+     * @param value An string value(s) given with flag
+     * @param query The current {@link Query} object
+     * @return A {@link CompletableFuture} of the process, if available
      */
-    Optional<CompletableFuture<?>> process(QuerySession session, String flag, Optional<String> value, Query query);
+    Optional<CompletableFuture<?>> process(QuerySession session, String flag, String value, Query query);
 }

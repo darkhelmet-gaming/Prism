@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -23,8 +23,10 @@
  */
 package com.helion3.prism.events.listeners;
 
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent.Disconnect;
+import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import com.helion3.prism.api.records.PrismRecord;
 
@@ -32,10 +34,11 @@ public class QuitListener {
     /**
      * Saves event records when a player quits.
      *
-     * @param event Disconnect event.
+     * @param event The disconnect event
+     * @param player The {@link Player} involved in the event
      */
     @Listener
-    public void onQuit(final Disconnect event) {
-        PrismRecord.create().player(event.getTargetEntity()).quit().save();
+    public void onQuit(final ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") Player player) {
+        PrismRecord.create().player(player).quit().save();
     }
 }

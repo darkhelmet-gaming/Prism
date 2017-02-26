@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -45,10 +45,11 @@ public class Messages {
     private Messages() {}
 
     /**
-     * Generates Text output from a Result.
+     * Generates Text output from a {@link Result}.
      *
-     * @param result Result
-     * @return Text
+     * @param result The {@link Result} to generate from
+     * @param extended Whether or not to include the full timestamp
+     * @return The generated {@link Text}
      */
     public static Text from(Result result, boolean extended) {
         Builder builder = Text.builder().append(Text.of(

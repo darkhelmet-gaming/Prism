@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -52,10 +52,10 @@ public class TypeUtil {
     /**
      * A simple, specific method to translate an event group to its past tense.
      *
-     * @param word String event name group.
-     * @return String past-tense verb.
-     * @todo move this to lang file
+     * @param word The name of the event group
+     * @return The past tense verb equivalent
      */
+    // @todo Move this to lang file
     public static String translateToPastTense(String word) {
         String verb;
 
@@ -86,38 +86,44 @@ public class TypeUtil {
     }
 
     /**
-     * Converts UUID to a string ready for use against a MySQL database.
+     * Converts a {@link UUID} to a string ready for
+     * use against a MySQL database.
      *
-     * @param id UUID
+     * @param id The {@link UUID} to convert
+     * @return An unhyphenated string representation of a {@link UUID}
      */
     public static String uuidToDbString(UUID id) {
         return uuidStringToDbString(id.toString());
     }
 
     /**
-     * Converts UUID string to a string ready for use against a MySQL database.
+     * Converts a {@link UUID} string to a string ready for
+     * use against a MySQL database.
      *
-     * @param id String
+     * @param id The string representation of a {@link UUID} to convert
+     * @return An unhyphenated string representation of a {@link UUID}
      */
     public static String uuidStringToDbString(String id) {
         return id.replace("-", "");
     }
 
     /**
-     * Converts an unhyphenated UUID string to a UUID.
+     * Converts an unhyphenated {@link UUID} string to a {@link UUID}.
      *
-     * @param uuid String
+     * @param uuid An unhyphenated string representation of a {@link UUID}
+     * @return The resulting {@link UUID}
      */
     public static UUID uuidFromDbString(String uuid) {
         return UUID.fromString(uuidStringFromDbString(uuid));
     }
 
     /**
-     * Converts an unhyphenated UUID string to a UUID String.
+     * Converts an unhyphenated {@link UUID} string to a {@link UUID} string.
      *
-     * @param uuid String
+     * @param uuid An unhyphenated string representation of a {@link UUID}
+     * @return The hyphenated string representation of a {@link UUID}
      */
-    public  static String uuidStringFromDbString(String uuid) {
+    public static String uuidStringFromDbString(String uuid) {
         // Positions need to be -2
         String completeUuid = uuid.substring(0, 8);
         completeUuid += "-" + uuid.substring(8,12);

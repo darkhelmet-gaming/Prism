@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -35,9 +35,10 @@ public class Format {
     private Format() {}
 
     /**
-     * Returns content formatted as an error message
-     * @param content Object[] Content to format
-     * @return Text Formatted content.
+     * Returns content formatted as an error message.
+     *
+     * @param objects The Object[] content to format
+     * @return The formatted content as {@link Text}
      */
     public static Text error(Object...objects) {
         return error(Text.of(objects));
@@ -45,8 +46,9 @@ public class Format {
 
     /**
      * Returns content formatted as an error message
-     * @param content Text Content to format
-     * @return Text Formatted content.
+     *
+     * @param content The {@link Text} content to format
+     * @return The formatted text as {@link Text}
      */
     public static Text error(Text content) {
         checkNotNull(content);
@@ -55,8 +57,9 @@ public class Format {
 
     /**
      * Returns content formatted as a "heading"
-     * @param content Object[] Content to format
-     * @return Text Formatted content.
+     *
+     * @param objects The Object[] content to format
+     * @return The formatted content as {@link Text}
      */
     public static Text heading(Object...objects) {
         return heading(Text.of(objects));
@@ -64,8 +67,9 @@ public class Format {
 
     /**
      * Returns content formatted as a "heading"
-     * @param content Text Content to format
-     * @return Text Formatted content.
+     *
+     * @param content The {@link Text} content to format
+     * @return The formatted text as {@link Text}
      */
     public static Text heading(Text content) {
         checkNotNull(content);
@@ -74,8 +78,9 @@ public class Format {
 
     /**
      * Returns content formatted as a standard message
-     * @param content Object[] Content to format
-     * @return Text Formatted content.
+     *
+     * @param objects The Object[] content to format
+     * @return The formatted content as {@link Text}
      */
     public static Text message(Object...objects) {
         return message(Text.of(objects));
@@ -83,8 +88,9 @@ public class Format {
 
     /**
      * Returns content formatted as a standard message
-     * @param content Text Content to format
-     * @return Text Formatted content.
+     *
+     * @param content The {@link Text} content to format
+     * @return The formatted text as {@link Text}
      */
     public static Text message(Text content) {
         checkNotNull(content);
@@ -93,8 +99,9 @@ public class Format {
 
     /**
      * Returns content formatted as a "subdued heading"
-     * @param content Object[] Content to format
-     * @return Text Formatted content.
+     *
+     * @param objects The Object[] content to format
+     * @return The formatted content as {@link Text}
      */
     public static Text subduedHeading(Object...objects) {
         return subduedHeading(Text.of(objects));
@@ -102,8 +109,9 @@ public class Format {
 
     /**
      * Returns content formatted as a "subdued heading"
-     * @param content Text Content to format
-     * @return Text Formatted content.
+     *
+     * @param content The {@link Text} content to format
+     * @return The formatted text as {@link Text}
      */
     public static Text subduedHeading(Text content) {
         checkNotNull(content);
@@ -112,8 +120,9 @@ public class Format {
 
     /**
      * Returns content formatted as a success message
-     * @param content Object[] Content to format
-     * @return Text Formatted content.
+     *
+     * @param objects The Object[] content to format
+     * @return The formatted content as {@link Text}
      */
     public static Text success(Object...objects) {
         return success(Text.of(objects));
@@ -121,8 +130,9 @@ public class Format {
 
     /**
      * Returns content formatted as a success message
-     * @param content Text Content to format
-     * @return Text Formatted content.
+     *
+     * @param content The {@link Text} content to format
+     * @return The formatted text as {@link Text}
      */
     public static Text success(Text content) {
         checkNotNull(content);
@@ -131,8 +141,9 @@ public class Format {
 
     /**
      * Returns content formatted as a bonus message
-     * @param content Object[] Content to format
-     * @return Text Formatted content.
+     *
+     * @param objects The Object[] content to format
+     * @return The formatted content as {@link Text}
      */
     public static Text bonus(Object...objects) {
         return bonus(Text.of(objects));
@@ -141,8 +152,9 @@ public class Format {
     /**
      * Returns content formatted as a bonus string. Usually used
      * for fun wording inside other messages.
-     * @param content  Text Content to format
-     * @return Text Formatted content.
+     *
+     * @param content The {@link Text} content to format
+     * @return The formatted text as {@link Text}
      */
     public static Text bonus(Text content) {
         checkNotNull(content);

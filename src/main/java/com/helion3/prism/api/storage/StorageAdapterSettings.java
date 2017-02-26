@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -29,49 +29,49 @@ public interface StorageAdapterSettings {
     /**
      * Remove a meta setting by its key
      *
-     * @param key
+     * @param key The key of the setting to delete
      */
     void deleteSetting(String key);
 
     /**
      * Retrieve a meta setting by its key
      *
-     * @param key
-     * @return String setting value
+     * @param key The key of the setting to get
+     * @return The setting value
      */
     String getSetting(String key);
 
     /**
      * Save a new key/value
      *
-     * @param key
-     * @param value
+     * @param key The key of the setting to save
+     * @param value The value to associate with the key
      */
     void saveSetting(String key, String value);
 
     /**
      * Remove an owner's meta setting by its key
      *
-     * @param key
-     * @param owner
+     * @param key The key of setting to delete
+     * @param owner The owner which the setting belongs to
      */
     void deleteSetting(String key, UUID owner);
 
     /**
-     * Retrieve an owner's meta setting by its key
+     * Save a new key/value for an owner
      *
-     * @param key
-     * @param value
-     * @param owner
+     * @param key The key of the setting to save
+     * @param value The value to associate with the key
+     * @param owner The owner which the setting belongs to
      */
     void saveSetting(String key, String value, UUID owner);
 
     /**
-     * Save a new key/value for an owner
+     * Retrieve an owner's meta setting by its key
      *
-     * @param key
-     * @param owner
-     * @return String setting value
+     * @param key The key of the setting to get
+     * @param owner The owner which the setting belongs to
+     * @return The setting value
      */
     String getSetting(String key, UUID owner);
 }

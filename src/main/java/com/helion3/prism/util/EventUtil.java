@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -38,10 +38,10 @@ public class EventUtil {
      * Reject certain events which can only be identified
      * by the change + cause signature.
      *
-     * @param a BlockType original
-     * @param b BlockType replacement
-     * @param cause Cause chain from event
-     * @return boolean If should be rejected
+     * @param a The original {@link BlockType}
+     * @param b The replacement {@link BlockType}
+     * @param cause The {@link Cause} chain from the event
+     * @return boolean Whether or not the event should be rejected
      */
     public static boolean rejectBreakEventIdentity(BlockType a, BlockType b, Cause cause) {
         // Falling blocks
@@ -61,10 +61,10 @@ public class EventUtil {
      * Reject certain events which can only be identified
      * by the change + cause signature.
      *
-     * @param a BlockType original
-     * @param b BlockType replacement
-     * @param cause Cause chain from event
-     * @return boolean If should be rejected
+     * @param a The original {@link BlockType}
+     * @param b The replacement {@link BlockType}
+     * @param cause The {@link Cause} chain from the event
+     * @return boolean Whether or not the event should be rejected
      */
     public static boolean rejectPlaceEventIdentity(BlockType a, BlockType b, Cause cause) {
         // Things that eat grass...

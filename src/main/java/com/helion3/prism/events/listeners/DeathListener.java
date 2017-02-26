@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -24,13 +24,18 @@
 package com.helion3.prism.events.listeners;
 
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.entity.DestructEntityEvent.Death;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
 
 import com.helion3.prism.api.records.PrismRecord;
 
 public class DeathListener {
+    /**
+     * Saves event records when an entity dies.
+     *
+     * @param event The death event
+     */
     @Listener
-    public void onDeath(final Death event) {
+    public void onDeath(final DestructEntityEvent.Death event) {
         PrismRecord.create().source(event.getCause()).killed(event.getTargetEntity()).save();
     }
 }

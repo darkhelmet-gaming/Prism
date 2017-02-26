@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -62,9 +62,9 @@ public class FlagOrder extends SimpleFlagHandler {
     }
 
     @Override
-    public Optional<CompletableFuture<?>> process(QuerySession session, String flag, Optional<String> value, Query query) {
-        if (value.isPresent()) {
-            switch (value.get()) {
+    public Optional<CompletableFuture<?>> process(QuerySession session, String flag, String value, Query query) {
+        if (value != null) {
+            switch (value) {
                 case "new":
                 case "newest":
                 case "desc":

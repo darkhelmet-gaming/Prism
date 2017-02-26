@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -24,5 +24,5 @@
 package com.helion3.prism.api.query;
 
 public interface QueryValueMutator {
-    public String mutate(String value);
+    String mutate(String value);
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -33,16 +33,16 @@ public interface Actionable {
      * the action removed the block, this will restore
      * the block at the same location.
      *
-     * @return ActionableResult Results of applier action
+     * @return The {@link ActionableResult} of the applier action
      */
-    public ActionableResult rollback() throws Exception;
+    ActionableResult rollback();
 
     /**
      * Re-applies the result of this event to a subject,
      * unless the subject does not exist in a state that
      * would allow this change.
      *
-     * @return ActionableResult Results of applier action
+     * @return The {@link ActionableResult} of the applier action
      */
-    public ActionableResult restore() throws Exception;
+    ActionableResult restore();
 }

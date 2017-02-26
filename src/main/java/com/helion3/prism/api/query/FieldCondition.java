@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -41,10 +41,10 @@ final public class FieldCondition implements Condition {
     /**
      * Statically build a new condition.
      *
-     * @param query DataQuery matching the field name.
-     * @param matchRule MatchRule describing comparison of values.
+     * @param query The {@link DataQuery} that matches the field name
+     * @param matchRule The {@link MatchRule} describing comparison of values
      * @param value List, String or Number value.
-     * @return Condition
+     * @return The built condition
      */
     public static FieldCondition of(DataQuery query, MatchRule matchRule, Object value) {
         return new FieldCondition(query, matchRule, value);
@@ -53,9 +53,9 @@ final public class FieldCondition implements Condition {
     /**
      * Statically build a new condition.
      *
-     * @param field DataQuery matching the field name.
-     * @param value Range of values.
-     * @return Condition
+     * @param field The {@link DataQuery} that matches the field name
+     * @param value The range of values
+     * @return The built condition
      */
     public static FieldCondition of(DataQuery field, Range<?> value) {
         return new FieldCondition(field, MatchRule.BETWEEN, value);
@@ -64,9 +64,9 @@ final public class FieldCondition implements Condition {
     /**
      * Build a condition for use with querying the storage.
      *
-     * @param field DataQuery matching the field name.
-     * @param matchRule MatchRule describing comparison of values.
-     * @param value List, String or Number value.
+     * @param field The {@link DataQuery} that matches the field name
+     * @param matchRule {@link MatchRule} describing comparison of values
+     * @param value List, String or Number value
      */
     public FieldCondition(DataQuery field, MatchRule matchRule, Object value) {
         checkNotNull(field);
@@ -81,7 +81,7 @@ final public class FieldCondition implements Condition {
      * Returns the DataQuery name for the field
      * this condition applies to.
      *
-     * @return DataQuery DataQuery field name.
+     * @return DataQuery The field name as a {@link DataQuery}
      */
     public DataQuery getFieldName() {
         return field;
@@ -90,7 +90,7 @@ final public class FieldCondition implements Condition {
     /**
      * Returns the match rule for the given values.
      *
-     * @return MatchRule Match rule for condition's value.
+     * @return MatchRule The {@link MatchRule} for this condition's value
      */
     public MatchRule getMatchRule() {
         return matchRule;

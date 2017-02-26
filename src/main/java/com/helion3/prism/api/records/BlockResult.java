@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -36,13 +36,15 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.util.BlockUtil;
 import com.helion3.prism.util.DataQueries;
 import org.spongepowered.api.world.BlockChangeFlag;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 /**
  * Represents a block change event record.
  */
 public class BlockResult extends ResultComplete implements Actionable {
     @Override
-    public ActionableResult rollback() throws Exception {
+    public ActionableResult rollback() {
         Optional<Object> optionalOriginal = data.get(DataQueries.OriginalBlock);
 
         if (!optionalOriginal.isPresent()) {
@@ -60,7 +62,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         }
 
         // Format
-        finalBlock = formatBlockData(finalBlock, optionalLocation);
+        finalBlock = formatBlockData(finalBlock, optionalLocation.get());
 
         Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(finalBlock);
         if (!optionalSnapshot.isPresent()) {
@@ -74,8 +76,14 @@ public class BlockResult extends ResultComplete implements Actionable {
             return ActionableResult.skipped(SkipReason.ILLEGAL_BLOCK);
         }
 
+        if (!snapshot.getLocation().isPresent()) {
+            return ActionableResult.skipped(SkipReason.INVALID_LOCATION);
+        }
+
+        Location<World> location = snapshot.getLocation().get();
+
         // Current block in this space.
-        BlockSnapshot original = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+        BlockSnapshot original = location.getBlock().snapshotFor(location);
 
         // Actually restore!
         if (!optionalSnapshot.get().restore(true, BlockChangeFlag.NONE)) {
@@ -83,13 +91,20 @@ public class BlockResult extends ResultComplete implements Actionable {
         }
 
         // Final block in this space.
-        BlockSnapshot resultingBlock = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+        BlockSnapshot resultingBlock = location.getBlock().snapshotFor(location);
 
         return ActionableResult.success(new Transaction<>(original, resultingBlock));
     }
 
-    public DataView formatBlockData(DataView finalBlock, Optional<Object> optionalLocation) {
-        DataView location = (MemoryDataView) optionalLocation.get();
+    /**
+     * Formats block data into a Sponge {@link DataView}.
+     *
+     * @param finalBlock The {@link DataView} to format
+     * @param optionalLocation The optional location to format the {@link DataView}
+     * @return The block data formatted as a {@link DataView}
+     */
+    public DataView formatBlockData(DataView finalBlock, Object optionalLocation) {
+        DataView location = (MemoryDataView) optionalLocation;
         DataView position = new MemoryDataContainer();
         position.set(DataQueries.X, location.get(DataQueries.X).get());
         position.set(DataQueries.Y, location.get(DataQueries.Y).get());
@@ -114,7 +129,7 @@ public class BlockResult extends ResultComplete implements Actionable {
     }
 
     @Override
-    public ActionableResult restore() throws Exception {
+    public ActionableResult restore() {
         Optional<Object> optionalFinal = data.get(DataQueries.ReplacementBlock);
         if (!optionalFinal.isPresent()) {
             return ActionableResult.skipped(SkipReason.INVALID);
@@ -131,7 +146,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         }
 
         // Format
-        finalBlock = formatBlockData(finalBlock, optionalLocation);
+        finalBlock = formatBlockData(finalBlock, optionalLocation.get());
 
         Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(finalBlock);
         if (!optionalSnapshot.isPresent()) {
@@ -145,8 +160,14 @@ public class BlockResult extends ResultComplete implements Actionable {
             return ActionableResult.skipped(SkipReason.ILLEGAL_BLOCK);
         }
 
+        if (!snapshot.getLocation().isPresent()) {
+            return ActionableResult.skipped(SkipReason.INVALID_LOCATION);
+        }
+
+        Location<World> location = snapshot.getLocation().get();
+
         // Current block in this space.
-        BlockSnapshot original = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+        BlockSnapshot original = location.getBlock().snapshotFor(location);
 
         // Actually restore!
         if (!optionalSnapshot.get().restore(true, BlockChangeFlag.NONE)) {
@@ -154,7 +175,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         }
 
         // Final block in this space.
-        BlockSnapshot resultingBlock = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+        BlockSnapshot resultingBlock = location.getBlock().snapshotFor(location);
 
         return ActionableResult.success(new Transaction<>(original, resultingBlock));
     }

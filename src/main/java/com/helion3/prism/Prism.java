@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import com.helion3.prism.api.flags.*;
 import com.helion3.prism.api.parameters.ParameterCause;
@@ -42,7 +44,6 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -66,23 +67,24 @@ import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.h2.H2StorageAdapter;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 import com.helion3.prism.storage.mysql.MySQLStorageAdapter;
+import org.spongepowered.api.scheduler.Task;
 
 /**
  * Prism is an event logging + rollback/restore engine for Minecraft servers.
  *
  * @author viveleroi
  */
-@Plugin(id = "prism", name = "Prism", version = "3.0.0")
+@Plugin(id = "prism", name = "Prism", version = "3.0.0", description = "A rollback/restore grief-prevention plugin.", authors = "viveleroi")
 final public class Prism {
-    private static List<Player> activeWands = new ArrayList<>();
+    private static List<UUID> activeWands = new ArrayList<>();
     private static final FilterList filterlist = new FilterList(FilterMode.BLACKLIST);
     private static Configuration config;
     private static Game game;
     private static List<ParameterHandler> handlers = new ArrayList<>();
     private static List<FlagHandler> flagHandlers = new ArrayList<>();
-    private static Map<Player, List<ActionableResult>> lastActionResults = new HashMap<>();
+    private static Map<UUID, List<ActionableResult>> lastActionResults = new HashMap<>();
     private static Logger logger;
-    private static Map<String,Class<? extends Result>> resultRecords = new HashMap<>();
+    private static Map<String, Class<? extends Result>> resultRecords = new HashMap<>();
     private static File parentDirectory;
     private static Object plugin;
     private static StorageAdapter storageAdapter;
@@ -100,7 +102,7 @@ final public class Prism {
     /**
      * Performs bootstrapping of Prism resources/objects.
      *
-     * @param event Server started
+     * @param event The server started event
      */
     @Listener
     public void onServerStart(GameStartedServerEvent event) {
@@ -145,7 +147,12 @@ final public class Prism {
         }
 
         // Initialize the recording queue manager
-        new RecordingQueueManager().start();
+        Task.builder()
+            .async()
+            .name("prism-recording-queue-manager")
+            .delay(1000, TimeUnit.MILLISECONDS)
+            .execute(new RecordingQueueManager())
+            .submit(this);
 
         // Commands
         game.getCommandManager().register(this, PrismCommands.getCommand(), "prism", "pr");
@@ -154,41 +161,45 @@ final public class Prism {
     }
 
     /**
-     * Returns a list of players who have active inspection wands.
+     * Returns a list of player UUIDs who have active inspection wands.
      *
-     * @return List of Players.
+     * @return The list of player UUIDs
      */
-    public static List<Player> getActiveWands() {
+    public static List<UUID> getActiveWands() {
         return activeWands;
     }
 
     /**
      * Returns the blacklist manager.
-     * @return Blacklist
+     *
+     * @return The blacklist
      */
     public static FilterList getFilterList() {
         return filterlist;
     }
 
     /**
-     * Returns the plugin configuration
-     * @return Configuration
+     * Returns the plugin configuration.
+     *
+     * @return The configuration
      */
     public static Configuration getConfig() {
         return config;
     }
 
     /**
-     * Returns the current game
-     * @return Game
+     * Returns the current game.
+     *
+     * @return The Sponge {@link Game}
      */
     public static Game getGame() {
         return game;
     }
 
     /**
-     * Injected Game instance.
-     * @param injectGame Game
+     * Injects the {@link Game} instance.
+     *
+     * @param injectGame The {@link Game} to inject
      */
     @Inject
     public void setGame(Game injectGame) {
@@ -196,16 +207,18 @@ final public class Prism {
     }
 
     /**
-     * Get a map of players and their last available actionable results.
-     * @return
+     * Get a map of player UUIDs and their last available actionable results.
+     *
+     * @return The last action results
      */
-    public static Map<Player, List<ActionableResult>> getLastActionResults() {
+    public static Map<UUID, List<ActionableResult>> getLastActionResults() {
         return lastActionResults;
     }
 
     /**
      * Returns the Logger instance for this plugin.
-     * @return Logger instance
+     *
+     * @return The logger instance
      */
     public static Logger getLogger() {
         return logger;
@@ -213,8 +226,9 @@ final public class Prism {
 
     /**
      * Returns a specific handler for a given parameter
-     * @param flag String flag name
-     * @return
+     *
+     * @param flag The flag name
+     * @return The flag handler for the specified flag
      */
     public static Optional<FlagHandler> getFlagHandler(String flag) {
         FlagHandler result = null;
@@ -229,7 +243,8 @@ final public class Prism {
 
     /**
      * Returns all currently registered flag handlers.
-     * @return List of {@link FlagHandler}
+     *
+     * @return The list of {@link FlagHandler}s
      */
     public static List<FlagHandler> getFlagHandlers() {
         return flagHandlers;
@@ -237,8 +252,9 @@ final public class Prism {
 
     /**
      * Returns a specific handler for a given parameter
-     * @param parameter String parameter name
-     * @return
+     *
+     * @param parameter The parameter name
+     * @return The handler for the parameter, if available
      */
     public static Optional<ParameterHandler> getParameterHandler(String parameter) {
         ParameterHandler result = null;
@@ -253,23 +269,26 @@ final public class Prism {
 
     /**
      * Returns all currently registered parameter handlers.
-     * @return List of {@link ParameterHandler}
+     *
+     * @return The list of {@link ParameterHandler}s
      */
     public static List<ParameterHandler> getParameterHandlers() {
         return handlers;
     }
 
     /**
-     * Get parent directory.
-     * @return File
+     * Gets the parent directory for Prism
+     *
+     * @return The parent directory
      */
     public static File getParentDirectory() {
         return parentDirectory;
     }
 
     /**
+     * Gets the plugin object for Prism
      *
-     * @return
+     * @return The plugin Object
      */
     public static Object getPlugin() {
         return plugin;
@@ -277,8 +296,9 @@ final public class Prism {
 
     /**
      * Returns the result record for a given event.
-     * @param eventName Event name.
-     * @return Result record class.
+     *
+     * @param eventName The event name
+     * @return The {@link Result} record class
      */
     public static Class<? extends Result> getResultRecord(String eventName) {
         return resultRecords.get(eventName);
@@ -286,7 +306,8 @@ final public class Prism {
 
     /**
      * Returns our storage/database adapter.
-     * @return Storage adapter.
+     *
+     * @return The Prism {@link StorageAdapter}
      */
     public static StorageAdapter getStorageAdapter() {
         return storageAdapter;
@@ -294,7 +315,8 @@ final public class Prism {
 
     /**
      * Injects the Logger instance for this plugin
-     * @param log Logger
+     *
+     * @param log The logger to inject
      */
     @Inject
     private void setLogger(Logger log) {
@@ -314,7 +336,8 @@ final public class Prism {
 
     /**
      * Register a flag handler.
-     * @param handler
+     *
+     * @param handler The handler to register
      */
     private void registerFlagHandler(FlagHandler handler) {
         checkNotNull(handler);
@@ -334,8 +357,9 @@ final public class Prism {
     }
 
     /**
+     * Registers the specified {@link ParameterHandler}s
      *
-     * @param handler
+     * @param handler The handler to register
      */
     public void registerParameterHandler(ParameterHandler handler) {
         checkNotNull(handler);
@@ -357,8 +381,9 @@ final public class Prism {
 
     /**
      * Register a custom result record for a given event name.
-     * @param eventName
-     * @param clazz
+     *
+     * @param eventName The event name
+     * @param clazz The {@link Result} class to register
      */
     public void registerResultRecord(String eventName, Class<? extends Result> clazz) {
         if (resultRecords.containsKey(eventName)) {

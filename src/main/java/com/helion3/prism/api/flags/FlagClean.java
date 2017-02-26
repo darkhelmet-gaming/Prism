@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -51,7 +51,7 @@ public class FlagClean extends SimpleFlagHandler {
     }
 
     @Override
-    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, Optional<String> value, Query query) {
+    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
         session.addFlag(Flag.CLEAN);
         return Optional.empty();
     }

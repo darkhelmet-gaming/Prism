@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -34,9 +34,10 @@ final public class Translation {
     private Translation() {}
 
     /**
+     * Gets the translation from the specified key
      *
-     * @param key
-     * @return
+     * @param key The key to get the translation from
+     * @return The translation as a string
      */
     public static String from(String key) {
         if (lang.isEmpty()) {

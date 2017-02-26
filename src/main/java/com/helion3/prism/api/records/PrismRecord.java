@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Prism, licensed under the MIT License (MIT).
  *
  * Copyright (c) 2015 Helion3 http://helion3.com/
@@ -26,7 +26,6 @@ package com.helion3.prism.api.records;
 import java.util.Date;
 import java.util.Optional;
 
-import com.helion3.prism.util.DataUtil;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -40,6 +39,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.spongepowered.api.world.Location;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -64,8 +64,9 @@ public class PrismRecord {
 
     /**
      * A final, save-ready record.
-     * @param source Result source builder.
-     * @param event Result event builder.
+     *
+     * @param source Result source builder
+     * @param event Result event builder
      */
     private PrismRecord(PrismRecordSourceBuilder source, PrismRecordEventBuilder event) {
         this.source = source;
@@ -142,7 +143,8 @@ public class PrismRecord {
 
         /**
          * Get data.
-         * @return DataContainer Data
+         *
+         * @return The data
          */
         public DataContainer getData() {
             return data;
@@ -151,17 +153,17 @@ public class PrismRecord {
         /**
          * Get the event name.
          *
-         * @return String Event name.
+         * @return The event name
          */
         public String getEventName() {
             return eventName;
         }
 
         /**
-         * Describes a single block break at a given Location.
+         * Describes a single block break at a given {@link Location}.
          *
-         * @param transaction Block broken.
-         * @return PrismRecord
+         * @param transaction The block break transaction
+         * @return The {@link PrismRecord} made from the transaction
          */
         public PrismRecord brokeBlock(Transaction<BlockSnapshot> transaction) {
             this.eventName = "break";
@@ -170,10 +172,10 @@ public class PrismRecord {
         }
 
         /**
-         * Describes a single block break at a given Location.
+         * Describes a single block break at a given {@link Location}.
          *
-         * @param transaction Block broken.
-         * @return PrismRecord
+         * @param transaction The block break transaction
+         * @return The {@link PrismRecord} made from the transaction
          */
         public PrismRecord decayedBlock(Transaction<BlockSnapshot> transaction){
             this.eventName = "decay";
@@ -184,8 +186,8 @@ public class PrismRecord {
         /**
          * Describes a single item entity drop.
          *
-         * @param entity Item Entity dropped.
-         * @return PrismRecord
+         * @param entity The item entity that was dropped
+         * @return The {@link PrismRecord} made from dropped item
          */
         public PrismRecord dropped(Entity entity) {
             this.eventName = "dropped";
@@ -194,10 +196,10 @@ public class PrismRecord {
         }
 
         /**
-         * Describes a single block break at a given Location.
+         * Describes a single block break at a given {@link Location}.
          *
-         * @param transaction Block broken.
-         * @return PrismRecord
+         * @param transaction The grow block transaction
+         * @return The {@link PrismRecord} made from this transaction
          */
         public PrismRecord grewBlock(Transaction<BlockSnapshot> transaction){
             this.eventName = "grow";
@@ -208,8 +210,8 @@ public class PrismRecord {
         /**
          * Describes a single item entity pickup.
          *
-         * @param entity Item Entity picked up.
-         * @return PrismRecord
+         * @param entity The item entity that was picked up
+         * @return The {@link PrismRecord} made from this item pickup
          */
         public PrismRecord pickedUp(Entity entity) {
             this.eventName = "picked up";
@@ -218,10 +220,10 @@ public class PrismRecord {
         }
 
         /**
-         * Describes a single block place at a given Location.
+         * Describes a single block place at a given {@link Location}.
          *
-         * @param transaction Block placed.
-         * @return PrismRecord
+         * @param transaction The place block transaction
+         * @return The {@link PrismRecord} made from this transaction
          */
         public PrismRecord placedBlock(Transaction<BlockSnapshot> transaction){
             this.eventName = "place";
@@ -232,8 +234,8 @@ public class PrismRecord {
         /**
          * Describes an entity death.
          *
-         * @param entity Living entity.
-         * @return PrismRecord
+         * @param entity The living entity killed
+         * @return The {@link PrismRecord} made from this entity death
          */
         public PrismRecord killed(Living entity){
             this.eventName = "death";
@@ -246,7 +248,7 @@ public class PrismRecord {
          * the final replacement value. We must alter the data structure
          * slightly to avoid duplication, decoupling location from blocks, etc.
          *
-         * @param transaction BlockTransaction representing a block change in the world.
+         * @param transaction The transaction representing a block change
          */
         private void writeBlockTransaction(Transaction<BlockSnapshot> transaction) {
             checkNotNull(transaction);
@@ -272,7 +274,8 @@ public class PrismRecord {
 
         /**
          * Helper method for formatting entity container data.
-         * @param entity
+         *
+         * @param entity The {@link Entity} to write to the data
          */
         private void writeEntity(Entity entity) {
             checkNotNull(entity);
@@ -303,7 +306,7 @@ public class PrismRecord {
         /**
          * Helper method for formatting item container data.
          *
-         * @param item
+         * @param item The {@link Item} to write to the data
          */
         private void writeItem(Item item) {
             checkNotNull(item);
@@ -332,8 +335,8 @@ public class PrismRecord {
         /**
          * Removes unnecessary/duplicate data from a BlockSnapshot's DataContainer.
          *
-         * @param blockSnapshot Block Snapshot.
-         * @return DataContainer Formatted Data Container.
+         * @param blockSnapshot The {@link BlockSnapshot} to format
+         * @return The formatted {@link BlockSnapshot} as a {@link DataContainer}
          */
         private DataContainer formatBlockDataContainer(BlockSnapshot blockSnapshot) {
             DataContainer block = blockSnapshot.toContainer();
@@ -364,7 +367,7 @@ public class PrismRecord {
         /**
          * Describes a player quit.
          *
-         * @return PrismRecordCompleted
+         * @return A completed {@link PrismRecord} of the source quitting
          */
         public PrismRecord quit() {
             this.eventName = "quit";
@@ -375,7 +378,7 @@ public class PrismRecord {
         /**
          * Describes a player join.
          *
-         * @return PrismRecordCompleted
+         * @return A completed {@link PrismRecord} of the source joining
          */
         public PrismRecord joined() {
             this.eventName = "join";
@@ -386,7 +389,7 @@ public class PrismRecord {
         /**
          * Helper method for formatting player container data.
          *
-         * @param player
+         * @param player The player to write to the record data
          */
         private void writePlayerLocation(Player player) {
             checkNotNull(player);
@@ -403,8 +406,8 @@ public class PrismRecord {
         /**
          * Set a cause based on a Cause chain.
          *
-         * @param cause Cause of event.
-         * @return PrismRecord
+         * @param cause The cause of the event
+         * @return This {@link PrismRecord} builder
          */
         public PrismRecordEventBuilder source(Cause cause) {
             Object source = null;
@@ -438,8 +441,8 @@ public class PrismRecord {
         /**
          * Set the Player responsible for this event.
          *
-         * @param player Player responsible for this event
-         * @return PrismRecord
+         * @param player The player responsible for this event
+         * @return This {@link PrismRecord} builder
          */
         public PrismPlayerRecordEventBuilder player(Player player) {
             return new PrismPlayerRecordEventBuilder(new PrismRecordSourceBuilder(player));
@@ -449,7 +452,7 @@ public class PrismRecord {
          * Set the source non-Entity player responsible for this event.
          *
          * @param entity Entity responsible for this event
-         * @return PrismRecord
+         * @return This {@link PrismRecord} builder
          */
         public PrismRecordEventBuilder entity(Entity entity) {
             return new PrismRecordEventBuilder(new PrismRecordSourceBuilder(entity));
@@ -458,7 +461,8 @@ public class PrismRecord {
 
     /**
      * Create a new record builder.
-     * @return PrismRecordBuilder Result builder.
+     *
+     * @return A prism record builder
      */
     public static PrismRecordBuilder create() {
         return new PrismRecordBuilder();

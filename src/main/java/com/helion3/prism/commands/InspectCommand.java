@@ -40,11 +40,11 @@ public class InspectCommand {
             if (source instanceof Player) {
                 Player player = (Player) source;
 
-                if (Prism.getActiveWands().contains(player)) {
-                    Prism.getActiveWands().remove(player);
+                if (Prism.getActiveWands().contains(player.getUniqueId())) {
+                    Prism.getActiveWands().remove(player.getUniqueId());
                     source.sendMessage(Format.heading("Inspection wand disabled."));
                 } else {
-                    Prism.getActiveWands().add(player);
+                    Prism.getActiveWands().add(player.getUniqueId());
                     source.sendMessage(Format.heading("Inspection wand enabled."));
                 }
             }

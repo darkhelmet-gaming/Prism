@@ -1,3 +1,14 @@
+// Apply plugins
+plugins {
+    id 'java'
+    id 'idea'
+    id 'maven'
+    id 'eclipse'
+    id 'checkstyle'
+    id 'com.github.hierynomus.license' version '0.13.0'
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
+}
+
 def getVersionName = { ->
     def stdout = new ByteArrayOutputStream()
     exec {
@@ -8,26 +19,6 @@ def getVersionName = { ->
 }
 
 version = getVersionName()
-
-// Gradle repositories and dependencies
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
-    }
-}
-
-// Apply plugin
-apply plugin: 'java'
-apply plugin: 'license'
-apply plugin: 'checkstyle'
-apply plugin: 'maven'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'com.github.johnrengelman.shadow'
 
 // Default tasks
 defaultTasks 'licenseFormat', 'check', 'build', 'shadowJar'
@@ -47,21 +38,18 @@ ext.commit = project.hasProperty("commit") ? commit : 'unknown'
 
 // Project repositories
 repositories {
-    mavenCentral()
+    jcenter()
     maven {
-        name 'Sponge maven repo'
-        url 'http://repo.spongepowered.org/maven'
-    }
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots'
+        name 'Sponge Maven Repository'
+        url 'https://repo.spongepowered.org/maven'
     }
 }
 
 // Project dependencies
 dependencies {
     compile 'org.spongepowered:spongeapi:6.0.0-SNAPSHOT'
-    compile 'org.mongodb:mongo-java-driver:3.2.0'
-    compile 'com.zaxxer:HikariCP:2.4.3'
+    compile 'org.mongodb:mongo-java-driver:3.4.2'
+    compile 'com.zaxxer:HikariCP:2.5.1'
 }
 
 shadowJar {

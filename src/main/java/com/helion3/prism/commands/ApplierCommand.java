@@ -135,7 +135,7 @@ public class ApplierCommand {
                                 ));
 
                                 if (source instanceof Player) {
-                                    Prism.getLastActionResults().put((Player) source, actionResults);
+                                    Prism.getLastActionResults().put(((Player) source).getUniqueId(), actionResults);
                                 }
                             }
                         });

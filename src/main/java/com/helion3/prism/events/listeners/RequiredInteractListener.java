@@ -55,7 +55,7 @@ public class RequiredInteractListener {
         Optional<Player> playerCause = event.getCause().first(Player.class);
 
         // Wand support
-        if (playerCause.isPresent() && Prism.getActiveWands().contains(playerCause.get())) {
+        if (playerCause.isPresent() && Prism.getActiveWands().contains(playerCause.get().getUniqueId())) {
             if (event instanceof InteractBlockEvent) {
                 QuerySession session = new QuerySession(playerCause.get());
                 session.addFlag(Flag.EXTENDED);

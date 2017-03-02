@@ -53,7 +53,7 @@ public class FlagDrain extends SimpleFlagHandler {
     }
 
     @Override
-    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, Optional<String> value, Query query) {
+    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, @Nullable String value, Query query) {
         session.addFlag(Flag.DRAIN);
         return Optional.empty();
     }

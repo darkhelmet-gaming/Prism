@@ -62,9 +62,9 @@ public class FlagOrder extends SimpleFlagHandler {
     }
 
     @Override
-    public Optional<CompletableFuture<?>> process(QuerySession session, String flag, Optional<String> value, Query query) {
-        if (value.isPresent()) {
-            switch (value.get()) {
+    public Optional<CompletableFuture<?>> process(QuerySession session, String flag, @Nullable String value, Query query) {
+        if (value != null) {
+            switch (value) {
                 case "new":
                 case "newest":
                 case "desc":

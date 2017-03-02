@@ -32,7 +32,7 @@ import org.spongepowered.api.data.Transaction;
 public class ActionableResult {
     private final boolean changeWasApplied;
     private final SkipReason skipReason;
-    private final Optional<Transaction<?>> transaction;
+    private final Transaction<?> transaction;
 
     /**
      * Build a skipped actionable result.
@@ -53,13 +53,13 @@ public class ActionableResult {
     }
 
     private ActionableResult(@Nullable Transaction<?> transaction) {
-        this.transaction = Optional.ofNullable(transaction);
+        this.transaction = transaction;
         this.changeWasApplied = true;
         this.skipReason = null;
     }
 
     private ActionableResult(SkipReason skipReason) {
-        this.transaction = Optional.empty();
+        this.transaction = null;
         this.changeWasApplied = false;
         this.skipReason = skipReason;
     }
@@ -77,7 +77,7 @@ public class ActionableResult {
      * @return Optional transaction.
      */
     public Optional<Transaction<?>> getTransaction() {
-        return transaction;
+        return Optional.ofNullable(transaction);
     }
 
     /**

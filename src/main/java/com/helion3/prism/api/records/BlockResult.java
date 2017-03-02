@@ -25,6 +25,7 @@ package com.helion3.prism.api.records;
 
 import java.util.Optional;
 
+import com.google.common.base.Preconditions;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
@@ -36,6 +37,8 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.util.BlockUtil;
 import com.helion3.prism.util.DataQueries;
 import org.spongepowered.api.world.BlockChangeFlag;
+
+import javax.annotation.Nonnull;
 
 /**
  * Represents a block change event record.
@@ -60,7 +63,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         }
 
         // Format
-        finalBlock = formatBlockData(finalBlock, optionalLocation);
+        finalBlock = formatBlockData(finalBlock, optionalLocation.get());
 
         Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(finalBlock);
         if (!optionalSnapshot.isPresent()) {
@@ -88,8 +91,9 @@ public class BlockResult extends ResultComplete implements Actionable {
         return ActionableResult.success(new Transaction<>(original, resultingBlock));
     }
 
-    public DataView formatBlockData(DataView finalBlock, Optional<Object> optionalLocation) {
-        DataView location = (MemoryDataView) optionalLocation.get();
+    public DataView formatBlockData(DataView finalBlock, @Nonnull Object optionalLocation) {
+        Preconditions.checkNotNull(optionalLocation, "The location you are formatting cannot be null.");
+        DataView location = (MemoryDataView) optionalLocation;
         DataView position = new MemoryDataContainer();
         position.set(DataQueries.X, location.get(DataQueries.X).get());
         position.set(DataQueries.Y, location.get(DataQueries.Y).get());
@@ -131,7 +135,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         }
 
         // Format
-        finalBlock = formatBlockData(finalBlock, optionalLocation);
+        finalBlock = formatBlockData(finalBlock, optionalLocation.get());
 
         Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(finalBlock);
         if (!optionalSnapshot.isPresent()) {

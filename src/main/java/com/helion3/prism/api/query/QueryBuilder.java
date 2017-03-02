@@ -86,7 +86,7 @@ public class QueryBuilder {
         // Track all parameter pairs
         Map<String, String> definedParameters = new HashMap<>();
 
-        if (arguments.length > 0) {
+        if (arguments != null && arguments.length > 0) {
             List<CompletableFuture<?>> futures = new ArrayList<>();
             for (String arg : arguments) {
                 Optional<CompletableFuture<?>> listenable;
@@ -110,7 +110,7 @@ public class QueryBuilder {
             }
 
             if (!futures.isEmpty()) {
-                CompletableFuture<Void> combinedFuture = CompletableFuture.<Void>allOf(futures.toArray(new CompletableFuture[futures.size()]));
+                CompletableFuture<Void> combinedFuture = CompletableFuture.<Void>allOf(futures.toArray(new CompletableFuture<?>[futures.size()]));
                 combinedFuture.thenAccept((q) -> future.complete(query));
             } else {
                 future.complete(query);

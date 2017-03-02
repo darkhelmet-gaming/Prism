@@ -55,7 +55,7 @@ public class UndoCommand {
                 }
 
                 List<ActionableResult> results = Prism.getLastActionResults().get(((Player) source).getUniqueId());
-                if (results == null) {
+                if (results == null || results.isEmpty()) {
                     source.sendMessage(Format.error("You have no valid actions to undo."));
                     return CommandResult.empty();
                 }

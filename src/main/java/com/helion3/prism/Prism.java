@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import com.helion3.prism.api.flags.*;
 import com.helion3.prism.api.parameters.ParameterCause;
@@ -48,6 +49,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.scheduler.Task;
 
 import com.google.inject.Inject;
 import com.helion3.prism.api.filters.FilterList;
@@ -145,7 +147,12 @@ final public class Prism {
         }
 
         // Initialize the recording queue manager
-        new RecordingQueueManager().start();
+        Task.builder()
+            .async()
+            .name("PrismRecordingQueueManager")
+            .interval(1, TimeUnit.SECONDS)
+            .execute(new RecordingQueueManager())
+            .submit(this);
 
         // Commands
         game.getCommandManager().register(this, PrismCommands.getCommand(), "prism", "pr");

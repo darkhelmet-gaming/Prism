@@ -142,7 +142,7 @@ public class QueryBuilder {
 
             // @todo should move this
             if (!defaultsUsed.isEmpty()) {
-                session.getCommandSource().get().sendMessage(Format.subduedHeading(Text.of(String.format("Defaults used: %s", defaultsUsed))));
+                session.getCommandSource().sendMessage(Format.subduedHeading(Text.of(String.format("Defaults used: %s", defaultsUsed))));
             }
         }
 
@@ -180,7 +180,7 @@ public class QueryBuilder {
         FlagHandler handler = optionalHandler.get();
 
         // Allows this command source?
-        if (!handler.acceptsSource(session.getCommandSource().get())) {
+        if (!handler.acceptsSource(session.getCommandSource())) {
             throw new ParameterException("This command source may not use the \"" + flag + "\" flag.");
         }
 
@@ -236,7 +236,7 @@ public class QueryBuilder {
         ParameterHandler handler = optionalHandler.get();
 
         // Allows this command source?
-        if (!handler.acceptsSource(session.getCommandSource().get())) {
+        if (!handler.acceptsSource(session.getCommandSource())) {
             throw new ParameterException("This command source may not use the \"" + parameter.getKey() + "\" parameter.");
         }
 

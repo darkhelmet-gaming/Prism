@@ -47,12 +47,7 @@ public class AsyncUtil {
      * @param session QuerySession running this lookup.
      */
     public static void lookup(final QuerySession session) throws Exception {
-        if (!session.getCommandSource().isPresent()) {
-            // @todo handle this.
-            return;
-        }
-
-        CommandSource source = session.getCommandSource().get();
+        CommandSource source = session.getCommandSource();
 
         // Enforce lookup limits
         session.getQuery().setLimit(Prism.getConfig().getNode("query", "lookup", "limit").getInt());
@@ -69,12 +64,12 @@ public class AsyncUtil {
                         // Build paginated content
                         PaginationList.Builder builder = service.get().builder();
                         builder.contents(messages);
-                        builder.sendTo(session.getCommandSource().get());
+                        builder.sendTo(source);
                         builder.linesPerPage(5);
                     }
                 } else {
                     for (Result result : results) {
-                        session.getCommandSource().get().sendMessage(Messages.from(result, session.hasFlag(Flag.EXTENDED)));
+                        source.sendMessage(Messages.from(result, session.hasFlag(Flag.EXTENDED)));
                     }
                 }
             }
@@ -111,7 +106,7 @@ public class AsyncUtil {
                             callback.success(results);
                         }
                     } catch(Exception e) {
-                        session.getCommandSource().get().sendMessage(Format.error(e.getMessage()));
+                        session.getCommandSource().sendMessage(Format.error(e.getMessage()));
                         e.printStackTrace();
                     }
                 });

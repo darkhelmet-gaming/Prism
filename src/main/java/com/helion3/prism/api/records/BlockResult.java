@@ -36,6 +36,8 @@ import com.helion3.prism.Prism;
 import com.helion3.prism.util.BlockUtil;
 import com.helion3.prism.util.DataQueries;
 import org.spongepowered.api.world.BlockChangeFlag;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 /**
  * Represents a block change event record.
@@ -69,13 +71,19 @@ public class BlockResult extends ResultComplete implements Actionable {
 
         BlockSnapshot snapshot = optionalSnapshot.get();
 
+        if (!snapshot.getLocation().isPresent()) {
+            return ActionableResult.skipped(SkipReason.INVALID_LOCATION);
+        }
+
+        Location<World> location = snapshot.getLocation().get();
+
         // Filter unsafe blocks
         if (BlockUtil.rejectIllegalApplierBlock(snapshot.getState().getType())) {
             return ActionableResult.skipped(SkipReason.ILLEGAL_BLOCK);
         }
 
         // Current block in this space.
-        BlockSnapshot original = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+        BlockSnapshot original = location.getBlock().snapshotFor(location);
 
         // Actually restore!
         if (!optionalSnapshot.get().restore(true, BlockChangeFlag.NONE)) {
@@ -83,7 +91,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         }
 
         // Final block in this space.
-        BlockSnapshot resultingBlock = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+        BlockSnapshot resultingBlock = location.getBlock().snapshotFor(location);
 
         return ActionableResult.success(new Transaction<>(original, resultingBlock));
     }
@@ -140,13 +148,19 @@ public class BlockResult extends ResultComplete implements Actionable {
 
         BlockSnapshot snapshot = optionalSnapshot.get();
 
+        if (!snapshot.getLocation().isPresent()) {
+            return ActionableResult.skipped(SkipReason.INVALID_LOCATION);
+        }
+
+        Location<World> location = snapshot.getLocation().get();
+
         // Filter unsafe blocks
         if (BlockUtil.rejectIllegalApplierBlock(snapshot.getState().getType())) {
             return ActionableResult.skipped(SkipReason.ILLEGAL_BLOCK);
         }
 
         // Current block in this space.
-        BlockSnapshot original = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+        BlockSnapshot original = location.getBlock().snapshotFor(location);
 
         // Actually restore!
         if (!optionalSnapshot.get().restore(true, BlockChangeFlag.NONE)) {
@@ -154,7 +168,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         }
 
         // Final block in this space.
-        BlockSnapshot resultingBlock = snapshot.getLocation().get().getBlock().snapshotFor(snapshot.getLocation().get());
+        BlockSnapshot resultingBlock = location.getBlock().snapshotFor(location);
 
         return ActionableResult.success(new Transaction<>(original, resultingBlock));
     }

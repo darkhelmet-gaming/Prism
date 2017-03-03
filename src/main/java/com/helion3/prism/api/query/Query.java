@@ -31,7 +31,7 @@ final public class Query {
     private int limit = 1000;
 
     public void addConditions(List<Condition> conditions) {
-        conditions.addAll(conditions);
+        this.conditions.addAll(conditions);
     }
 
     /**

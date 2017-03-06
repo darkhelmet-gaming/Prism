@@ -23,6 +23,7 @@
  */
 package com.helion3.prism.api.query;
 
+import com.google.common.base.Preconditions;
 import org.spongepowered.api.command.CommandSource;
 
 import com.helion3.prism.api.flags.Flag;
@@ -30,9 +31,9 @@ import com.helion3.prism.api.parameters.ParameterException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -42,17 +43,15 @@ import javax.annotation.Nullable;
  */
 public class QuerySession {
     protected List<Flag> flags = new ArrayList<>();
-    protected final CommandSource commandSource;
+    protected CommandSource commandSource;
     protected Query query;
     protected int radius;
     protected Sort sort = Sort.NEWEST_FIRST;
 
-    /**
-     * Constructs a new session without any command source.
+    /*
+     * Disallow creation of a query session without a command source.
      */
-    public QuerySession() {
-        this.commandSource = null;
-    }
+    private QuerySession() {}
 
     /**
      * Constructs a new query session with a known command source.
@@ -62,7 +61,8 @@ public class QuerySession {
      *
      * @param commandSource CommandSource this session belongs to.
      */
-    public QuerySession(CommandSource commandSource) {
+    public QuerySession(@Nonnull CommandSource commandSource) {
+        Preconditions.checkNotNull(commandSource, "The specified command source cannot be null.");
         this.commandSource = commandSource;
     }
 
@@ -75,12 +75,12 @@ public class QuerySession {
     }
 
     /**
-     * Returns the command source this session belongs to, if any.
+     * Returns the command source this session belongs to
      *
      * @return CommandSource
      */
-    public Optional<CommandSource> getCommandSource(){
-        return Optional.ofNullable(commandSource);
+    public CommandSource getCommandSource(){
+        return commandSource;
     }
 
     /**

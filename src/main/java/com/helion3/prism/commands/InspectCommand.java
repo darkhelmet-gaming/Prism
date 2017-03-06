@@ -23,6 +23,7 @@
  */
 package com.helion3.prism.commands;
 
+import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.command.CommandResult;
@@ -47,9 +48,11 @@ public class InspectCommand {
                     Prism.getActiveWands().add(player.getUniqueId());
                     source.sendMessage(Format.heading("Inspection wand enabled."));
                 }
-            }
 
-            return CommandResult.empty();
+                return CommandResult.success();
+            } else {
+                throw new CommandException(Format.error("You must be a player to use this command."));
+            }
         }).build();
     }
 }

@@ -36,7 +36,6 @@ import org.spongepowered.api.world.World;
 public class WorldUtil {
     private WorldUtil() {}
 
-
     public static int removeIllegalBlocks(Location<World> location, int radius, Cause cause) {
         final World world = location.getExtent();
 

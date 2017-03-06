@@ -26,7 +26,6 @@ package com.helion3.prism.storage.h2;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.query.SQLQuery;
-import com.helion3.prism.api.query.Sort;
 
 public class H2SQLQuery extends SQLQuery {
     public H2SQLQuery(String query) {

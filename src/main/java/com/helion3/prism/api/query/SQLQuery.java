@@ -24,13 +24,13 @@
 package com.helion3.prism.api.query;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.helion3.prism.api.flags.Flag;
 import org.spongepowered.api.data.DataQuery;
 
 import com.google.common.collect.Range;
@@ -172,9 +172,7 @@ public class SQLQuery {
          * @return
          */
         public Builder order(String... cols) {
-            for (String col : cols) {
-                orderBy.add(col);
-            }
+            Collections.addAll(orderBy, cols);
             return this;
         }
 
@@ -184,36 +182,36 @@ public class SQLQuery {
          * @return String
          */
         public SQLQuery build() {
-            String sql = mode.name() + " ";
+            StringBuilder sql = new StringBuilder(mode.name() + " ");
             
             // Columns
-            sql += String.join(", ", columns) + " ";
+            sql.append(String.join(", ", columns)).append(" ");
 
             // Tables
-            sql += "FROM " + table + " ";
+            sql.append("FROM ").append(table).append(" ");
 
             // Joins
             for (Entry<String, String> entry : joins.entrySet()) {
-                sql += "LEFT JOIN " + entry.getKey() + " ON " + entry.getValue() + " ";
+                sql.append("LEFT JOIN ").append(entry.getKey()).append(" ON ").append(entry.getValue()).append(" ");
             }
 
             // Where
             List<String> queryConditions = buildConditions(conditions);
             if (!queryConditions.isEmpty()) {
-                sql += "WHERE " + String.join(" ", queryConditions).replaceFirst("AND ", "").replaceFirst("OR ", "") + " ";
+                sql.append("WHERE ").append(String.join(" ", queryConditions).replaceFirst("AND ", "").replaceFirst("OR ", "")).append(" ");
             }
 
             // Group By
             if (!groupBy.isEmpty()) {
-                sql += "GROUP BY " + String.join(", ", groupBy) + " ";
+                sql.append("GROUP BY ").append(String.join(", ", groupBy)).append(" ");
             }
 
             // Order By
             if (!orderBy.isEmpty()) {
-                sql += "ORDER BY " + String.join(", ", orderBy) + " ";
+                sql.append("ORDER BY ").append(String.join(", ", orderBy)).append(" ");
             }
 
-            return new SQLQuery(sql.trim());
+            return new SQLQuery(sql.toString().trim());
         }
 
         /**
@@ -229,12 +227,12 @@ public class SQLQuery {
                 if (fieldOrGroup instanceof ConditionGroup) {
                     ConditionGroup group = (ConditionGroup) fieldOrGroup;
 
-                    String query = "AND (";
+                    StringBuilder query = new StringBuilder("AND (");
 
                     List<String> inner = new ArrayList<>();
                     for (Object obj : group.getConditions()) {
                         if (obj instanceof ConditionGroup) {
-                            query += buildConditions(((ConditionGroup) obj).getConditions());
+                            query.append(buildConditions(((ConditionGroup) obj).getConditions()));
                         }
                         else if (obj instanceof FieldCondition) {
                             FieldCondition condition = (FieldCondition) obj;
@@ -248,7 +246,7 @@ public class SQLQuery {
                     }
 
                     if (!inner.isEmpty()) {
-                        query += String.join(group.getOperator().name() + " ", inner);
+                        query.append(String.join(group.getOperator().name() + " ", inner));
                     }
 
                     queryConditions.add(query + ")");

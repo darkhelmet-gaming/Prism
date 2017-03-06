@@ -24,5 +24,5 @@
 package com.helion3.prism.api.query;
 
 public interface QueryValueMutator {
-    public String mutate(String value);
+    String mutate(String value);
 }

@@ -39,7 +39,7 @@ import com.helion3.prism.api.storage.StorageAdapterSettings;
 public class H2StorageAdapter implements StorageAdapter {
     private final String tablePrefix = Prism.getConfig().getNode("db", "h2", "tablePrefix").getString();
     private final SqlService sql = Prism.getGame().getServiceManager().provide(SqlService.class).get();
-    private final String dbPath = Prism.getParentDirectory().getAbsolutePath().toString() + "/" + Prism.getConfig().getNode("db", "name").getString();
+    private final String dbPath = Prism.getParentDirectory().getAbsolutePath() + "/" + Prism.getConfig().getNode("db", "name").getString();
     private final StorageAdapterRecords records;
     private static DataSource db;
 

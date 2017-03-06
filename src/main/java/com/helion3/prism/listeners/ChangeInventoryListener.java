@@ -21,29 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.events.listeners;
+package com.helion3.prism.listeners;
 
 import com.helion3.prism.api.records.PrismRecord;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 
-public class DropItemListener {
+public class ChangeInventoryListener {
     /**
-     * Saves event records when a player drops an item.
+     * Saves event records when a player picks up an item.
      *
-     * @param event Dispense event.
+     * @param event Pickup event.
      */
     @Listener(order = Order.POST)
-    public void onDrop(final DropItemEvent.Dispense event, @Root EntitySpawnCause spawncause) {
-        if (spawncause.getEntity() instanceof User) {
-            for (Entity entity : event.getEntities()) {
-                PrismRecord.create().entity(spawncause.getEntity()).dropped(entity).save();
-            }
-        }
+    public void onItemPickup(final ChangeInventoryEvent.Pickup event, @Root Player player) {
+        PrismRecord.create().player(player).pickedUp(event.getTargetEntity()).save();
     }
 }

@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 final public class Query {
-    private List<Condition> conditions = new ArrayList<>();
+    private final List<Condition> conditions = new ArrayList<>();
     private int limit = 1000;
 
     public void addConditions(List<Condition> conditions) {

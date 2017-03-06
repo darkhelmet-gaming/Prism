@@ -54,16 +54,12 @@ public class EntityResult extends ResultComplete implements Actionable {
         }
 
         // Don't let it burn to death (again?)
-        Optional<IgniteableData> flaming = entity.get().get(IgniteableData.class);
-        if (flaming.isPresent()) {
-            entity.get().offer(flaming.get().fireTicks().set(0));
-        }
+        entity.get().get(IgniteableData.class).ifPresent(data -> entity.get().offer(data.fireTicks().set(0)));
 
         // Heal, it was probably killed.
-        HealthData health = entity.get().get(HealthData.class).get();
-        entity.get().offer(health.health().set(health.maxHealth().get()));
+        entity.get().get(HealthData.class).ifPresent(data -> entity.get().offer(data.health().set(data.maxHealth().get())));
 
-        return ActionableResult.success(new Transaction<>(new SerializableNonExistant(), entity.get()));
+        return ActionableResult.success(new Transaction<>(new SerializableNonExistent(), entity.get()));
     }
 
     @Override
@@ -90,9 +86,11 @@ public class EntityResult extends ResultComplete implements Actionable {
         unsafe.set(DataQueries.Pos, coordinates);
 
         DataView rotation = entity.getView(DataQueries.Rotation).get();
+        /* @todo For now this is commented out as we are not using it yet.
         List<Double> rot = new ArrayList<>();
         rot.add(rotation.getDouble(DataQueries.Y).get());
         rot.add(rotation.getDouble(DataQueries.Z).get());
+        */
         unsafe.set(DataQueries.Rotation, rotation);
 
         entity.set(DataQueries.UnsafeData, unsafe);

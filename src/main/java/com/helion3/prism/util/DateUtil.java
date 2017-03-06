@@ -48,7 +48,7 @@ public class DateUtil {
         diff[3] = ( diffInSeconds >= 60 ? diffInSeconds % 60 : diffInSeconds );
         diff[2] = ( diffInSeconds = ( diffInSeconds / 60 ) ) >= 60 ? diffInSeconds % 60 : diffInSeconds;
         diff[1] = ( diffInSeconds = ( diffInSeconds / 60 ) ) >= 24 ? diffInSeconds % 24 : diffInSeconds;
-        diff[0] = ( diffInSeconds = ( diffInSeconds / 24 ) );
+        diff[0] = ( diffInSeconds / 24 );
 
         // Only show days if more than 1
         if( diff[0] >= 1 ) {
@@ -94,22 +94,24 @@ public class DateUtil {
                     final int tfValue = Integer.parseInt(m.group(1));
                     final String tfFormat = m.group(2);
 
-                    if (tfFormat.equals("w")) {
-                        calendar.add(Calendar.WEEK_OF_YEAR, (future ? 1 : -1) * tfValue);
-                    }
-                    else if( tfFormat.equals( "d" ) ) {
-                        calendar.add(Calendar.DAY_OF_MONTH, (future ? 1 : -1) * tfValue);
-                    }
-                    else if (tfFormat.equals( "h" ) ) {
-                        calendar.add(Calendar.HOUR, (future ? 1 : -1) * tfValue);
-                    }
-                    else if (tfFormat.equals( "m" )) {
-                        calendar.add(Calendar.MINUTE, (future ? 1 : -1) * tfValue);
-                    }
-                    else if (tfFormat.equals("s")) {
-                        calendar.add(Calendar.SECOND, (future ? 1 : -1) * tfValue);
-                    } else {
-                        return null;
+                    switch (tfFormat) {
+                        case "w":
+                            calendar.add(Calendar.WEEK_OF_YEAR, (future ? 1 : -1) * tfValue);
+                            break;
+                        case "d":
+                            calendar.add(Calendar.DAY_OF_MONTH, (future ? 1 : -1) * tfValue);
+                            break;
+                        case "h":
+                            calendar.add(Calendar.HOUR, (future ? 1 : -1) * tfValue);
+                            break;
+                        case "m":
+                            calendar.add(Calendar.MINUTE, (future ? 1 : -1) * tfValue);
+                            break;
+                        case "s":
+                            calendar.add(Calendar.SECOND, (future ? 1 : -1) * tfValue);
+                            break;
+                        default:
+                            return null;
                     }
                 }
             }

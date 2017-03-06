@@ -25,6 +25,7 @@ package com.helion3.prism.commands;
 
 import com.helion3.prism.util.CauseUtil;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -43,8 +44,7 @@ public class ExtinguishCommand {
             .arguments(GenericArguments.integer(Text.of("radius")))
             .executor((source, args) -> {
                 if (!(source instanceof Player)) {
-                    source.sendMessage(Format.error("You must be a player to use this command."));
-                    return CommandResult.empty();
+                    throw new CommandException(Format.error("You must be a player to use this command."));
                 }
 
                 int radius = args.<Integer>getOne("radius").get();

@@ -21,23 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.events.listeners;
+package com.helion3.prism.listeners;
 
-import com.helion3.prism.api.records.PrismRecord;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
+import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 
-public class ChangeInventoryListener {
+import com.helion3.prism.api.records.PrismRecord;
+
+public class JoinListener {
     /**
-     * Saves event records when a player picks up an item.
+     * Saves event records when a player joins.
      *
-     * @param event Pickup event.
+     * @param event Join event.
      */
-    @Listener(order = Order.POST)
-    public void onItemPickup(final ChangeInventoryEvent.Pickup event, @Root Player player) {
-        PrismRecord.create().player(player).pickedUp(event.getTargetEntity()).save();
+    @Listener
+    public void onJoin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
+        PrismRecord.create().player(player).joined().save();
     }
 }

@@ -64,9 +64,7 @@ public class ParameterPlayer extends SimpleParameterHandler {
     public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
         CompletableFuture<GameProfile> future = Prism.getGame().getServer().getGameProfileManager().get(value, true);
 
-        future.thenAccept((profile) -> {
-            query.addCondition(FieldCondition.of(DataQueries.Player, MatchRule.EQUALS, profile.getUniqueId().toString()));
-        });
+        future.thenAccept(profile -> query.addCondition(FieldCondition.of(DataQueries.Player, MatchRule.EQUALS, profile.getUniqueId().toString())));
 
         return Optional.of(future);
     }

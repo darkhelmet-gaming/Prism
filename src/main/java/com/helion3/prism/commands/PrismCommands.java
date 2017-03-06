@@ -27,6 +27,7 @@ import java.util.List;
 
 import com.helion3.prism.api.query.Sort;
 import org.spongepowered.api.command.CommandCallable;
+import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
@@ -67,8 +68,11 @@ public class PrismCommands {
                             TextColors.GRAY, "IRC: ", TextColors.WHITE, "irc.esper.net #prism\n",
                             TextColors.GRAY, "Site: ", TextColors.WHITE, "http://discover-prism.com"
                     ));
+
+                    return CommandResult.success();
+                } else {
+                    throw new CommandException(Format.error("You do not have permission to use this command."));
                 }
-                return CommandResult.empty();
             })
             .children(builder.build()).build();
     }

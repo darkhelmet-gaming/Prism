@@ -38,7 +38,13 @@ import com.helion3.prism.api.flags.*;
 import com.helion3.prism.api.parameters.ParameterCause;
 import com.helion3.prism.api.records.BlockResult;
 import com.helion3.prism.api.records.Result;
-import com.helion3.prism.events.listeners.*;
+import com.helion3.prism.listeners.ChangeBlockListener;
+import com.helion3.prism.listeners.ChangeInventoryListener;
+import com.helion3.prism.listeners.DeathListener;
+import com.helion3.prism.listeners.DropItemListener;
+import com.helion3.prism.listeners.JoinListener;
+import com.helion3.prism.listeners.QuitListener;
+import com.helion3.prism.listeners.RequiredInteractListener;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
@@ -74,7 +80,7 @@ import com.helion3.prism.storage.mysql.MySQLStorageAdapter;
  *
  * @author viveleroi
  */
-@Plugin(id = "prism", name = "Prism", version = "3.0.0")
+@Plugin(id = "prism", name = "Prism", version = "3.0.0", description = "A rollback/restore grief-prevention plugin.", authors = "viveleroi")
 final public class Prism {
     private static List<UUID> activeWands = new ArrayList<>();
     private static final FilterList filterlist = new FilterList(FilterMode.BLACKLIST);

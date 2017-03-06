@@ -51,7 +51,7 @@ public class FlagExtended extends SimpleFlagHandler {
     }
 
     @Override
-    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, Optional<String> value, Query query) {
+    public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, @Nullable String value, Query query) {
         session.addFlag(Flag.EXTENDED);
         session.addFlag(Flag.NO_GROUP);
         return Optional.empty();

@@ -161,13 +161,13 @@ public class QueryBuilder {
         flag = flag.substring(1);
 
         // Determine the true alias and value
-        Optional<String> optionalValue = Optional.empty();
+        String value = null;
         if (flag.contains("=")) {
             // Split the parameter: values
             String[] split = flag.split("=");
             flag = split[0];
             if (split.length == 2 && !split[1].trim().isEmpty()) {
-                optionalValue = Optional.of(split[1]);
+                value = split[1];
             }
         }
 
@@ -185,11 +185,11 @@ public class QueryBuilder {
         }
 
         // Validate value
-        if (optionalValue.isPresent() && !handler.acceptsValue(optionalValue.get())) {
-            throw new ParameterException("Invalid value \"" + optionalValue.get() + "\" for parameter \"" + flag + "\".");
+        if (value != null && !handler.acceptsValue(value)) {
+            throw new ParameterException("Invalid value \"" + value + "\" for parameter \"" + flag + "\".");
         }
 
-        return handler.process(session, flag, optionalValue, query);
+        return handler.process(session, flag, value, query);
     }
 
     /**

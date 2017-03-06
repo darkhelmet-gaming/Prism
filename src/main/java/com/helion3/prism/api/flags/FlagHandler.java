@@ -67,5 +67,5 @@ public interface FlagHandler {
      * @param value String value(s) given with flag
      * @param query Query Current query object
      */
-    Optional<CompletableFuture<?>> process(QuerySession session, String flag, Optional<String> value, Query query);
+    Optional<CompletableFuture<?>> process(QuerySession session, @Nullable String flag, String value, Query query);
 }

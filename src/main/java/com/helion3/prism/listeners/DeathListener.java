@@ -21,16 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.events.listeners;
+package com.helion3.prism.listeners;
 
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.entity.DestructEntityEvent.Death;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
 
 import com.helion3.prism.api.records.PrismRecord;
 
 public class DeathListener {
     @Listener
-    public void onDeath(final Death event) {
+    public void onDeath(final DestructEntityEvent.Death event) {
         PrismRecord.create().source(event.getCause()).killed(event.getTargetEntity()).save();
     }
 }

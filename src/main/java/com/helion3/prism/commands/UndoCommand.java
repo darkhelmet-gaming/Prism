@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Lists;
+import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.command.CommandResult;
@@ -50,14 +51,12 @@ public class UndoCommand {
             .permission("prism.undo")
             .executor((source, args) -> {
                 if (!(source instanceof Player)) {
-                    source.sendMessage(Format.error("You must be a player to use this command."));
-                    return CommandResult.empty();
+                    throw new CommandException(Format.error("You must be a player to use this command."));
                 }
 
                 List<ActionableResult> results = Prism.getLastActionResults().get(((Player) source).getUniqueId());
                 if (results == null || results.isEmpty()) {
-                    source.sendMessage(Format.error("You have no valid actions to undo."));
-                    return CommandResult.empty();
+                    throw new CommandException(Format.error("You have no valid actions to undo."));
                 }
                 // Reverse the order of the list to undo last action.
                 results = Lists.reverse(results);
@@ -97,7 +96,7 @@ public class UndoCommand {
                 tokens.put("appliedCount", "" + applied);
                 tokens.put("skippedCount", "" + skipped);
 
-                String messageTemplate = null;
+                final String messageTemplate;
                 if (skipped > 0) {
                     messageTemplate = Translation.from("rollback.success.withskipped");
                 } else {

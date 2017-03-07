@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.command.CommandSource;

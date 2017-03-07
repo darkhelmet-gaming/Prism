@@ -93,7 +93,7 @@ abstract public class Result {
      */
     public static Result from(String eventName, boolean isAggregate) throws IllegalAccessException, InstantiationException {
         // Build our result object
-        Result result = null;
+        final Result result;
         if (isAggregate) {
             result = new ResultAggregate();
         } else {

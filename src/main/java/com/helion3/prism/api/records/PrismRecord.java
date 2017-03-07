@@ -26,7 +26,6 @@ package com.helion3.prism.api.records;
 import java.util.Date;
 import java.util.Optional;
 
-import com.helion3.prism.util.DataUtil;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;

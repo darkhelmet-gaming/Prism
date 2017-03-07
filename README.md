@@ -59,7 +59,7 @@ If using Mongo, download the `Prism-(version)-all.jar` file. Otherwise, download
 
 ## Permissions
 
-- `prism.info` - Can view informations about Prism.
+- `prism.info` - Can view information about Prism.
 - `prism.help` - Can view help.
 - `prism.inspect` - Can use inspection wand.
 - `prism.lookup` - Can query records (via lookup or near).

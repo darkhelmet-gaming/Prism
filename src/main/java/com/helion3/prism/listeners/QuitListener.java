@@ -21,10 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.events.listeners;
+package com.helion3.prism.listeners;
 
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent.Disconnect;
+import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import com.helion3.prism.api.records.PrismRecord;
 
@@ -35,7 +37,7 @@ public class QuitListener {
      * @param event Disconnect event.
      */
     @Listener
-    public void onQuit(final Disconnect event) {
-        PrismRecord.create().player(event.getTargetEntity()).quit().save();
+    public void onQuit(final ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") Player player) {
+        PrismRecord.create().player(player).quit().save();
     }
 }

@@ -26,7 +26,6 @@ package com.helion3.prism.storage.mongodb;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,7 +35,6 @@ import java.util.concurrent.CompletableFuture;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.query.*;
 import com.helion3.prism.api.records.Result;
-import com.helion3.prism.util.Format;
 import org.bson.Document;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -180,12 +178,12 @@ public class MongoRecords implements StorageAdapterRecords {
        for (Condition fieldOrGroup : fieldsOrGroups) {
            if (fieldOrGroup instanceof ConditionGroup) {
                ConditionGroup group = (ConditionGroup) fieldOrGroup;
-               Document subdoc = buildConditions(group.getConditions());
+               Document subDoc = buildConditions(group.getConditions());
 
                if (group.getOperator().equals(Operator.OR)) {
-                   conditions.append("$or", subdoc);
+                   conditions.append("$or", subDoc);
                } else {
-                   conditions.putAll(subdoc);
+                   conditions.putAll(subDoc);
                }
            } else {
                FieldCondition field = (FieldCondition) fieldOrGroup;
@@ -257,7 +255,7 @@ public class MongoRecords implements StorageAdapterRecords {
        Document limit = new Document("$limit", query.getLimit());
 
        // Build aggregators
-       AggregateIterable<Document> aggregated = null;
+       final AggregateIterable<Document> aggregated;
        if (!session.hasFlag(Flag.NO_GROUP)) {
            // Grouping fields
            Document groupFields = new Document();

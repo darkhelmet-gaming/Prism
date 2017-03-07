@@ -37,7 +37,7 @@ import com.helion3.prism.util.DataQueries;
  * as part of the group.
  */
 final public class ConditionGroup implements Condition {
-    private List<Condition> conditions = new ArrayList<>();
+    private final List<Condition> conditions = new ArrayList<>();
     private final Operator operator;
 
     public enum Operator {

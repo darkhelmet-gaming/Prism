@@ -122,7 +122,7 @@ public class ApplierCommand {
                                 tokens.put("appliedCount", ""+appliedCount);
                                 tokens.put("skippedCount", ""+skippedCount);
 
-                                String messageTemplate = null;
+                                final String messageTemplate;
                                 if (skippedCount > 0) {
                                     messageTemplate = Translation.from("rollback.success.withskipped");
                                 } else {

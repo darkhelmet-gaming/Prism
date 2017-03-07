@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.events.listeners;
+package com.helion3.prism.listeners;
 
 import java.util.Optional;
 
@@ -32,6 +32,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.InteractEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent.Secondary;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -51,49 +52,43 @@ public class RequiredInteractListener {
      * @param event InteractEvent
      */
     @Listener
-    public void onInteract(final InteractEvent event) {
-        Optional<Player> playerCause = event.getCause().first(Player.class);
-
+    public void onInteract(final InteractBlockEvent event, @First Player player) {
         // Wand support
-        if (playerCause.isPresent() && Prism.getActiveWands().contains(playerCause.get().getUniqueId())) {
-            if (event instanceof InteractBlockEvent) {
-                QuerySession session = new QuerySession(playerCause.get());
-                session.addFlag(Flag.EXTENDED);
-                session.addFlag(Flag.NO_GROUP);
+        if (Prism.getActiveWands().contains(player.getUniqueId())) {
+            QuerySession session = new QuerySession(player);
+            session.addFlag(Flag.EXTENDED);
+            session.addFlag(Flag.NO_GROUP);
 
-                Query query = session.newQuery();
+            Query query = session.newQuery();
 
-                InteractBlockEvent blockEvent = (InteractBlockEvent) event;
-
-                if (blockEvent.getTargetBlock().equals(BlockSnapshot.NONE)) {
-                    return;
-                }
-
-                // Location of block
-                Location<World> location = blockEvent.getTargetBlock().getLocation().get();
-
-                // Secondary click gets location relative to side clicked
-                if (event instanceof Secondary) {
-                    location = location.getRelative(blockEvent.getTargetSide());
-                }
-
-                query.addCondition(ConditionGroup.from(location));
-
-                playerCause.get().sendMessage(Format.heading(String.format("Querying x:%d y:%d z:%d:",
-                        location.getBlockX(),
-                        location.getBlockY(),
-                        location.getBlockZ())));
-
-                // Pass off to an async lookup helper
-                try {
-                    AsyncUtil.lookup(session);
-                } catch (Exception e) {
-                    playerCause.get().sendMessage(Format.error(e.getMessage()));
-                    e.printStackTrace();
-                }
-
-                event.setCancelled(true);
+            if (event.getTargetBlock().equals(BlockSnapshot.NONE)) {
+                return;
             }
+
+            // Location of block
+            Location<World> location = event.getTargetBlock().getLocation().get();
+
+            // Secondary click gets location relative to side clicked
+            if (event instanceof Secondary) {
+                location = location.getRelative(event.getTargetSide());
+            }
+
+            query.addCondition(ConditionGroup.from(location));
+
+            player.sendMessage(Format.heading(String.format("Querying x:%d y:%d z:%d:",
+                    location.getBlockX(),
+                    location.getBlockY(),
+                    location.getBlockZ())));
+
+            // Pass off to an async lookup helper
+            try {
+                AsyncUtil.lookup(session);
+            } catch (Exception e) {
+                player.sendMessage(Format.error(e.getMessage()));
+                e.printStackTrace();
+            }
+
+            event.setCancelled(true);
         }
     }
 }

@@ -28,12 +28,12 @@ import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.MemoryDataContainer;
 
 /**
- * Represents a non-existant value for use with a Transaction.
+ * Represents a non-existent value for use with a Transaction.
  * For example, an entity rollback produces an entity but there's
  * no valid original value. This allows us to safely represent
  * that without having to wrap/extend the transaction class.
  */
-public class SerializableNonExistant implements DataSerializable {
+public class SerializableNonExistent implements DataSerializable {
     @Override
     public int getContentVersion() {
         return 1;

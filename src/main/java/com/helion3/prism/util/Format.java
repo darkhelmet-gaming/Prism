@@ -36,7 +36,7 @@ public class Format {
 
     /**
      * Returns content formatted as an error message
-     * @param content Object[] Content to format
+     * @param objects Object[] Content to format
      * @return Text Formatted content.
      */
     public static Text error(Object...objects) {
@@ -55,7 +55,7 @@ public class Format {
 
     /**
      * Returns content formatted as a "heading"
-     * @param content Object[] Content to format
+     * @param objects Object[] Content to format
      * @return Text Formatted content.
      */
     public static Text heading(Object...objects) {
@@ -74,7 +74,7 @@ public class Format {
 
     /**
      * Returns content formatted as a standard message
-     * @param content Object[] Content to format
+     * @param objects Object[] Content to format
      * @return Text Formatted content.
      */
     public static Text message(Object...objects) {
@@ -93,7 +93,7 @@ public class Format {
 
     /**
      * Returns content formatted as a "subdued heading"
-     * @param content Object[] Content to format
+     * @param objects Object[] Content to format
      * @return Text Formatted content.
      */
     public static Text subduedHeading(Object...objects) {
@@ -112,7 +112,7 @@ public class Format {
 
     /**
      * Returns content formatted as a success message
-     * @param content Object[] Content to format
+     * @param objects Object[] Content to format
      * @return Text Formatted content.
      */
     public static Text success(Object...objects) {
@@ -131,7 +131,7 @@ public class Format {
 
     /**
      * Returns content formatted as a bonus message
-     * @param content Object[] Content to format
+     * @param objects Object[] Content to format
      * @return Text Formatted content.
      */
     public static Text bonus(Object...objects) {

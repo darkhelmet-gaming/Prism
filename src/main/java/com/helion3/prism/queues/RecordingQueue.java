@@ -36,7 +36,7 @@ public class RecordingQueue {
     /**
      * Adds a new Event to the recording queue.
      *
-     * @param event Event to be queued for database write
+     * @param container Event to be queued for database write
      */
     public static void add(final DataContainer container) {
         if (container == null) {
@@ -49,7 +49,7 @@ public class RecordingQueue {
     /**
      * Returns all unsaved events in the queue.
      *
-     * @return Current unsaved {@link EventRecord} queue
+     * @return Current unsaved {@link DataContainer} queue
      */
     public static LinkedBlockingQueue<DataContainer> getQueue() {
         return queue;

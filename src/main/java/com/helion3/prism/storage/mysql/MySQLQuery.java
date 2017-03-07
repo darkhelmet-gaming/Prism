@@ -26,7 +26,6 @@ package com.helion3.prism.storage.mysql;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.api.query.SQLQuery;
-import com.helion3.prism.api.query.Sort;
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.TypeUtil;
 

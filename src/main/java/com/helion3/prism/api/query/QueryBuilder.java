@@ -38,9 +38,6 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.api.text.Text;
 
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.flags.FlagHandler;
 import com.helion3.prism.api.parameters.ParameterException;
@@ -104,9 +101,7 @@ public class QueryBuilder {
                     definedParameters.put(pair.getKey(), pair.getValue());
                 }
 
-                if (listenable.isPresent()) {
-                    futures.add(listenable.get());
-                }
+                listenable.ifPresent(futures::add);
             }
 
             if (!futures.isEmpty()) {
@@ -121,7 +116,7 @@ public class QueryBuilder {
 
         if (Prism.getConfig().getNode("defaults", "enabled").getBoolean()) {
             // Require any parameter defaults
-            String defaultsUsed = "";
+            StringBuilder defaultsUsed = new StringBuilder();
             for (ParameterHandler handler : Prism.getParameterHandlers()) {
                 boolean aliasFound = false;
 
@@ -133,16 +128,14 @@ public class QueryBuilder {
                 }
 
                 if (!aliasFound) {
-                    Optional<Pair<String, String>> pair = handler.processDefault(session, query);
-                    if (pair.isPresent()) {
-                        defaultsUsed += pair.get().getKey() + ":" + pair.get().getValue() + " ";
-                    }
+                    handler.processDefault(session, query).ifPresent(stringStringPair -> defaultsUsed.append(stringStringPair.getKey())
+                        .append(":").append(stringStringPair.getValue()).append(" "));
                 }
             }
 
             // @todo should move this
-            if (!defaultsUsed.isEmpty()) {
-                session.getCommandSource().sendMessage(Format.subduedHeading(Text.of(String.format("Defaults used: %s", defaultsUsed))));
+            if (defaultsUsed.length() > 0) {
+                session.getCommandSource().sendMessage(Format.subduedHeading(Text.of(String.format("Defaults used: %s", defaultsUsed.toString()))));
             }
         }
 

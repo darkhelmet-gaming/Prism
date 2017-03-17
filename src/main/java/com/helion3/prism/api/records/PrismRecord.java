@@ -393,7 +393,6 @@ public class PrismRecord {
                 }
             }
 
-
             data.set(DataQueries.Target, itemId);
             data.set(DataQueries.Quantity, itemQty);
         }

@@ -42,6 +42,7 @@ import com.helion3.prism.listeners.ChangeBlockListener;
 import com.helion3.prism.listeners.ChangeInventoryListener;
 import com.helion3.prism.listeners.DeathListener;
 import com.helion3.prism.listeners.DropItemListener;
+import com.helion3.prism.listeners.ClickInventoryListener;
 import com.helion3.prism.listeners.JoinListener;
 import com.helion3.prism.listeners.QuitListener;
 import com.helion3.prism.listeners.RequiredInteractListener;
@@ -389,6 +390,7 @@ final public class Prism {
         eventManager.unregisterPluginListeners(this);
 
         eventManager.registerListeners(this, new ChangeBlockListener());
+        eventManager.registerListeners(this, new ClickInventoryListener());
 
         if (listening.DEATH) {
             eventManager.registerListeners(this, new DeathListener());

@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -45,6 +46,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.helion3.prism.Prism;
 import com.helion3.prism.queues.RecordingQueue;
 import com.helion3.prism.util.DataQueries;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
 /**
  * An easy-to-understand factory class for Prism records.
@@ -205,6 +209,18 @@ public class PrismRecord {
         }
 
         /**
+         * Describes a single itemstack insertion at a given Location.
+         *
+         * @param transaction itemstack inserted.
+         * @return PrismRecord
+         */
+        public PrismRecord insertItem(SlotTransaction transaction){
+            this.eventName = "insert";
+            writeItemTransaction(transaction);
+            return new PrismRecord(source, this);
+        }
+
+        /**
          * Describes a single item entity pickup.
          *
          * @param entity Item Entity picked up.
@@ -225,6 +241,18 @@ public class PrismRecord {
         public PrismRecord placedBlock(Transaction<BlockSnapshot> transaction){
             this.eventName = "place";
             writeBlockTransaction(transaction);
+            return new PrismRecord(source, this);
+        }
+
+        /**
+         * Describes a single itemstack insertion at a given Location.
+         *
+         * @param transaction itemstack inserted.
+         * @return PrismRecord
+         */
+        public PrismRecord removeItem(SlotTransaction transaction){
+            this.eventName = "remove";
+            writeItemTransaction(transaction);
             return new PrismRecord(source, this);
         }
 
@@ -323,6 +351,48 @@ public class PrismRecord {
                 itemId = optionalItem.get().getString(DataQuery.of("id")).orElse("item");
                 itemQty = optionalItem.get().getInt(DataQuery.of("Count")).orElse(1);
             }
+
+            data.set(DataQueries.Target, itemId);
+            data.set(DataQueries.Quantity, itemQty);
+        }
+
+        /**
+         * Helper method for writing block transaction data, using only
+         * the final replacement value. We must alter the data structure
+         * slightly to avoid duplication, decoupling location from blocks, etc.
+         *
+         * @param transaction BlockTransaction representing a block change in the world.
+         */
+        private void writeItemTransaction(SlotTransaction transaction) {
+            checkNotNull(transaction);
+            Slot slot = transaction.getSlot();
+
+            // Location
+            DataContainer location = ((TileEntityCarrier) slot.parent()).getLocation().toContainer();
+            data.set(DataQueries.Location, location);
+
+            String itemId = "";
+            int itemQty = 0;
+
+            // Insert
+            if (transaction.getFinal().getType() != ItemTypes.NONE || transaction.getFinal().getCount() > transaction.getOriginal().getCount()) {
+                itemId = transaction.getFinal().getType().getId();
+                if (transaction.getOriginal().getType() == ItemTypes.NONE) {
+                    itemQty = transaction.getFinal().getCount();
+                } else {
+                    itemQty = transaction.getFinal().getCount() - transaction.getOriginal().getCount();
+                }
+            }
+            // Remove
+            if (transaction.getFinal().getType() == ItemTypes.NONE || transaction.getFinal().getCount() < transaction.getOriginal().getCount()) {
+                itemId = transaction.getOriginal().getType().getId();
+                if (transaction.getFinal().getType() == ItemTypes.NONE){
+                    itemQty = transaction.getOriginal().getCount();
+                } else {
+                    itemQty = transaction.getOriginal().getCount() - transaction.getFinal().getCount();
+                }
+            }
+
 
             data.set(DataQueries.Target, itemId);
             data.set(DataQueries.Quantity, itemQty);

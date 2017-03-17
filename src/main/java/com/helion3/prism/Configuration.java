@@ -132,6 +132,11 @@ public class Configuration {
                 dbH2TablePrefix.setValue("prism_");
             }
 
+            ConfigurationNode eventIgnoreFakePlayers = rootNode.getNode("events", "ignore-fakeplayers");
+            if (eventIgnoreFakePlayers.isVirtual()) {
+                eventIgnoreFakePlayers.setValue(true);
+            }
+
             // Events
             ConfigurationNode eventBlockBreak = rootNode.getNode("events", "break");
             if (eventBlockBreak.isVirtual()) {

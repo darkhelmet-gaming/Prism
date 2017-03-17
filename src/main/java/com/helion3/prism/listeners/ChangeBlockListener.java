@@ -27,6 +27,7 @@ import java.util.Optional;
 
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -52,6 +53,13 @@ public class ChangeBlockListener {
             event.setCancelled(true);
             return;
         }
+
+        Optional<TileEntity> teCause = event.getCause().first(TileEntity.class);
+        if (teCause.isPresent() && Prism.getConfig().getNode("events", "ignore-fakeplayers").getBoolean()){
+            // ignore fake player if set in the config
+            return;
+        }
+
         for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
             if (!transaction.isValid()) {
                 continue;

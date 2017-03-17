@@ -134,7 +134,7 @@ public class Configuration {
 
             ConfigurationNode eventIgnoreFakePlayers = rootNode.getNode("events", "ignore-fakeplayers");
             if (eventIgnoreFakePlayers.isVirtual()) {
-                eventIgnoreFakePlayers.setValue(true);
+                eventIgnoreFakePlayers.setValue(false);
             }
 
             // Events

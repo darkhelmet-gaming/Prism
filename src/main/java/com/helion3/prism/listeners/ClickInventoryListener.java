@@ -50,7 +50,7 @@ public class ClickInventoryListener {
 
         for(SlotTransaction transaction : event.getTransactions()) {
             Slot slot = transaction.getSlot();
-            if (slot.parent() instanceof TileEntityCarrier && transaction.getOriginal().getCount() != transaction.getFinal().getCount()) {
+            if (slot.parent() instanceof TileEntityCarrier && transaction.getOriginal() != transaction.getFinal()) {
                 //If the final item is SOMETHING (or amount is more) person is inserting
                 if (transaction.getFinal().getType() != ItemTypes.NONE || transaction.getFinal().getCount() > transaction.getOriginal().getCount()) {
                     if (Prism.listening.INSERT) {

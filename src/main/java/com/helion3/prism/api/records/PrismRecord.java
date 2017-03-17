@@ -209,12 +209,12 @@ public class PrismRecord {
         }
 
         /**
-         * Describes a single itemstack insertion at a given Location.
+         * Describes a single ItemStack insertion at a given Location.
          *
-         * @param transaction itemstack inserted.
+         * @param transaction ItemStack inserted.
          * @return PrismRecord
          */
-        public PrismRecord insertItem(SlotTransaction transaction){
+        public PrismRecord insertedItem(SlotTransaction transaction){
             this.eventName = "insert";
             writeItemTransaction(transaction);
             return new PrismRecord(source, this);
@@ -245,12 +245,12 @@ public class PrismRecord {
         }
 
         /**
-         * Describes a single itemstack insertion at a given Location.
+         * Describes a single ItemStack insertion at a given Location.
          *
-         * @param transaction itemstack inserted.
+         * @param transaction ItemStack inserted.
          * @return PrismRecord
          */
-        public PrismRecord removeItem(SlotTransaction transaction){
+        public PrismRecord removedItem(SlotTransaction transaction){
             this.eventName = "remove";
             writeItemTransaction(transaction);
             return new PrismRecord(source, this);
@@ -357,11 +357,12 @@ public class PrismRecord {
         }
 
         /**
-         * Helper method for writing block transaction data, using only
-         * the final replacement value. We must alter the data structure
-         * slightly to avoid duplication, decoupling location from blocks, etc.
+         * Helper method for writing item transaction data. We must identify
+         * the Type of movement to properly calcuate the amount of items being moved.
+         * We can get the Location of the inventory involved, from the parent
+         * Tile Entity.
          *
-         * @param transaction BlockTransaction representing a block change in the world.
+         * @param transaction SlotTransaction representing a ItemStack movement.
          */
         private void writeItemTransaction(SlotTransaction transaction) {
             checkNotNull(transaction);

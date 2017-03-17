@@ -63,7 +63,7 @@ public class Messages {
 
         String quantity = result.getTargetQuantity();
         if (!quantity.isEmpty()) {
-            builder.append(Text.of(TextColors.DARK_AQUA, "x" , quantity, " "));
+            builder.append(Text.of(TextColors.GREEN, "x" , quantity, " "));
         }
 
         if (result instanceof ResultAggregate) {

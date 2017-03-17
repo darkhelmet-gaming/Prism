@@ -43,7 +43,7 @@ public class ClickInventoryListener {
      */
     @Listener(order = Order.POST)
     public void onClickInventory(ClickInventoryEvent event, @First Player player) {
-        //Make sure we have a transaction to validate
+        // Make sure we have a transaction to validate
         if (event.getTransactions().size() <= 0) {
             return;
         }

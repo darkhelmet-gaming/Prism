@@ -61,6 +61,11 @@ public class Messages {
             builder.append(Text.of(TextColors.DARK_AQUA, target, " "));
         }
 
+        String quantity = result.getTargetQuantity();
+        if (!quantity.isEmpty()) {
+            builder.append(Text.of(TextColors.DARK_AQUA, "x" , quantity, " "));
+        }
+
         if (result instanceof ResultAggregate) {
             int count = result.data.getInt(DataQueries.Count).get();
             builder.append(Text.of(TextColors.GREEN, "x" + count, " "));

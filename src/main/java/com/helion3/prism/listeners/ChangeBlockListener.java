@@ -55,7 +55,7 @@ public class ChangeBlockListener {
         }
 
         Optional<TileEntity> teCause = event.getCause().first(TileEntity.class);
-        if (teCause.isPresent() && Prism.getConfig().getNode("events", "ignore-fakeplayers").getBoolean()){
+        if (teCause.isPresent() && Prism.listening.IGNORE_FAKEPLAYERS){
             // ignore fake player if set in the config
             return;
         }

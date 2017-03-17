@@ -29,7 +29,7 @@ public class Listening {
     public final boolean DECAY;
     public final boolean DROP;
     public final boolean GROW;
-    public final boolean IGNORE_FAKEPLAYERS;
+    public final boolean IGNOREFAKEPLAYERS;
     public final boolean JOIN;
     public final boolean PICKUP;
     public final boolean PLACE;
@@ -41,7 +41,7 @@ public class Listening {
         DECAY = Prism.getConfig().getNode("events", "decay").getBoolean();
         DROP = Prism.getConfig().getNode("events", "drop").getBoolean();
         GROW = Prism.getConfig().getNode("events", "grow").getBoolean();
-        IGNORE_FAKEPLAYERS = Prism.getConfig().getNode("events", "ignore-fakeplayers").getBoolean();
+        IGNOREFAKEPLAYERS = Prism.getConfig().getNode("events", "ignore-fakeplayers").getBoolean();
         JOIN = Prism.getConfig().getNode("events", "join").getBoolean();
         PICKUP = Prism.getConfig().getNode("events", "pickup").getBoolean();
         PLACE = Prism.getConfig().getNode("events", "place").getBoolean();

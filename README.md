@@ -16,9 +16,6 @@ Because of this, our feature set is growing. File an issue or let us know in IRC
 
 If using Mongo, download the `Prism-(version)-all.jar` file. Otherwise, download `Prism-(version).jar`.
 
-- Prism 3.0.0-beta2+ supports SpongeAPI 4.0+
-- Prism 3.0.0-beta1+ supports SpongeAPI 3.0+
-
 ## Installation
 
 1. Place into your `mods` directory. 

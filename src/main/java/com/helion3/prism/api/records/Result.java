@@ -70,6 +70,16 @@ abstract public class Result {
     }
 
     /**
+     * Returns the quantity as a string of the target item,
+     * block, or entity of this event record.
+     *
+     * @return String quantity.
+     */
+    public String getTargetQuantity() {
+        return formatId(data.getString(DataQueries.Quantity).orElse(""));
+    }
+
+    /**
      * Strips ID prefixes, like "minecraft:".
      *
      * @param id String ID

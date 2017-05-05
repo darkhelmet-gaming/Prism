@@ -168,6 +168,11 @@ public class Configuration {
                 eventEntityDeath.setValue(true);
             }
 
+            ConfigurationNode eventItemInsert = rootNode.getNode("events", "insert");
+            if (eventItemInsert.isVirtual()) {
+                eventItemInsert.setValue(true);
+            }
+
             ConfigurationNode eventPlayerJoin = rootNode.getNode("events", "join");
             if (eventPlayerJoin.isVirtual()) {
                 eventPlayerJoin.setValue(false);
@@ -176,6 +181,11 @@ public class Configuration {
             ConfigurationNode eventPlayerQuit = rootNode.getNode("events", "quit");
             if (eventPlayerQuit.isVirtual()) {
                 eventPlayerQuit.setValue(false);
+            }
+
+            ConfigurationNode eventItemRemove = rootNode.getNode("events", "remove");
+            if (eventItemRemove.isVirtual()) {
+                eventItemRemove.setValue(true);
             }
 
             // Default parameters

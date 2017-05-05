@@ -29,10 +29,12 @@ public class Listening {
     public final boolean DECAY;
     public final boolean DROP;
     public final boolean GROW;
+    public final boolean INSERT;
     public final boolean JOIN;
     public final boolean PICKUP;
     public final boolean PLACE;
     public final boolean QUIT;
+    public final boolean REMOVE;
 
     public Listening() {
         BREAK = Prism.getConfig().getNode("events", "break").getBoolean();
@@ -40,9 +42,11 @@ public class Listening {
         DECAY = Prism.getConfig().getNode("events", "decay").getBoolean();
         DROP = Prism.getConfig().getNode("events", "drop").getBoolean();
         GROW = Prism.getConfig().getNode("events", "grow").getBoolean();
+        INSERT = Prism.getConfig().getNode("events", "insert").getBoolean();
         JOIN = Prism.getConfig().getNode("events", "join").getBoolean();
         PICKUP = Prism.getConfig().getNode("events", "pickup").getBoolean();
         PLACE = Prism.getConfig().getNode("events", "place").getBoolean();
         QUIT = Prism.getConfig().getNode("events", "quit").getBoolean();
+        REMOVE = Prism.getConfig().getNode("events", "remove").getBoolean();
     }
 }

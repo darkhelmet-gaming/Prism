@@ -69,11 +69,17 @@ public class TypeUtil {
             case "grow":
                 verb = "grew";
                 break;
+            case "insert":
+                verb = "inserted";
+                break;
             case "join":
                 verb = "joined";
                 break;
             case "place":
                 verb = "placed";
+                break;
+            case "remove":
+                verb = "removed";
                 break;
             case "death":
                 verb = "killed";

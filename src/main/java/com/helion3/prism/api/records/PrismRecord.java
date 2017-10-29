@@ -30,7 +30,6 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
@@ -133,7 +132,7 @@ public class PrismRecord {
     public static class PrismRecordEventBuilder {
         protected final PrismRecordSourceBuilder source;
         protected String eventName;
-        protected DataContainer data = new MemoryDataContainer();
+        protected DataContainer data = DataContainer.createNew();
 
         private PrismRecordEventBuilder(PrismRecordSourceBuilder source) {
             this.source = source;

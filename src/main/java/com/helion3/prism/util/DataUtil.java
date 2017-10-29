@@ -31,7 +31,6 @@ import com.helion3.prism.api.records.Result;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -69,7 +68,7 @@ public class DataUtil {
      * @return DataView
      */
     public static DataView dataViewFromJson(JsonObject json) {
-        DataContainer data = new MemoryDataContainer();
+        DataContainer data = DataContainer.createNew();
         for (Entry<String, JsonElement> entry : json.entrySet()) {
             Optional<Object> value = jsonElementToObject(entry.getValue());
             if (value.isPresent()) {

@@ -39,7 +39,6 @@ import org.bson.Document;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 
 import com.google.common.collect.Range;
 import com.helion3.prism.Prism;
@@ -124,7 +123,7 @@ public class MongoRecords implements StorageAdapterRecords {
      * @return Data container.
      */
     private DataContainer documentToDataContainer(Document document) {
-        DataContainer result = new MemoryDataContainer();
+        DataContainer result = DataContainer.createNew();
 
         for (String key : document.keySet()) {
             DataQuery keyQuery = DataQuery.of(key);

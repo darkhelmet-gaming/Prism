@@ -41,7 +41,6 @@ import com.helion3.prism.api.records.Result;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -163,7 +162,7 @@ public class MySQLRecords implements StorageAdapterRecords {
                 Result result = Result.from(rs.getString(DataQueries.EventName.toString()), !session.hasFlag(Flag.NO_GROUP));
 
                 // Restore the data container
-                DataContainer data = new MemoryDataContainer();
+                DataContainer data = DataContainer.createNew();
                 data.set(DataQueries.EventName, rs.getString(DataQueries.EventName.toString()));
                 data.set(DataQueries.Created, rs.getLong(DataQueries.Created.toString()));
 
@@ -173,7 +172,7 @@ public class MySQLRecords implements StorageAdapterRecords {
                 if (!session.hasFlag(Flag.NO_GROUP)) {
                     data.set(DataQueries.Count, rs.getInt("total"));
                 } else {
-                    DataContainer loc = new MemoryDataContainer();
+                    DataContainer loc = DataContainer.createNew();
                     loc.set(DataQueries.X, rs.getInt(DataQueries.X.toString()));
                     loc.set(DataQueries.Y, rs.getInt(DataQueries.Y.toString()));
                     loc.set(DataQueries.Z, rs.getInt(DataQueries.Z.toString()));

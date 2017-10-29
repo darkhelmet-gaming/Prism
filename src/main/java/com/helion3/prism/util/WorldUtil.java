@@ -36,7 +36,7 @@ import org.spongepowered.api.world.World;
 public class WorldUtil {
     private WorldUtil() {}
 
-    public static int removeIllegalBlocks(Location<World> location, int radius, Cause cause) {
+    public static int removeIllegalBlocks(Location<World> location, int radius) {
         final World world = location.getExtent();
 
         int xMin = location.getBlockX() - radius;
@@ -64,7 +64,7 @@ public class WorldUtil {
                 for (int y = yMin; y <= yMax; y++) {
                     BlockType existing = world.getBlock(x, y, z).getType();
                     if (existing.equals(BlockTypes.FIRE) || existing.equals(BlockTypes.TNT)) {
-                        world.setBlockType(x, y, z, BlockTypes.AIR, cause);
+                        world.setBlockType(x, y, z, BlockTypes.AIR);
                         changeCount++;
                     }
                 }
@@ -80,10 +80,9 @@ public class WorldUtil {
      * @param type BlockType to remove.
      * @param location Location center
      * @param radius Integer radius around location
-     * @param cause Cause
      * @return integer Count of removals
      */
-    public static int removeAroundFromLocation(BlockType type, Location<World> location, int radius, Cause cause) {
+    public static int removeAroundFromLocation(BlockType type, Location<World> location, int radius) {
         final World world = location.getExtent();
 
         int xMin = location.getBlockX() - radius;
@@ -110,7 +109,7 @@ public class WorldUtil {
             for (int z = zMin; z <= zMax; z++) {
                 for (int y = yMin; y <= yMax; y++) {
                     if (world.getBlock(x, y, z).getType().equals(type)) {
-                        world.setBlockType(x, y, z, BlockTypes.AIR, cause);
+                        world.setBlockType(x, y, z, BlockTypes.AIR);
                         changeCount++;
                     }
                 }
@@ -159,13 +158,12 @@ public class WorldUtil {
      *
      * @param location Location center
      * @param radius Integer radius around location
-     * @param cause Cause
      * @return integer Count of removals
      */
-    public static int removeLiquidsAroundLocation(Location<World> location, int radius, Cause cause) {
+    public static int removeLiquidsAroundLocation(Location<World> location, int radius) {
         int changeCount = 0;
         for (BlockType liquid : BlockUtil.getLiquidBlockTypes()) {
-            changeCount = removeAroundFromLocation(liquid, location, radius, cause);
+            changeCount = removeAroundFromLocation(liquid, location, radius);
         }
 
         return changeCount;

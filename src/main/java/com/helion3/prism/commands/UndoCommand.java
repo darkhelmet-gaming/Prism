@@ -29,7 +29,6 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;

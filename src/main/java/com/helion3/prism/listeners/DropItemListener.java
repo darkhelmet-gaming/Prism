@@ -24,12 +24,15 @@
 package com.helion3.prism.listeners;
 
 import com.helion3.prism.api.records.PrismRecord;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 public class DropItemListener {
     /**
@@ -39,8 +42,14 @@ public class DropItemListener {
      */
     @Listener(order = Order.POST)
     public void onDrop(final DropItemEvent.Dispense event, @Root Player spawnCause) {
-        for (Entity e : event.getEntities()) {
-            PrismRecord.create().entity(spawnCause).dropped(e).save();
+        for (Entity entity : event.getEntities()) {
+            if (!(entity instanceof Item)) {
+                continue;
+            }
+            
+            Item item = (Item) entity;
+            Transaction<ItemStackSnapshot> transaction = new Transaction<>(ItemStackSnapshot.NONE, item.item().get());
+            PrismRecord.create().entity(spawnCause).dropped(transaction).save();
         }
     }
 }

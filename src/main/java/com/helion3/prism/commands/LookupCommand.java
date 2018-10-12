@@ -57,12 +57,7 @@ public class LookupCommand {
                     CompletableFuture<Void> future = session.newQueryFromArguments(parameters);
                     future.thenAccept((v) -> {
                         // Pass off to an async lookup helper
-                        try {
-                            AsyncUtil.lookup(session);
-                        } catch (Exception e) {
-                            source.sendMessage(Format.error(Text.of(e.getMessage())));
-                            e.printStackTrace();
-                        }
+                        AsyncUtil.lookup(session);
                     });
                 } catch(Exception e) {
                     String message = e.getMessage() == null ? "Unknown error. Please check the console." : e.getMessage();

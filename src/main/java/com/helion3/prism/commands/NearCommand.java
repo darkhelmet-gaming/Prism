@@ -51,13 +51,7 @@ public class NearCommand {
                 session.newQuery().addCondition(ConditionGroup.from(((Player) source).getLocation(), radius));
 
                 // Pass off to an async lookup helper
-                try {
-                    AsyncUtil.lookup(session);
-                } catch (Exception e) {
-                    source.sendMessage(Format.error(e.getMessage()));
-                    e.printStackTrace();
-                }
-
+                AsyncUtil.lookup(session);
                 return CommandResult.success();
             }).build();
     }

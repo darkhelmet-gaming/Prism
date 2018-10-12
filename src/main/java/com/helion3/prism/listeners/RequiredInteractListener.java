@@ -23,22 +23,20 @@
  */
 package com.helion3.prism.listeners;
 
-import java.util.Optional;
-
 import com.helion3.prism.api.flags.Flag;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.action.InteractEvent;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.event.block.InteractBlockEvent.Secondary;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.ConditionGroup;
-import com.helion3.prism.api.query.Query;
 import com.helion3.prism.api.query.QuerySession;
 import com.helion3.prism.util.AsyncUtil;
 import com.helion3.prism.util.Format;
@@ -51,44 +49,44 @@ public class RequiredInteractListener {
      *
      * @param event InteractEvent
      */
-    @Listener
-    public void onInteract(final InteractBlockEvent event, @First Player player) {
+    @Listener(order = Order.EARLY)
+    public void onInteractBlock(InteractBlockEvent event, @First Player player) {
         // Wand support
-        if (Prism.getActiveWands().contains(player.getUniqueId())) {
-            QuerySession session = new QuerySession(player);
-            session.addFlag(Flag.EXTENDED);
-            session.addFlag(Flag.NO_GROUP);
-
-            Query query = session.newQuery();
-
-            if (event.getTargetBlock().equals(BlockSnapshot.NONE)) {
-                return;
-            }
-
-            // Location of block
-            Location<World> location = event.getTargetBlock().getLocation().get();
-
-            // Secondary click gets location relative to side clicked
-            if (event instanceof Secondary) {
-                location = location.getRelative(event.getTargetSide());
-            }
-
-            query.addCondition(ConditionGroup.from(location));
-
-            player.sendMessage(Format.heading(String.format("Querying x:%d y:%d z:%d:",
-                    location.getBlockX(),
-                    location.getBlockY(),
-                    location.getBlockZ())));
-
-            // Pass off to an async lookup helper
-            try {
-                AsyncUtil.lookup(session);
-            } catch (Exception e) {
-                player.sendMessage(Format.error(e.getMessage()));
-                e.printStackTrace();
-            }
-
-            event.setCancelled(true);
+        if (!Prism.getActiveWands().contains(player.getUniqueId())) {
+            return;
         }
+        
+        event.setCancelled(true);
+        
+        // Ignore OffHand events
+        if (event instanceof InteractBlockEvent.Primary.OffHand || event instanceof InteractBlockEvent.Secondary.OffHand) {
+            return;
+        }
+        
+        // Verify target block is valid
+        if (event.getTargetBlock() == BlockSnapshot.NONE || !event.getTargetBlock().getLocation().isPresent()) {
+            return;
+        }
+        
+        // Location of block
+        Location<World> location = event.getTargetBlock().getLocation().get();
+        
+        // Secondary click gets location relative to side clicked
+        if (event instanceof InteractBlockEvent.Secondary) {
+            location = location.getRelative(event.getTargetSide());
+        }
+        
+        QuerySession session = new QuerySession(player);
+        // session.addFlag(Flag.EXTENDED);
+        session.addFlag(Flag.NO_GROUP);
+        session.newQuery().addCondition(ConditionGroup.from(location));
+        
+        player.sendMessage(Text.of(
+                Format.prefix(), TextColors.GOLD,
+                "--- Inspecting ", Format.item(location.getBlockType().getId(), true),
+                " at ", location.getBlockX(), " ", location.getBlockY(), " ", location.getBlockZ(), " ---"));
+        
+        // Pass off to an async lookup helper
+        AsyncUtil.lookup(session);
     }
 }

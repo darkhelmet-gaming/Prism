@@ -23,21 +23,12 @@
  */
 package com.helion3.prism.util;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-
-import com.helion3.prism.api.flags.Flag;
-import com.helion3.prism.api.records.Result;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.pagination.PaginationService;
-
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.QuerySession;
+import com.helion3.prism.api.records.Result;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class AsyncUtil {
     private AsyncUtil() {}
@@ -47,41 +38,10 @@ public class AsyncUtil {
      *
      * @param session QuerySession running this lookup.
      */
-    public static void lookup(final QuerySession session) throws Exception {
-        CommandSource source = session.getCommandSource();
-
+    public static void lookup(final QuerySession session) {
         // Enforce lookup limits
         session.getQuery().setLimit(Prism.getConfig().getNode("query", "lookup", "limit").getInt());
-
-        async(session, new AsyncCallback() {
-            @Override
-            public void success(List<Result> results) {
-                List<Text> messages = results.stream().map(result -> Messages.from(result, session.hasFlag(Flag.EXTENDED))).collect(Collectors.toList());
-                Optional<PaginationService> paginationService = Sponge.getServiceManager().provide(PaginationService.class);
-                if (paginationService.isPresent()) {
-                    paginationService.get().builder()
-                        .contents(messages)
-                        .linesPerPage(10)
-                        .sendTo(source);
-                } else {
-                    for (Text message : messages) {
-                        source.sendMessage(message);
-                    }
-                }
-            }
-
-            @Override
-            public void empty() {
-                // @todo move to language files
-                source.sendMessage(Format.error(Text.of("Nothing found. See /pr ? for help.")));
-            }
-
-            @Override
-            public void error(Exception e) {
-                // @todo move to language files
-                source.sendMessage(Format.error(Text.of("An error occurred. Please see the console.")));
-            }
-        });
+        async(session, new LookupCallback(session));
     }
 
     /**

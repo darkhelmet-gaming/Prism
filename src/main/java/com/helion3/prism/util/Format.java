@@ -25,12 +25,15 @@ package com.helion3.prism.util;
 
 import static com.google.common.base.Preconditions.*;
 
+import com.helion3.prism.Prism;
+import org.apache.commons.lang3.StringUtils;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.world.World;
 
 public class Format {
-
-    private static final String namespace = "Prism";
 
     private Format() {}
 
@@ -50,7 +53,7 @@ public class Format {
      */
     public static Text error(Text content) {
         checkNotNull(content);
-        return Text.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.RED, content);
+        return Text.of(prefix(), TextColors.RED, content);
     }
 
     /**
@@ -69,7 +72,7 @@ public class Format {
      */
     public static Text heading(Text content) {
         checkNotNull(content);
-        return Text.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.WHITE, content);
+        return Text.of(prefix(), TextColors.WHITE, content);
     }
 
     /**
@@ -107,7 +110,7 @@ public class Format {
      */
     public static Text subduedHeading(Text content) {
         checkNotNull(content);
-        return Text.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.GRAY, content);
+        return Text.of(prefix(), TextColors.GRAY, content);
     }
 
     /**
@@ -126,7 +129,7 @@ public class Format {
      */
     public static Text success(Text content) {
         checkNotNull(content);
-        return Text.of(TextColors.LIGHT_PURPLE, namespace, " // ", TextColors.GREEN, content);
+        return Text.of(prefix(), TextColors.GREEN, content);
     }
 
     /**
@@ -147,5 +150,45 @@ public class Format {
     public static Text bonus(Text content) {
         checkNotNull(content);
         return Text.of(TextColors.GRAY, content);
+    }
+    
+    public static Text prefix() {
+        return Text.of(TextColors.LIGHT_PURPLE, "Prism", " //", TextColors.RESET, " ");
+    }
+    
+    public static Text item(String id, boolean hoverAction) {
+        checkNotNull(id);
+        Text.Builder textBuilder = Text.builder();
+        if (StringUtils.contains(id, ":")) {
+            textBuilder.append(Text.of(StringUtils.substringAfter(id, ":")));
+        } else {
+            textBuilder.append(Text.of(id));
+        }
+        
+        if (hoverAction) {
+            textBuilder.onHover(TextActions.showText(Text.of(id)));
+        }
+        
+        return textBuilder.build();
+    }
+    
+    public static Text location(int x, int y, int z, World world, boolean clickAction) {
+        Text.Builder textBuilder = Text.builder();
+        textBuilder.append(Text.of("(x:", x, " y:", y, " z:", z));
+        if (world != null) {
+            textBuilder.append(Text.of(" world:", world.getName()));
+            
+            if (clickAction) {
+                textBuilder.onClick(TextActions.executeCallback(commandSource -> {
+                    if (!(commandSource instanceof Player)) {
+                        return;
+                    }
+                    
+                    ((Player) commandSource).setLocation(world.getLocation(x, y, z));
+                }));
+            }
+        }
+        
+        return textBuilder.append(Text.of(")")).build();
     }
 }

@@ -29,6 +29,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -47,7 +48,8 @@ public class RequiredInteractListener {
      *
      * This listener is required and does not track any events.
      *
-     * @param event InteractEvent
+     * @param event InteractBlockEvent
+     * @param player Player
      */
     @Listener(order = Order.EARLY)
     public void onInteractBlock(InteractBlockEvent event, @First Player player) {
@@ -88,5 +90,30 @@ public class RequiredInteractListener {
         
         // Pass off to an async lookup helper
         AsyncUtil.lookup(session);
+    }
+    
+    /**
+     * Listens for interactions by Players with active inspection wands.
+     *
+     * This listener is required and does not track any events.
+     *
+     * @param event InteractEntityEvent
+     * @param player Player
+     */
+    @Listener(order = Order.EARLY)
+    public void onInteractEntity(InteractEntityEvent event, @First Player player) {
+        // Wand support
+        if (!Prism.getActiveWands().contains(player.getUniqueId())) {
+            return;
+        }
+        
+        event.setCancelled(true);
+        
+        // Ignore OffHand events
+        if (event instanceof InteractEntityEvent.Primary.OffHand || event instanceof InteractEntityEvent.Secondary.OffHand) {
+            return;
+        }
+        
+        player.sendMessage(Format.error(Text.of("Cannot interact with entities while inspection is active!")));
     }
 }

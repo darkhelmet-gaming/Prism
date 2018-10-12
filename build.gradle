@@ -5,8 +5,8 @@ plugins {
     id 'maven'
     id 'eclipse'
     id 'checkstyle'
-    id 'com.github.hierynomus.license' version '0.13.0'
-    id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id 'com.github.hierynomus.license' version '0.14.0'
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
 }
 
 def getVersionName = { ->
@@ -47,9 +47,9 @@ repositories {
 
 // Project dependencies
 dependencies {
-    compile 'org.spongepowered:spongeapi:7.0.0-SNAPSHOT'
-    compile 'org.mongodb:mongo-java-driver:3.4.2'
-    compile 'com.zaxxer:HikariCP:2.5.1'
+    compile 'org.spongepowered:spongeapi:7.1.0'
+    compile 'org.mongodb:mongo-java-driver:3.8.1'
+    compile 'com.zaxxer:HikariCP:2.6.3'
 }
 
 shadowJar {

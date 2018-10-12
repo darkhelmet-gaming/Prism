@@ -29,7 +29,6 @@ import java.util.Map;
 
 import com.google.common.collect.Lists;
 import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -42,6 +41,7 @@ import com.helion3.prism.api.records.ActionableResult;
 import com.helion3.prism.util.Format;
 import com.helion3.prism.util.Template;
 import com.helion3.prism.util.Translation;
+import org.spongepowered.api.world.BlockChangeFlags;
 
 public class UndoCommand {
     private UndoCommand() {}
@@ -70,7 +70,7 @@ public class UndoCommand {
                         Object rawFinal = result.getTransaction().get().getFinal();
 
                         if (rawOriginal instanceof BlockSnapshot) {
-                            if (((BlockSnapshot)rawOriginal).restore(true, BlockChangeFlag.NONE)) {
+                            if (((BlockSnapshot)rawOriginal).restore(true, BlockChangeFlags.NONE)) {
                                 applied++;
                             } else {
                                 skipped++;

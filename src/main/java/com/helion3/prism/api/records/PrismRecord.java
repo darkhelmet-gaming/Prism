@@ -32,7 +32,6 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -44,6 +43,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.helion3.prism.Prism;
 import com.helion3.prism.queues.RecordingQueue;
 import com.helion3.prism.util.DataQueries;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.world.Locatable;
 
 /**
  * An easy-to-understand factory class for Prism records.
@@ -180,14 +182,18 @@ public class PrismRecord {
         }
 
         /**
-         * Describes a single item entity drop.
+         * Describes a single item drop.
          *
-         * @param entity Item Entity dropped.
+         * @param transaction Item dropped.
          * @return PrismRecord
          */
-        public PrismRecord dropped(Entity entity) {
+        public PrismRecord dropped(Transaction<ItemStackSnapshot> transaction) {
             this.eventName = "dropped";
-            writeItem((Item) entity);
+            if (source.getSource() instanceof Locatable) {
+                data.set(DataQueries.Location, ((Locatable) source.getSource()).getLocation().toContainer());
+            }
+            
+            writeItemTransaction(transaction);
             return new PrismRecord(source, this);
         }
 
@@ -206,12 +212,16 @@ public class PrismRecord {
         /**
          * Describes a single item entity pickup.
          *
-         * @param entity Item Entity picked up.
+         * @param transaction Item picked up.
          * @return PrismRecord
          */
-        public PrismRecord pickedUp(Entity entity) {
+        public PrismRecord pickedUp(Transaction<ItemStackSnapshot> transaction) {
             this.eventName = "picked up";
-            writeItem((Item) entity);
+            if (source.getSource() instanceof Entity) {
+                data.set(DataQueries.Location, ((Locatable) source.getSource()).getLocation().toContainer());
+            }
+            
+            writeItemTransaction(transaction);
             return new PrismRecord(source, this);
         }
 
@@ -301,30 +311,19 @@ public class PrismRecord {
         /**
          * Helper method for formatting item container data.
          *
-         * @param item
+         * @param transaction
          */
-        private void writeItem(Item item) {
-            checkNotNull(item);
-
-            DataContainer itemData = item.toContainer();
-
-            // Because item actions are not currently actionable, copy only what we need
-            Optional<DataView> position = itemData.getView(DataQueries.Position);
-            if (position.isPresent()) {
-                position.get().set(DataQueries.WorldUuid, itemData.get(DataQueries.WorldUuid).get());
-                data.set(DataQueries.Location, position.get());
+        private void writeItemTransaction(Transaction<ItemStackSnapshot> transaction) {
+            checkNotNull(transaction);
+            
+            String itemId = transaction.getFinal().getType().getId();
+            int itemQuantity = transaction.getFinal().getQuantity();
+            if (transaction.getOriginal().getType() != ItemTypes.NONE) {
+                itemQuantity -= transaction.getOriginal().getQuantity();
             }
-
-            String itemId = "";
-            int itemQty = 1;
-            Optional<DataView> optionalItem = itemData.getView(DataQueries.UnsafeData.then("Item"));
-            if (optionalItem.isPresent()) {
-                itemId = optionalItem.get().getString(DataQuery.of("id")).orElse("item");
-                itemQty = optionalItem.get().getInt(DataQuery.of("Count")).orElse(1);
-            }
-
+            
             data.set(DataQueries.Target, itemId);
-            data.set(DataQueries.Quantity, itemQty);
+            data.set(DataQueries.Quantity, itemQuantity);
         }
 
         /**

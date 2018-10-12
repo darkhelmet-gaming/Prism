@@ -58,7 +58,7 @@ public class LookupCallback extends AsyncCallback {
         }
         
         if (messages.isEmpty()) {
-            getQuerySession().getCommandSource().sendMessage(Format.error("Nothing found. See /pr ? for help."));
+            this.empty();
             return;
         }
         
@@ -66,28 +66,27 @@ public class LookupCallback extends AsyncCallback {
         paginationBuilder.padding(Text.of(TextColors.DARK_GRAY, "="));
         paginationBuilder.linesPerPage(15);
         paginationBuilder.contents(messages);
-        paginationBuilder.build().sendTo(getQuerySession().getCommandSource());
+        paginationBuilder.build().sendTo(this.querySession.getCommandSource());
     }
     
     @Override
     public void empty() {
-        getQuerySession().getCommandSource().sendMessage(Format.error("Nothing found. See /pr ? for help."));
+        this.querySession.getCommandSource().sendMessage(Format.error("Nothing found. See /pr ? for help."));
     }
     
     @Override
     public void error(Exception ex) {
-        getQuerySession().getCommandSource().sendMessage(Format.error("An error occurred. Please see the console."));
+        this.querySession.getCommandSource().sendMessage(Format.error("An error occurred. Please see the console."));
         Prism.getLogger().error("Exception thrown by {}", getClass().getSimpleName(), ex);
     }
     
     private Text buildResult(Result result) {
         Text.Builder resultMessage = Text.builder();
-        Text.Builder hoverMessage = Text.builder();
-        
-        hoverMessage.append(Format.prefix(), Text.NEW_LINE);
-        
         resultMessage.append(Text.of(TextColors.DARK_AQUA, result.getSourceName(), " "));
         resultMessage.append(Text.of(TextColors.WHITE, result.getEventVerb(), " "));
+        
+        Text.Builder hoverMessage = Text.builder();
+        hoverMessage.append(Format.prefix(), Text.NEW_LINE);
         hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Source: ", TextColors.WHITE, result.getSourceName(), Text.NEW_LINE));
         hoverMessage.append(Text.of(TextColors.DARK_GRAY, "PrismEvent: ", TextColors.WHITE, result.getEventName(), Text.NEW_LINE));
         
@@ -132,7 +131,7 @@ public class LookupCallback extends AsyncCallback {
                 int z = location.getInt(DataQueries.Z).orElse(0);
                 World world = location.get(DataQueries.WorldUuid).flatMap(TypeUtil::uuidFromObject).flatMap(Sponge.getServer()::getWorld).orElse(null);
                 
-                if (getQuerySession().hasFlag(Flag.EXTENDED)) {
+                if (this.querySession.hasFlag(Flag.EXTENDED)) {
                     resultMessage.append(Text.of(Text.NEW_LINE, TextColors.GRAY, " - ", Format.location(x, y, z, world, true)));
                 }
                 
@@ -142,9 +141,5 @@ public class LookupCallback extends AsyncCallback {
         
         resultMessage.onHover(TextActions.showText(hoverMessage.build()));
         return resultMessage.build();
-    }
-    
-    private QuerySession getQuerySession() {
-        return querySession;
     }
 }

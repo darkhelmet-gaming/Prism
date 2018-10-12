@@ -152,12 +152,25 @@ public class Format {
         return Text.of(TextColors.GRAY, content);
     }
     
+    /**
+     * Returns content formatted with the Plugin name.
+     * @return Text Formatted content.
+     */
     public static Text prefix() {
         return Text.of(TextColors.LIGHT_PURPLE, "Prism", " //", TextColors.RESET, " ");
     }
     
+    /**
+     * Returns content formatted with an Item name.
+     * Optionally a hover action can be added to display
+     * the full Item id.
+     * @param id Item Id
+     * @param hoverAction Hover Action
+     * @return Text Formatted content.
+     */
     public static Text item(String id, boolean hoverAction) {
         checkNotNull(id);
+        
         Text.Builder textBuilder = Text.builder();
         if (StringUtils.contains(id, ":")) {
             textBuilder.append(Text.of(StringUtils.substringAfter(id, ":")));
@@ -172,6 +185,17 @@ public class Format {
         return textBuilder.build();
     }
     
+    /**
+     * Return content formatted with location information.
+     * Optionally a click action can be added to teleport
+     * the message recipients to the provided location.
+     * @param x X Coordinate
+     * @param y Y Coordinate
+     * @param z Z Coordinate
+     * @param world World
+     * @param clickAction Click Action
+     * @return Text Formatted content.
+     */
     public static Text location(int x, int y, int z, World world, boolean clickAction) {
         Text.Builder textBuilder = Text.builder();
         textBuilder.append(Text.of("(x:", x, " y:", y, " z:", z));

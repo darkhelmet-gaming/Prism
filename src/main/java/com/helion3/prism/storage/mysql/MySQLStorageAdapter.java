@@ -160,7 +160,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
                 
                 purged += count;
                 purgeExtra();
-                Prism.getLogger().info("Deleted {} records...", purged);
+                Prism.getLogger().info("Deleted {} records", purged);
             }
             
             Prism.getLogger().info("Finished purging MySQL database");
@@ -186,8 +186,8 @@ public class MySQLStorageAdapter implements StorageAdapter {
         }
         
         String sql = "DELETE FROM " + tablePrefix + "records "
-                + "WHERE created <= ? "
-                + "ORDER BY id LIMIT ?;";
+                + "WHERE " + tablePrefix + "records.created <= ? "
+                + "LIMIT ?;";
         try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setLong(1, date.getTime() / 1000);
             statement.setInt(2, purgeBatchLimit);
@@ -214,7 +214,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
         String sql = "DELETE FROM " + tablePrefix + "extra "
                 + "WHERE " + tablePrefix + "extra.record_id NOT IN "
                 + "(SELECT " + tablePrefix + "records.id FROM " + tablePrefix + "records WHERE " + tablePrefix + "records.id = " + tablePrefix + "extra.record_id) "
-                + "ORDER BY id LIMIT ?;";
+                + "LIMIT ?;";
         try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, purgeBatchLimit);
             return statement.executeUpdate();

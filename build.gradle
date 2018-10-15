@@ -47,15 +47,15 @@ repositories {
 
 // Project dependencies
 dependencies {
-    compile 'org.spongepowered:spongeapi:7.1.0'
-    compile 'org.mongodb:mongo-java-driver:3.8.1'
     compile 'com.zaxxer:HikariCP:2.6.3'
+    shadow 'org.mongodb:mongo-java-driver:3.8.1'
+    compile 'org.spongepowered:spongeapi:7.1.0'
 }
 
 shadowJar {
-  dependencies {
-    include(dependency('org.mongodb:.*'))
-  }
+    configurations = [project.configurations.shadow]
+    relocate("com.mongodb", "com.helion3.prism.lib.mongodb")
+    relocate("org.bson", "com.helion3.prism.lib.bson")
 }
 
 // Filter, process, and include resources

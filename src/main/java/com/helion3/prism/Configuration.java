@@ -63,6 +63,21 @@ public class Configuration {
                 dbExpires.setValue("4w");
             }
 
+            ConfigurationNode maxPoolSize = rootNode.getNode("storage", "maxPoolSize");
+            if (maxPoolSize.isVirtual()) {
+                maxPoolSize.setValue(10);
+            }
+
+            ConfigurationNode minPoolSize = rootNode.getNode("storage", "minPoolSize");
+            if (minPoolSize.isVirtual()) {
+                minPoolSize.setValue(2);
+            }
+
+            ConfigurationNode purgeBatchLimit = rootNode.getNode("storage", "purgeBatchLimit");
+            if (purgeBatchLimit.isVirtual()) {
+                purgeBatchLimit.setValue(10000);
+            }
+
             // Database
             ConfigurationNode dbName = rootNode.getNode("db", "name");
             if (dbName.isVirtual()) {

@@ -159,7 +159,6 @@ public class MySQLStorageAdapter implements StorageAdapter {
                 }
                 
                 purged += count;
-                purgeExtra();
                 Prism.getLogger().info("Deleted {} records", purged);
             }
             
@@ -195,32 +194,6 @@ public class MySQLStorageAdapter implements StorageAdapter {
         }
     }
     
-    /**
-     * Removes extra record information if the parent record doesn't exist
-     *
-     * @return The amount of rows removed.
-     * @throws Exception
-     */
-    protected int purgeExtra() throws Exception {
-        Date date = DateUtil.parseTimeStringToDate(expiration, false);
-        if (date == null) {
-            throw new IllegalArgumentException("Failed to parse expiration");
-        }
-        
-        if (purgeBatchLimit <= 0) {
-            throw new IllegalArgumentException("PurgeBatchLimit cannot be equal to or lower than 0");
-        }
-        
-        String sql = "DELETE FROM " + tablePrefix + "extra "
-                + "WHERE " + tablePrefix + "extra.record_id NOT IN "
-                + "(SELECT " + tablePrefix + "records.id FROM " + tablePrefix + "records WHERE " + tablePrefix + "records.id = " + tablePrefix + "extra.record_id) "
-                + "LIMIT ?;";
-        try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setInt(1, purgeBatchLimit);
-            return statement.executeUpdate();
-        }
-    }
-
     @Override
     public StorageAdapterRecords records() {
         return records;

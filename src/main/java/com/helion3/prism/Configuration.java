@@ -75,7 +75,7 @@ public class Configuration {
 
             ConfigurationNode purgeBatchLimit = rootNode.getNode("storage", "purgeBatchLimit");
             if (purgeBatchLimit.isVirtual()) {
-                purgeBatchLimit.setValue(10000);
+                purgeBatchLimit.setValue(100000);
             }
 
             // Database

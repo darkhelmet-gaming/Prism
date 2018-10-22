@@ -24,11 +24,17 @@
 package com.helion3.prism.storage.h2;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Date;
 
 import javax.sql.DataSource;
 
 import com.helion3.prism.util.DataQueries;
+import com.helion3.prism.util.DateUtil;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.sql.SqlService;
 
 import com.helion3.prism.Prism;
@@ -37,7 +43,10 @@ import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageAdapterSettings;
 
 public class H2StorageAdapter implements StorageAdapter {
+    
+    private final String expiration = Prism.getConfig().getNode("storage", "expireRecords").getString();
     private final String tablePrefix = Prism.getConfig().getNode("db", "h2", "tablePrefix").getString();
+    private final int purgeBatchLimit = Prism.getConfig().getNode("storage", "purgeBatchLimit").getInt();
     private final SqlService sql = Prism.getGame().getServiceManager().provide(SqlService.class).get();
     private final String dbPath = Prism.getParentDirectory().getAbsolutePath() + "/" + Prism.getConfig().getNode("db", "name").getString();
     private final StorageAdapterRecords records;
@@ -64,17 +73,28 @@ public class H2StorageAdapter implements StorageAdapter {
     public boolean connect() throws Exception {
         try {
             // Get data source
-            db = sql.getDataSource("jdbc:h2:" + dbPath);
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl("jdbc:h2:" + dbPath);
+            config.setMaximumPoolSize(Prism.getConfig().getNode("storage", "maxPoolSize").getInt());
+            config.setMinimumIdle(Prism.getConfig().getNode("storage", "minPoolSize").getInt());
+
+            db = new HikariDataSource(config);
 
             // Create table if needed
             createTables();
-
+    
+            // Purge async
+            Task.builder()
+                    .async()
+                    .name("PrismH2Purge")
+                    .execute(this::purge)
+                    .submit(Prism.getPlugin());
+            
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-
-        return false;
     }
 
     /**
@@ -118,6 +138,55 @@ public class H2StorageAdapter implements StorageAdapter {
 
             String extraIndex = "CREATE INDEX IF NOT EXISTS recordId ON " + tablePrefix + "extra(record_id)";
             conn.prepareStatement(extraIndex).execute();
+        }
+    }
+    
+    /**
+     * Removes expires records and extra information from the database.
+     */
+    protected void purge() {
+        try {
+            Prism.getLogger().info("Purging H2 database...");
+            long purged = 0;
+            while (true) {
+                int count = purgeRecords();
+                if (count == 0) {
+                    break;
+                }
+                
+                purged += count;
+                Prism.getLogger().info("Deleted {} records", purged);
+            }
+            
+            Prism.getLogger().info("Finished purging H2 database");
+        } catch (Exception ex) {
+            Prism.getLogger().error("Encountered an error while purging H2 database", ex);
+        }
+    }
+    
+    /**
+     * Removes expires records from the database.
+     *
+     * @return The amount of rows removed.
+     * @throws Exception
+     */
+    protected int purgeRecords() throws Exception {
+        Date date = DateUtil.parseTimeStringToDate(expiration, false);
+        if (date == null) {
+            throw new IllegalArgumentException("Failed to parse expiration");
+        }
+        
+        if (purgeBatchLimit <= 0) {
+            throw new IllegalArgumentException("PurgeBatchLimit cannot be equal to or lower than 0");
+        }
+        
+        String sql = "DELETE FROM " + tablePrefix + "records "
+                + "WHERE " + tablePrefix + "records.created <= ? "
+                + "LIMIT ?;";
+        try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setLong(1, date.getTime() / 1000);
+            statement.setInt(2, purgeBatchLimit);
+            return statement.executeUpdate();
         }
     }
 

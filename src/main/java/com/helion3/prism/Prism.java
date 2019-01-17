@@ -45,6 +45,7 @@ import com.helion3.prism.listeners.DropItemListener;
 import com.helion3.prism.listeners.JoinListener;
 import com.helion3.prism.listeners.QuitListener;
 import com.helion3.prism.listeners.RequiredInteractListener;
+import com.helion3.prism.util.Reference;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
@@ -80,7 +81,14 @@ import com.helion3.prism.storage.mysql.MySQLStorageAdapter;
  *
  * @author viveleroi
  */
-@Plugin(id = "prism", name = "Prism", version = "3.0.0", description = "A rollback/restore grief-prevention plugin.", authors = "viveleroi")
+@Plugin(
+        id = Reference.ID,
+        name = Reference.NAME,
+        version = Reference.VERSION,
+        description = Reference.DESCRIPTION,
+        authors = Reference.AUTHORS,
+        url = Reference.WEBSITE
+)
 public final class Prism {
     private static List<UUID> activeWands = new ArrayList<>();
     private static final FilterList filterlist = new FilterList(FilterMode.BLACKLIST);

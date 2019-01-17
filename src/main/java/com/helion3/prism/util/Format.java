@@ -157,7 +157,7 @@ public class Format {
      * @return Text Formatted content.
      */
     public static Text prefix() {
-        return Text.of(TextColors.LIGHT_PURPLE, "Prism", " //", TextColors.RESET, " ");
+        return Text.of(TextColors.LIGHT_PURPLE, Reference.NAME, " //", TextColors.RESET, " ");
     }
     
     /**

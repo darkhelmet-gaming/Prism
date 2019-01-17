@@ -34,6 +34,6 @@ public final class Reference {
     public static final String VERSION = "3.0.0";
     public static final String DESCRIPTION = "A rollback/restore grief-prevention plugin.";
     public static final String AUTHORS = "viveleroi";
-    public static final String SOURCE = "https://github.com/Prism/Prism";
-    public static final String WEBSITE = "https://github.com/Prism";
+    public static final String SOURCE = "https://github.com/prism/Prism";
+    public static final String WEBSITE = "https://github.com/prism/Prism/wiki";
 }

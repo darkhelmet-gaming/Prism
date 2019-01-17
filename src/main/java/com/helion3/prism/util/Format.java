@@ -29,9 +29,13 @@ import com.helion3.prism.Prism;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class Format {
 
@@ -158,6 +162,25 @@ public class Format {
      */
     public static Text prefix() {
         return Text.of(TextColors.LIGHT_PURPLE, Reference.NAME, " //", TextColors.RESET, " ");
+    }
+    
+    /**
+     * Returns content formatted with a URL.
+     *
+     * @param url URL
+     * @return Text Formatted content.
+     */
+    public static Text url(String url) {
+        Text.Builder textBuilder = Text.builder();
+        textBuilder.append(Text.of(TextColors.BLUE, url));
+        
+        try {
+            textBuilder.onClick(TextActions.openUrl(new URL(url)));
+        } catch (MalformedURLException ex) {
+            textBuilder.onClick(TextActions.suggestCommand(url));
+        }
+        
+        return textBuilder.build();
     }
     
     /**

@@ -34,6 +34,7 @@ import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.DateUtil;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.sql.SqlService;
 
@@ -47,7 +48,7 @@ public class H2StorageAdapter implements StorageAdapter {
     private final String expiration = Prism.getConfig().getNode("storage", "expireRecords").getString();
     private final String tablePrefix = Prism.getConfig().getNode("db", "h2", "tablePrefix").getString();
     private final int purgeBatchLimit = Prism.getConfig().getNode("storage", "purgeBatchLimit").getInt();
-    private final SqlService sql = Prism.getGame().getServiceManager().provide(SqlService.class).get();
+    private final SqlService sql = Sponge.getServiceManager().provide(SqlService.class).get();
     private final String dbPath = Prism.getParentDirectory().getAbsolutePath() + "/" + Prism.getConfig().getNode("db", "name").getString();
     private final StorageAdapterRecords records;
     private static DataSource db;

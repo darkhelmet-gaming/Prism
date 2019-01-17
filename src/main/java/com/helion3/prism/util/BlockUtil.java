@@ -29,12 +29,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.data.property.block.MatterProperty.Matter;
-
-import com.helion3.prism.Prism;
 
 public class BlockUtil {
     private BlockUtil() {}
@@ -47,7 +46,7 @@ public class BlockUtil {
     public static List<BlockType> getLiquidBlockTypes() {
         List<BlockType> liquids = new ArrayList<>();
 
-        Collection<BlockType> types = Prism.getGame().getRegistry().getAllOf(BlockType.class);
+        Collection<BlockType> types = Sponge.getRegistry().getAllOf(BlockType.class);
         for (BlockType type : types) {
             Optional<MatterProperty> property = type.getProperty(MatterProperty.class);
             if (property.isPresent() && Objects.equals(property.get().getValue(), Matter.LIQUID)) {

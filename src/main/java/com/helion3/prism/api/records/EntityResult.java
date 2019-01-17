@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
@@ -35,7 +36,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntitySnapshot.Builder;
 
-import com.helion3.prism.Prism;
 import com.helion3.prism.util.DataQueries;
 
 public class EntityResult extends ResultComplete implements Actionable {
@@ -43,7 +43,7 @@ public class EntityResult extends ResultComplete implements Actionable {
     public ActionableResult rollback() throws Exception {
         DataView entityData = formatEntityData();
 
-        Optional<EntitySnapshot> snapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(entityData);
+        Optional<EntitySnapshot> snapshot = Sponge.getRegistry().createBuilder(Builder.class).build(entityData);
         if (!snapshot.isPresent()) {
             return ActionableResult.skipped(SkipReason.INVALID);
         }

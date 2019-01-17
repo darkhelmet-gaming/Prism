@@ -28,6 +28,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.Map.Entry;
 
 import com.helion3.prism.api.records.Result;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -197,7 +198,7 @@ public class DataUtil {
     public static CompletableFuture<List<Result>> translateUuidsToNames(List<Result> results, List<UUID> uuidsPendingLookup) {
         CompletableFuture<List<Result>> future = new CompletableFuture<>();
 
-        CompletableFuture<Collection<GameProfile>> futures = Prism.getGame().getServer().getGameProfileManager().getAllById(uuidsPendingLookup, true);
+        CompletableFuture<Collection<GameProfile>> futures = Sponge.getServer().getGameProfileManager().getAllById(uuidsPendingLookup, true);
         futures.thenAccept((profiles) -> {
             for (GameProfile profile : profiles) {
                 for (Result r : results) {

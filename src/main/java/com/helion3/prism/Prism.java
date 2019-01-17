@@ -49,7 +49,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 import org.slf4j.Logger;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
@@ -85,7 +85,6 @@ public final class Prism {
     private static List<UUID> activeWands = new ArrayList<>();
     private static final FilterList filterlist = new FilterList(FilterMode.BLACKLIST);
     private static Configuration config;
-    private static Game game;
     private static List<ParameterHandler> handlers = new ArrayList<>();
     private static List<FlagHandler> flagHandlers = new ArrayList<>();
     private static Map<UUID, List<ActionableResult>> lastActionResults = new HashMap<>();
@@ -127,7 +126,7 @@ public final class Prism {
         registerParameterHandlers();
 
         // Listen to events
-        registerSpongeEventListeners(game.getEventManager());
+        registerSpongeEventListeners(Sponge.getEventManager());
 
         // Initialize storage engine
         String engine = config.getNode("storage", "engine").getString();
@@ -161,7 +160,7 @@ public final class Prism {
             .submit(this);
 
         // Commands
-        game.getCommandManager().register(this, PrismCommands.getCommand(), "prism", "pr");
+        Sponge.getCommandManager().register(this, PrismCommands.getCommand(), "prism", "pr");
 
         logger.info("Prism started successfully. Bad guys beware.");
     }
@@ -189,23 +188,6 @@ public final class Prism {
      */
     public static Configuration getConfig() {
         return config;
-    }
-
-    /**
-     * Returns the current game
-     * @return Game
-     */
-    public static Game getGame() {
-        return game;
-    }
-
-    /**
-     * Injected Game instance.
-     * @param injectGame Game
-     */
-    @Inject
-    public void setGame(Game injectGame) {
-        game = injectGame;
     }
 
     /**

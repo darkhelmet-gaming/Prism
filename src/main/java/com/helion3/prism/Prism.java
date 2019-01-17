@@ -210,7 +210,7 @@ public final class Prism {
                 throw new Exception("Invalid storage engine configured.");
             }
             
-            getStorageAdapter().connect();
+            Preconditions.checkArgument(getStorageAdapter().connect());
             
             // Initialize the recording queue manager
             Task.builder()

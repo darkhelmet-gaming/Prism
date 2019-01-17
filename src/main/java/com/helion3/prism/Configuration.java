@@ -47,7 +47,7 @@ public class Configuration {
                 defaultConfig.getParentFile().mkdirs();
                 defaultConfig.createNewFile();
                 rootNode = configManager.createEmptyNode(ConfigurationOptions.defaults());
-                Prism.getLogger().info("Creating new config at mods/Prism/Prism.conf");
+                Prism.getInstance().getLogger().info("Creating new config at mods/Prism/Prism.conf");
             } else {
                 rootNode = configManager.load();
             }

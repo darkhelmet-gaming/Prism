@@ -93,19 +93,19 @@ public class PrismRecord {
         event.getData().set(causeKey, causeIdentifier);
 
         // Source filtered?
-        if (!Prism.getFilterList().allowsSource(source.getSource())) {
+        if (!Prism.getInstance().getFilterList().allowsSource(source.getSource())) {
             return;
         }
 
         // Original block filtered?
         Optional<Object> optionalOriginalBlock = event.getData().get(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
-        if (optionalOriginalBlock.isPresent() && !Prism.getFilterList().allowsBlock((String) optionalOriginalBlock.get())) {
+        if (optionalOriginalBlock.isPresent() && !Prism.getInstance().getFilterList().allowsBlock((String) optionalOriginalBlock.get())) {
             return;
         }
 
         // Replacement block filtered?
         Optional<Object> optionalReplacementBlock = event.getData().get(DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
-        if (optionalReplacementBlock.isPresent() && !Prism.getFilterList().allowsBlock((String) optionalReplacementBlock.get())) {
+        if (optionalReplacementBlock.isPresent() && !Prism.getInstance().getFilterList().allowsBlock((String) optionalReplacementBlock.get())) {
             return;
         }
 

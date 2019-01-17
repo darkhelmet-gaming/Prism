@@ -23,6 +23,7 @@
  */
 package com.helion3.prism.storage.h2;
 
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -45,11 +46,11 @@ import com.helion3.prism.api.storage.StorageAdapterSettings;
 
 public class H2StorageAdapter implements StorageAdapter {
     
-    private final String expiration = Prism.getConfig().getNode("storage", "expireRecords").getString();
-    private final String tablePrefix = Prism.getConfig().getNode("db", "h2", "tablePrefix").getString();
-    private final int purgeBatchLimit = Prism.getConfig().getNode("storage", "purgeBatchLimit").getInt();
+    private final String expiration = Prism.getInstance().getConfiguration().getNode("storage", "expireRecords").getString();
+    private final String tablePrefix = Prism.getInstance().getConfiguration().getNode("db", "h2", "tablePrefix").getString();
+    private final int purgeBatchLimit = Prism.getInstance().getConfiguration().getNode("storage", "purgeBatchLimit").getInt();
     private final SqlService sql = Sponge.getServiceManager().provide(SqlService.class).get();
-    private final String dbPath = Prism.getParentDirectory().getAbsolutePath() + "/" + Prism.getConfig().getNode("db", "name").getString();
+    private final Path dbPath = Prism.getInstance().getPath().getParent().resolve(Prism.getInstance().getConfiguration().getNode("db", "name").getString());
     private final StorageAdapterRecords records;
     private static DataSource db;
 
@@ -75,9 +76,9 @@ public class H2StorageAdapter implements StorageAdapter {
         try {
             // Get data source
             HikariConfig config = new HikariConfig();
-            config.setJdbcUrl("jdbc:h2:" + dbPath);
-            config.setMaximumPoolSize(Prism.getConfig().getNode("storage", "maxPoolSize").getInt());
-            config.setMinimumIdle(Prism.getConfig().getNode("storage", "minPoolSize").getInt());
+            config.setJdbcUrl("jdbc:h2:" + dbPath.toString());
+            config.setMaximumPoolSize(Prism.getInstance().getConfiguration().getNode("storage", "maxPoolSize").getInt());
+            config.setMinimumIdle(Prism.getInstance().getConfiguration().getNode("storage", "minPoolSize").getInt());
 
             db = new HikariDataSource(config);
 
@@ -89,7 +90,7 @@ public class H2StorageAdapter implements StorageAdapter {
                     .async()
                     .name("PrismH2Purge")
                     .execute(this::purge)
-                    .submit(Prism.getPlugin());
+                    .submit(Prism.getInstance().getPluginContainer());
             
             return true;
         } catch (SQLException e) {
@@ -147,7 +148,7 @@ public class H2StorageAdapter implements StorageAdapter {
      */
     protected void purge() {
         try {
-            Prism.getLogger().info("Purging H2 database...");
+            Prism.getInstance().getLogger().info("Purging H2 database...");
             long purged = 0;
             while (true) {
                 int count = purgeRecords();
@@ -156,12 +157,12 @@ public class H2StorageAdapter implements StorageAdapter {
                 }
                 
                 purged += count;
-                Prism.getLogger().info("Deleted {} records", purged);
+                Prism.getInstance().getLogger().info("Deleted {} records", purged);
             }
             
-            Prism.getLogger().info("Finished purging H2 database");
+            Prism.getInstance().getLogger().info("Finished purging H2 database");
         } catch (Exception ex) {
-            Prism.getLogger().error("Encountered an error while purging H2 database", ex);
+            Prism.getInstance().getLogger().error("Encountered an error while purging H2 database", ex);
         }
     }
     

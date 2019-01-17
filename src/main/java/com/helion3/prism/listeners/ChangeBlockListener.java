@@ -47,7 +47,7 @@ public class ChangeBlockListener {
     @Listener
     public void onChangeBlock(final ChangeBlockEvent event) {
         Optional<Player> playerCause = event.getCause().first(Player.class);
-        if (playerCause.isPresent() && Prism.getActiveWands().contains(playerCause.get().getUniqueId())) {
+        if (playerCause.isPresent() && Prism.getInstance().getActiveWands().contains(playerCause.get().getUniqueId())) {
             // Cancel and exit event here, not supposed to place/track a block with an active wand.
             event.setCancelled(true);
             return;
@@ -63,21 +63,21 @@ public class ChangeBlockListener {
             BlockType finalBlock = transaction.getFinal().getState().getType();
 
             if (event instanceof ChangeBlockEvent.Break) {
-                if (Prism.listening.BREAK &&
+                if (Prism.getInstance().getListening().BREAK &&
                         !BlockUtil.rejectBreakCombination(original, finalBlock) &&
                         !EventUtil.rejectBreakEventIdentity(original, finalBlock, event.getCause())) {
                     record.brokeBlock(transaction).save();
                 }
             }
             else if (event instanceof ChangeBlockEvent.Place) {
-                if (Prism.listening.PLACE &&
+                if (Prism.getInstance().getListening().PLACE &&
                         !BlockUtil.rejectPlaceCombination(original, finalBlock) &&
                         !EventUtil.rejectPlaceEventIdentity(original, finalBlock, event.getCause())) {
                     record.placedBlock(transaction).save();
                 }
             }
             else if (event instanceof ChangeBlockEvent.Decay) {
-                if (Prism.listening.DECAY) {
+                if (Prism.getInstance().getListening().DECAY) {
                     record.decayedBlock(transaction).save();
                 }
             }

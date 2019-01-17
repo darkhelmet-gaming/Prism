@@ -35,14 +35,14 @@ public class Listening {
     public final boolean QUIT;
 
     public Listening() {
-        BREAK = Prism.getConfig().getNode("events", "break").getBoolean();
-        DEATH = Prism.getConfig().getNode("events", "death").getBoolean();
-        DECAY = Prism.getConfig().getNode("events", "decay").getBoolean();
-        DROP = Prism.getConfig().getNode("events", "drop").getBoolean();
-        GROW = Prism.getConfig().getNode("events", "grow").getBoolean();
-        JOIN = Prism.getConfig().getNode("events", "join").getBoolean();
-        PICKUP = Prism.getConfig().getNode("events", "pickup").getBoolean();
-        PLACE = Prism.getConfig().getNode("events", "place").getBoolean();
-        QUIT = Prism.getConfig().getNode("events", "quit").getBoolean();
+        BREAK = Prism.getInstance().getConfiguration().getNode("events", "break").getBoolean();
+        DEATH = Prism.getInstance().getConfiguration().getNode("events", "death").getBoolean();
+        DECAY = Prism.getInstance().getConfiguration().getNode("events", "decay").getBoolean();
+        DROP = Prism.getInstance().getConfiguration().getNode("events", "drop").getBoolean();
+        GROW = Prism.getInstance().getConfiguration().getNode("events", "grow").getBoolean();
+        JOIN = Prism.getInstance().getConfiguration().getNode("events", "join").getBoolean();
+        PICKUP = Prism.getInstance().getConfiguration().getNode("events", "pickup").getBoolean();
+        PLACE = Prism.getInstance().getConfiguration().getNode("events", "place").getBoolean();
+        QUIT = Prism.getInstance().getConfiguration().getNode("events", "quit").getBoolean();
     }
 }

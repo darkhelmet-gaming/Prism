@@ -114,10 +114,10 @@ public class QueryBuilder {
             future.complete(query);
         }
 
-        if (Prism.getConfig().getNode("defaults", "enabled").getBoolean()) {
+        if (Prism.getInstance().getConfiguration().getNode("defaults", "enabled").getBoolean()) {
             // Require any parameter defaults
             StringBuilder defaultsUsed = new StringBuilder();
-            for (ParameterHandler handler : Prism.getParameterHandlers()) {
+            for (ParameterHandler handler : Prism.getInstance().getParameterHandlers()) {
                 boolean aliasFound = false;
 
                 for (String alias : handler.getAliases()) {
@@ -165,7 +165,7 @@ public class QueryBuilder {
         }
 
         // Find a handler
-        Optional<FlagHandler> optionalHandler = Prism.getFlagHandler(flag);
+        Optional<FlagHandler> optionalHandler = Prism.getInstance().getFlagHandler(flag);
         if (!optionalHandler.isPresent()) {
             throw new ParameterException("\"" + flag + "\" is not a valid flag. No handler found.");
         }
@@ -221,7 +221,7 @@ public class QueryBuilder {
         }
 
         // Find a handler
-        Optional<ParameterHandler> optionalHandler = Prism.getParameterHandler(parameter.getKey());
+        Optional<ParameterHandler> optionalHandler = Prism.getInstance().getParameterHandler(parameter.getKey());
         if (!optionalHandler.isPresent()) {
             throw new ParameterException("\"" + parameter.getKey() + "\" is not a valid parameter. No handler found.");
         }

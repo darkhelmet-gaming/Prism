@@ -52,7 +52,7 @@ import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.DataUtil;
 
 public class H2Records implements StorageAdapterRecords {
-    private final String tablePrefix = Prism.getConfig().getNode("db", "h2", "tablePrefix").getString();
+    private final String tablePrefix = Prism.getInstance().getConfiguration().getNode("db", "h2", "tablePrefix").getString();
 
     @Override
     public StorageWriteResult write(List<DataContainer> containers) throws Exception {
@@ -131,7 +131,7 @@ public class H2Records implements StorageAdapterRecords {
         CompletableFuture<List<Result>> future = new CompletableFuture<>();
 
         SQLQuery query = H2SQLQuery.from(session);
-        Prism.getLogger().debug("H2 SQL Query: " + query);
+        Prism.getInstance().getLogger().debug("H2 SQL Query: " + query);
 
         try (Connection conn = H2StorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(query.toString()); ResultSet rs = statement.executeQuery()) {
             List<UUID> uuidsPendingLookup = new ArrayList<>();

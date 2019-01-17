@@ -40,7 +40,7 @@ import com.helion3.prism.Prism;
  * Super simple SQL query builder.
  */
 public class SQLQuery {
-    protected final static String tablePrefix = Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString();
+    protected final static String tablePrefix = Prism.getInstance().getConfiguration().getNode("db", "mysql", "tablePrefix").getString();
     protected final String query;
 
     /**

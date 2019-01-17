@@ -42,7 +42,7 @@ public class NearCommand {
             .description(Text.of("Alias of /pr l r:(default radius)"))
             .permission("prism.lookup")
             .executor((source, args) -> {
-                int radius = Prism.getConfig().getNode("commands", "near", "defaultRadius").getInt();
+                int radius = Prism.getInstance().getConfiguration().getNode("commands", "near", "defaultRadius").getInt();
 
                 source.sendMessage(Format.heading("Querying records..."));
 

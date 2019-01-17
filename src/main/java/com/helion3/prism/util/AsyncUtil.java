@@ -41,7 +41,7 @@ public class AsyncUtil {
      */
     public static void lookup(final QuerySession session) {
         // Enforce lookup limits
-        session.getQuery().setLimit(Prism.getConfig().getNode("query", "lookup", "limit").getInt());
+        session.getQuery().setLimit(Prism.getInstance().getConfiguration().getNode("query", "lookup", "limit").getInt());
         async(session, new LookupCallback(session));
     }
 
@@ -54,7 +54,7 @@ public class AsyncUtil {
     private static void async(final QuerySession session, AsyncCallback callback) {
         Sponge.getScheduler().createTaskBuilder().async().execute(() -> {
             try {
-                CompletableFuture<List<Result>> future = Prism.getStorageAdapter().records().query(session, true);
+                CompletableFuture<List<Result>> future = Prism.getInstance().getStorageAdapter().records().query(session, true);
                 future.thenAccept(results -> {
                     try {
                         if (results.isEmpty()) {
@@ -71,6 +71,6 @@ public class AsyncUtil {
                 callback.error(e);
                 e.printStackTrace();
             }
-        }).submit(Prism.getPlugin());
+        }).submit(Prism.getInstance().getPluginContainer());
     }
 }

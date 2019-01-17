@@ -75,7 +75,7 @@ public class DataUtil {
             if (value.isPresent()) {
                 data.set(DataQuery.of(entry.getKey()), value.get());
             } else {
-                Prism.getLogger().error(String.format("Failed to transform %s data.", entry.getKey()));
+                Prism.getInstance().getLogger().error(String.format("Failed to transform %s data.", entry.getKey()));
             }
         }
 
@@ -154,7 +154,7 @@ public class DataUtil {
                             break;
                         }
                         else {
-                            Prism.getLogger().error("Unsupported json list data type: " + object.getClass().getName() + " for key " + key);
+                            Prism.getInstance().getLogger().error("Unsupported json list data type: " + object.getClass().getName() + " for key " + key);
                         }
                     }
 

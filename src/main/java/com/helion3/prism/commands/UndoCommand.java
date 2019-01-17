@@ -54,7 +54,7 @@ public class UndoCommand {
                     throw new CommandException(Format.error("You must be a player to use this command."));
                 }
 
-                List<ActionableResult> results = Prism.getLastActionResults().get(((Player) source).getUniqueId());
+                List<ActionableResult> results = Prism.getInstance().getLastActionResults().get(((Player) source).getUniqueId());
                 if (results == null || results.isEmpty()) {
                     throw new CommandException(Format.error("You have no valid actions to undo."));
                 }

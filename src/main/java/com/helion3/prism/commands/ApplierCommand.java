@@ -64,12 +64,12 @@ public class ApplierCommand {
                 // Ignore user order flag, if used, for proper rollback/restore order to be used.
                 session.setSortBy(sort);
                 future.thenAccept((v) -> {
-                    session.getQuery().setLimit(Prism.getConfig().getNode("query", "actionable", "limit").getInt());
+                    session.getQuery().setLimit(Prism.getInstance().getConfiguration().getNode("query", "actionable", "limit").getInt());
 
                     try {
                         List<ActionableResult> actionResults = new ArrayList<>();
                         // Iterate query results
-                        CompletableFuture<List<Result>> futureResults = Prism.getStorageAdapter().records().query(session, false);
+                        CompletableFuture<List<Result>> futureResults = Prism.getInstance().getStorageAdapter().records().query(session, false);
                         futureResults.thenAccept(results -> {
                             if (results.isEmpty()) {
                                 source.sendMessage(Format.error("No results."));
@@ -137,7 +137,7 @@ public class ApplierCommand {
                                 ));
 
                                 if (source instanceof Player) {
-                                    Prism.getLastActionResults().put(((Player) source).getUniqueId(), actionResults);
+                                    Prism.getInstance().getLastActionResults().put(((Player) source).getUniqueId(), actionResults);
                                 }
                             }
                         });

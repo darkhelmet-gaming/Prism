@@ -26,7 +26,7 @@ package com.helion3.prism.util;
 import java.util.HashMap;
 import java.util.Map;
 
-final public class Translation {
+public final class Translation {
 
     // @todo this is mega temporary, should be moved to a language file
     private static Map<String,String> lang = new HashMap<>();

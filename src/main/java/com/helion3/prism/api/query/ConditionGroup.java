@@ -36,7 +36,7 @@ import com.helion3.prism.util.DataQueries;
  * separately, and each field within each group should be compared
  * as part of the group.
  */
-final public class ConditionGroup implements Condition {
+public final class ConditionGroup implements Condition {
     private final List<Condition> conditions = new ArrayList<>();
     private final Operator operator;
 

@@ -26,7 +26,7 @@ package com.helion3.prism.api.query;
 import java.util.ArrayList;
 import java.util.List;
 
-final public class Query {
+public final class Query {
     private final List<Condition> conditions = new ArrayList<>();
     private int limit = 1000;
 

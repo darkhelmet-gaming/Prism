@@ -43,65 +43,65 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LookupCallback extends AsyncCallback {
-    
+
     private final QuerySession querySession;
-    
+
     public LookupCallback(QuerySession querySession) {
         this.querySession = querySession;
     }
-    
+
     @Override
     public void success(List<Result> results) {
         List<Text> messages = new ArrayList<>();
         for (Result result : results) {
             messages.add(buildResult(result));
         }
-        
+
         if (messages.isEmpty()) {
             this.empty();
             return;
         }
-        
+
         PaginationList.Builder paginationBuilder = PaginationList.builder();
         paginationBuilder.padding(Text.of(TextColors.DARK_GRAY, "="));
         paginationBuilder.linesPerPage(15);
         paginationBuilder.contents(messages);
         paginationBuilder.build().sendTo(this.querySession.getCommandSource());
     }
-    
+
     @Override
     public void empty() {
         this.querySession.getCommandSource().sendMessage(Format.error("Nothing found. See /pr ? for help."));
     }
-    
+
     @Override
     public void error(Exception ex) {
         this.querySession.getCommandSource().sendMessage(Format.error("An error occurred. Please see the console."));
-        Prism.getLogger().error("Exception thrown by {}", getClass().getSimpleName(), ex);
+        Prism.getInstance().getLogger().error("Exception thrown by {}", getClass().getSimpleName(), ex);
     }
-    
+
     private Text buildResult(Result result) {
         Text.Builder resultMessage = Text.builder();
         resultMessage.append(Text.of(TextColors.DARK_AQUA, result.getSourceName(), " "));
         resultMessage.append(Text.of(TextColors.WHITE, result.getEventVerb(), " "));
-        
+
         Text.Builder hoverMessage = Text.builder();
         hoverMessage.append(Format.prefix(), Text.NEW_LINE);
         hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Source: ", TextColors.WHITE, result.getSourceName(), Text.NEW_LINE));
         hoverMessage.append(Text.of(TextColors.DARK_GRAY, "PrismEvent: ", TextColors.WHITE, result.getEventName(), Text.NEW_LINE));
-        
+
         String quantity = result.data.getString(DataQueries.Quantity).orElse(null);
         if (StringUtils.isNotBlank(quantity)) {
             resultMessage.append(Text.of(TextColors.DARK_AQUA, quantity, " "));
             hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Quantity: ", TextColors.WHITE, quantity, Text.NEW_LINE));
         }
-        
+
         String target = result.data.getString(DataQueries.Target).orElse("Unknown");
         if (StringUtils.isNotBlank(target)) {
             resultMessage.append(Text.of(TextColors.DARK_AQUA, Format.item(target, false), " "));
             hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Target: ", TextColors.WHITE, target, Text.NEW_LINE));
         }
-        
+
         /*
         // This is for Item Insert and Item Remove logging which may be added in a future Prism version.
         String container = result.data.getString(DataQueries.Container).orElse(null);
@@ -109,7 +109,7 @@ public class LookupCallback extends AsyncCallback {
             hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Container: ", TextColors.WHITE, container, Text.NEW_LINE));
         }
         */
-        
+
         if (result instanceof ResultAggregate) {
             int count = result.data.getInt(DataQueries.Count).orElse(0);
             if (count > 0) {
@@ -117,28 +117,28 @@ public class LookupCallback extends AsyncCallback {
                 hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Count: ", TextColors.WHITE, count));
             }
         }
-        
+
         if (result instanceof ResultComplete) {
             ResultComplete resultComplete = (ResultComplete) result;
-            
+
             resultMessage.append(Text.of(TextColors.WHITE, resultComplete.getRelativeTime()));
             hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Time: ", TextColors.WHITE, resultComplete.getTime(), Text.NEW_LINE));
-            
+
             DataView location = (DataView) resultComplete.data.get(DataQueries.Location).orElse(null);
             if (location != null) {
                 int x = location.getInt(DataQueries.X).orElse(0);
                 int y = location.getInt(DataQueries.Y).orElse(0);
                 int z = location.getInt(DataQueries.Z).orElse(0);
                 World world = location.get(DataQueries.WorldUuid).flatMap(TypeUtil::uuidFromObject).flatMap(Sponge.getServer()::getWorld).orElse(null);
-                
+
                 if (this.querySession.hasFlag(Flag.EXTENDED)) {
                     resultMessage.append(Text.of(Text.NEW_LINE, TextColors.GRAY, " - ", Format.location(x, y, z, world, true)));
                 }
-                
+
                 hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Location: ", TextColors.WHITE, Format.location(x, y, z, world, false)));
             }
         }
-        
+
         resultMessage.onHover(TextActions.showText(hoverMessage.build()));
         return resultMessage.build();
     }

@@ -93,19 +93,19 @@ public class PrismRecord {
         event.getData().set(causeKey, causeIdentifier);
 
         // Source filtered?
-        if (!Prism.getFilterList().allowsSource(source.getSource())) {
+        if (!Prism.getInstance().getFilterList().allowsSource(source.getSource())) {
             return;
         }
 
         // Original block filtered?
         Optional<Object> optionalOriginalBlock = event.getData().get(DataQueries.OriginalBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
-        if (optionalOriginalBlock.isPresent() && !Prism.getFilterList().allowsBlock((String) optionalOriginalBlock.get())) {
+        if (optionalOriginalBlock.isPresent() && !Prism.getInstance().getFilterList().allowsBlock((String) optionalOriginalBlock.get())) {
             return;
         }
 
         // Replacement block filtered?
         Optional<Object> optionalReplacementBlock = event.getData().get(DataQueries.ReplacementBlock.then(DataQueries.BlockState).then(DataQueries.BlockType));
-        if (optionalReplacementBlock.isPresent() && !Prism.getFilterList().allowsBlock((String) optionalReplacementBlock.get())) {
+        if (optionalReplacementBlock.isPresent() && !Prism.getInstance().getFilterList().allowsBlock((String) optionalReplacementBlock.get())) {
             return;
         }
 
@@ -192,7 +192,7 @@ public class PrismRecord {
             if (source.getSource() instanceof Locatable) {
                 data.set(DataQueries.Location, ((Locatable) source.getSource()).getLocation().toContainer());
             }
-            
+
             writeItemTransaction(transaction);
             return new PrismRecord(source, this);
         }
@@ -220,7 +220,7 @@ public class PrismRecord {
             if (source.getSource() instanceof Entity) {
                 data.set(DataQueries.Location, ((Locatable) source.getSource()).getLocation().toContainer());
             }
-            
+
             writeItemTransaction(transaction);
             return new PrismRecord(source, this);
         }
@@ -315,13 +315,13 @@ public class PrismRecord {
          */
         private void writeItemTransaction(Transaction<ItemStackSnapshot> transaction) {
             checkNotNull(transaction);
-            
+
             String itemId = transaction.getFinal().getType().getId();
             int itemQuantity = transaction.getFinal().getQuantity();
             if (transaction.getOriginal().getType() != ItemTypes.NONE) {
                 itemQuantity -= transaction.getOriginal().getQuantity();
             }
-            
+
             data.set(DataQueries.Target, itemId);
             data.set(DataQueries.Quantity, itemQuantity);
         }

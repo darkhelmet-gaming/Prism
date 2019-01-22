@@ -1,7 +1,13 @@
+sudo: false
 dist: trusty
-install: true
+
 language: java
 jdk:
   - openjdk8
   - oraclejdk8
-script: gradle build
+
+before_script:
+  - chmod +x ./gradlew
+
+script:
+  - ./gradlew build

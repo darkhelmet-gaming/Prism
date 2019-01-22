@@ -58,7 +58,7 @@ import com.mongodb.client.model.WriteModel;
 
 public class MongoRecords implements StorageAdapterRecords {
     private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
-    private final String expiration = Prism.getConfig().getNode("storage", "expireRecords").getString();
+    private final String expiration = Prism.getInstance().getConfiguration().getNode("storage", "expireRecords").getString();
 
     /**
      * Converts a DataView to a Document, recursively if needed.
@@ -92,7 +92,7 @@ public class MongoRecords implements StorageAdapterRecords {
                             break;
                         }
                         else {
-                            Prism.getLogger().error("Unsupported list data type: " + object.getClass().getName());
+                            Prism.getInstance().getLogger().error("Unsupported list data type: " + object.getClass().getName());
                         }
                     }
 
@@ -148,7 +148,7 @@ public class MongoRecords implements StorageAdapterRecords {
        for (DataContainer container : containers) {
            Document document = documentFromView(container);
 
-           //Prism.getLogger().debug(DataUtil.jsonFromDataView(container).toString());
+           //Prism.getInstance().getLogger().debug(DataUtil.jsonFromDataView(container).toString());
 
            // TTL
            document.append("Expires", DateUtil.parseTimeStringToDate(expiration, true));
@@ -282,7 +282,7 @@ public class MongoRecords implements StorageAdapterRecords {
            pipeline.add(limit);
 
            aggregated = collection.aggregate(pipeline);
-           Prism.getLogger().debug("MongoDB Query: " + pipeline);
+           Prism.getInstance().getLogger().debug("MongoDB Query: " + pipeline);
        } else {
            // Aggregation pipeline
            List<Document> pipeline = new ArrayList<>();
@@ -291,7 +291,7 @@ public class MongoRecords implements StorageAdapterRecords {
            pipeline.add(limit);
 
            aggregated = collection.aggregate(pipeline);
-           Prism.getLogger().debug("MongoDB Query: " + pipeline);
+           Prism.getInstance().getLogger().debug("MongoDB Query: " + pipeline);
        }
 
        // Iterate results and build our event record list

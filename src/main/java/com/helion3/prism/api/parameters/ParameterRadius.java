@@ -69,7 +69,7 @@ public class ParameterRadius extends SimpleParameterHandler {
             Location<World> location = player.getLocation();
 
             int radius = Integer.parseInt(value);
-            int maxRadius = Prism.getConfig().getNode("limits", "radius", "max").getInt();
+            int maxRadius = Prism.getInstance().getConfiguration().getNode("limits", "radius", "max").getInt();
 
             // Enforce max radius unless player has override perms
             if (radius > maxRadius && !player.hasPermission("prism.override.radius")) {
@@ -90,7 +90,7 @@ public class ParameterRadius extends SimpleParameterHandler {
     public Optional<Pair<String, String>> processDefault(QuerySession session, Query query) {
         if (session.getCommandSource() instanceof Player) {
             // Default radius from config
-            int defaultRadius = Prism.getConfig().getNode("defaults", "radius").getInt();
+            int defaultRadius = Prism.getInstance().getConfiguration().getNode("defaults", "radius").getInt();
 
             // Player location
             Location<World> location = ((Player) session.getCommandSource()).getLocation();

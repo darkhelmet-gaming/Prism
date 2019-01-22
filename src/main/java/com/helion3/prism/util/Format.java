@@ -29,9 +29,13 @@ import com.helion3.prism.Prism;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class Format {
 
@@ -151,15 +155,34 @@ public class Format {
         checkNotNull(content);
         return Text.of(TextColors.GRAY, content);
     }
-    
+
     /**
      * Returns content formatted with the Plugin name.
      * @return Text Formatted content.
      */
     public static Text prefix() {
-        return Text.of(TextColors.LIGHT_PURPLE, "Prism", " //", TextColors.RESET, " ");
+        return Text.of(TextColors.LIGHT_PURPLE, Reference.NAME, " //", TextColors.RESET, " ");
     }
-    
+
+    /**
+     * Returns content formatted with a URL.
+     *
+     * @param url URL
+     * @return Text Formatted content.
+     */
+    public static Text url(String url) {
+        Text.Builder textBuilder = Text.builder();
+        textBuilder.append(Text.of(TextColors.BLUE, url));
+
+        try {
+            textBuilder.onClick(TextActions.openUrl(new URL(url)));
+        } catch (MalformedURLException ex) {
+            textBuilder.onClick(TextActions.suggestCommand(url));
+        }
+
+        return textBuilder.build();
+    }
+
     /**
      * Returns content formatted with an Item name.
      * Optionally a hover action can be added to display
@@ -170,21 +193,21 @@ public class Format {
      */
     public static Text item(String id, boolean hoverAction) {
         checkNotNull(id);
-        
+
         Text.Builder textBuilder = Text.builder();
         if (StringUtils.contains(id, ":")) {
             textBuilder.append(Text.of(StringUtils.substringAfter(id, ":")));
         } else {
             textBuilder.append(Text.of(id));
         }
-        
+
         if (hoverAction) {
             textBuilder.onHover(TextActions.showText(Text.of(id)));
         }
-        
+
         return textBuilder.build();
     }
-    
+
     /**
      * Return content formatted with location information.
      * Optionally a click action can be added to teleport
@@ -201,18 +224,18 @@ public class Format {
         textBuilder.append(Text.of("(x:", x, " y:", y, " z:", z));
         if (world != null) {
             textBuilder.append(Text.of(" world:", world.getName()));
-            
+
             if (clickAction) {
                 textBuilder.onClick(TextActions.executeCallback(commandSource -> {
                     if (!(commandSource instanceof Player)) {
                         return;
                     }
-                    
+
                     ((Player) commandSource).setLocation(world.getLocation(x, y, z));
                 }));
             }
         }
-        
+
         return textBuilder.append(Text.of(")")).build();
     }
 }

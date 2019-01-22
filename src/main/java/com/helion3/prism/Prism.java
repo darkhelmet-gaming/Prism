@@ -21,23 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.helion3.prism;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import com.helion3.prism.api.flags.*;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.inject.Inject;
+import com.helion3.prism.api.filters.FilterList;
+import com.helion3.prism.api.filters.FilterMode;
+import com.helion3.prism.api.flags.FlagClean;
+import com.helion3.prism.api.flags.FlagDrain;
+import com.helion3.prism.api.flags.FlagExtended;
+import com.helion3.prism.api.flags.FlagHandler;
+import com.helion3.prism.api.flags.FlagNoGroup;
+import com.helion3.prism.api.flags.FlagOrder;
+import com.helion3.prism.api.parameters.ParameterBlock;
 import com.helion3.prism.api.parameters.ParameterCause;
+import com.helion3.prism.api.parameters.ParameterEventName;
+import com.helion3.prism.api.parameters.ParameterHandler;
+import com.helion3.prism.api.parameters.ParameterPlayer;
+import com.helion3.prism.api.parameters.ParameterRadius;
+import com.helion3.prism.api.parameters.ParameterTime;
+import com.helion3.prism.api.records.ActionableResult;
 import com.helion3.prism.api.records.BlockResult;
+import com.helion3.prism.api.records.EntityResult;
 import com.helion3.prism.api.records.Result;
+import com.helion3.prism.api.storage.StorageAdapter;
+import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.listeners.ChangeBlockListener;
 import com.helion3.prism.listeners.ChangeInventoryListener;
 import com.helion3.prism.listeners.DeathListener;
@@ -45,125 +56,202 @@ import com.helion3.prism.listeners.DropItemListener;
 import com.helion3.prism.listeners.JoinListener;
 import com.helion3.prism.listeners.QuitListener;
 import com.helion3.prism.listeners.RequiredInteractListener;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-
-import org.slf4j.Logger;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.event.EventManager;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.scheduler.Task;
-
-import com.google.inject.Inject;
-import com.helion3.prism.api.filters.FilterList;
-import com.helion3.prism.api.filters.FilterMode;
-import com.helion3.prism.api.parameters.ParameterBlock;
-import com.helion3.prism.api.parameters.ParameterEventName;
-import com.helion3.prism.api.parameters.ParameterHandler;
-import com.helion3.prism.api.parameters.ParameterPlayer;
-import com.helion3.prism.api.parameters.ParameterRadius;
-import com.helion3.prism.api.parameters.ParameterTime;
-import com.helion3.prism.api.records.ActionableResult;
-import com.helion3.prism.api.records.EntityResult;
-import com.helion3.prism.api.storage.StorageAdapter;
-import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.h2.H2StorageAdapter;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 import com.helion3.prism.storage.mysql.MySQLStorageAdapter;
+import com.helion3.prism.util.Reference;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameConstructionEvent;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.Task;
+
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Prism is an event logging + rollback/restore engine for Minecraft servers.
  *
  * @author viveleroi
  */
-@Plugin(id = "prism", name = "Prism", version = "3.0.0", description = "A rollback/restore grief-prevention plugin.", authors = "viveleroi")
-final public class Prism {
-    private static List<UUID> activeWands = new ArrayList<>();
-    private static final FilterList filterlist = new FilterList(FilterMode.BLACKLIST);
-    private static Configuration config;
-    private static Game game;
-    private static List<ParameterHandler> handlers = new ArrayList<>();
-    private static List<FlagHandler> flagHandlers = new ArrayList<>();
-    private static Map<UUID, List<ActionableResult>> lastActionResults = new HashMap<>();
-    private static Logger logger;
-    private static Map<String,Class<? extends Result>> resultRecords = new HashMap<>();
-    private static File parentDirectory;
-    private static Object plugin;
-    private static StorageAdapter storageAdapter;
+@Plugin(
+        id = Reference.ID,
+        name = Reference.NAME,
+        version = Reference.VERSION,
+        description = Reference.DESCRIPTION,
+        authors = Reference.AUTHORS,
+        url = Reference.WEBSITE
+)
+public final class Prism {
 
-    public static Listening listening;
+    private static Prism instance;
+
+    @Inject
+    private PluginContainer pluginContainer;
+
+    @Inject
+    private Logger logger;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
-    private File defaultConfig;
+    private Path path;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
-    private ConfigurationLoader<CommentedConfigurationNode> configManager;
+    private ConfigurationLoader<CommentedConfigurationNode> configurationLoader;
 
-    /**
-     * Performs bootstrapping of Prism resources/objects.
-     *
-     * @param event Server started
-     */
+    private Configuration configuration;
+    private Listening listening;
+    private StorageAdapter storageAdapter;
+
+    private final Set<UUID> activeWands = Sets.newHashSet();
+    private final FilterList filterList = new FilterList(FilterMode.BLACKLIST);
+    private final Set<FlagHandler> flagHandlers = Sets.newHashSet();
+    private final Map<UUID, List<ActionableResult>> lastActionResults = Maps.newHashMap();
+    private final Set<ParameterHandler> parameterHandlers = Sets.newHashSet();
+    private final Map<String, Class<? extends Result>> resultRecords = Maps.newHashMap();
+
     @Listener
-    public void onServerStart(GameStartedServerEvent event) {
-        plugin = this;
-        parentDirectory = defaultConfig.getParentFile();
+    public void onConstruction(GameConstructionEvent event) {
+        instance = this;
+    }
 
-        // Load configuration data
-        config = new Configuration(defaultConfig, configManager);
+    @Listener
+    public void onPreInitialization(GamePreInitializationEvent event) {
+        configuration = new Configuration(path.toFile(), configurationLoader);
         listening = new Listening();
+    }
 
-        // Register all result record classes
-        registerEventResultRecords();
+    @Listener
+    public void onInitialization(GameInitializationEvent event) {
+        // Register FlagHandlers
+        registerFlagHandler(new FlagClean());
+        registerFlagHandler(new FlagDrain());
+        registerFlagHandler(new FlagExtended());
+        registerFlagHandler(new FlagNoGroup());
+        registerFlagHandler(new FlagOrder());
 
-        // Register handlers
-        registerFlagHandlers();
-        registerParameterHandlers();
+        // Register ParameterHandlers
+        registerParameterHandler(new ParameterBlock());
+        registerParameterHandler(new ParameterCause());
+        registerParameterHandler(new ParameterEventName());
+        registerParameterHandler(new ParameterPlayer());
+        registerParameterHandler(new ParameterRadius());
+        registerParameterHandler(new ParameterTime());
 
-        // Listen to events
-        registerSpongeEventListeners(game.getEventManager());
+        // Register ResultRecords
+        registerResultRecord("break", BlockResult.class);
+        registerResultRecord("decay", BlockResult.class);
+        registerResultRecord("grow", BlockResult.class);
+        registerResultRecord("place", BlockResult.class);
+        registerResultRecord("death", EntityResult.class);
 
-        // Initialize storage engine
-        String engine = config.getNode("storage", "engine").getString();
+        // Register Commands
+        Sponge.getCommandManager().register(this, PrismCommands.getCommand(), Reference.ID, "pr");
 
+        // Register Listeners
+        Sponge.getEventManager().registerListeners(getPluginContainer(), new ChangeBlockListener());
+
+        if (getListening().DEATH) {
+            Sponge.getEventManager().registerListeners(getPluginContainer(), new DeathListener());
+        }
+
+        if (getListening().DROP) {
+            Sponge.getEventManager().registerListeners(getPluginContainer(), new DropItemListener());
+        }
+
+        if (getListening().JOIN) {
+            Sponge.getEventManager().registerListeners(getPluginContainer(), new JoinListener());
+        }
+
+        if (getListening().PICKUP) {
+            Sponge.getEventManager().registerListeners(getPluginContainer(), new ChangeInventoryListener());
+        }
+
+        if (getListening().QUIT) {
+            Sponge.getEventManager().registerListeners(getPluginContainer(), new QuitListener());
+        }
+
+        // Events required for internal operation
+        Sponge.getEventManager().registerListeners(getPluginContainer(), new RequiredInteractListener());
+    }
+
+    @Listener
+    public void onPostInitialization(GamePostInitializationEvent event) {
+    }
+
+    @Listener
+    public void onStartedServer(GameStartedServerEvent event) {
+        String engine = getConfiguration().getNode("storage", "engine").getString();
         try {
-            if (engine.equalsIgnoreCase("h2")) {
+            if (StringUtils.equalsIgnoreCase(engine, "h2")) {
                 storageAdapter = new H2StorageAdapter();
-            }
-            else if (engine.equalsIgnoreCase("mongo")) {
+            } else if (StringUtils.equalsIgnoreCase(engine, "mongo")) {
                 storageAdapter = new MongoStorageAdapter();
-            }
-            else if (engine.equalsIgnoreCase("mysql")) {
+            } else if (StringUtils.equalsIgnoreCase(engine, "mysql")) {
                 storageAdapter = new MySQLStorageAdapter();
-            }
-            else {
+            } else {
                 throw new Exception("Invalid storage engine configured.");
             }
 
-            storageAdapter.connect();
-        } catch (Exception e) {
-            // @todo handle this
-            e.printStackTrace();
+            Preconditions.checkArgument(getStorageAdapter().connect());
+
+            // Initialize the recording queue manager
+            Task.builder()
+                    .async()
+                    .name("PrismRecordingQueueManager")
+                    .interval(1, TimeUnit.SECONDS)
+                    .execute(new RecordingQueueManager())
+                    .submit(getPluginContainer());
+            getLogger().info("Prism started successfully. Bad guys beware.");
+        } catch (Exception ex) {
+            Sponge.getEventManager().unregisterPluginListeners(getPluginContainer());
+            getLogger().error("Encountered an error processing {}::onStartedServer", "Prism", ex);
         }
+    }
 
-        // Initialize the recording queue manager
-        Task.builder()
-            .async()
-            .name("PrismRecordingQueueManager")
-            .interval(1, TimeUnit.SECONDS)
-            .execute(new RecordingQueueManager())
-            .submit(this);
+    public static Prism getInstance() {
+        return instance;
+    }
 
-        // Commands
-        game.getCommandManager().register(this, PrismCommands.getCommand(), "prism", "pr");
+    public PluginContainer getPluginContainer() {
+        return pluginContainer;
+    }
 
-        logger.info("Prism started successfully. Bad guys beware.");
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public Path getPath() {
+        return path;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public Listening getListening() {
+        return listening;
+    }
+
+    public StorageAdapter getStorageAdapter() {
+        return storageAdapter;
     }
 
     /**
@@ -171,41 +259,53 @@ final public class Prism {
      *
      * @return A list of players' UUIDs who have an active inspection wand
      */
-    public static List<UUID> getActiveWands() {
+    public Set<UUID> getActiveWands() {
         return activeWands;
     }
 
     /**
      * Returns the blacklist manager.
+     *
      * @return Blacklist
      */
-    public static FilterList getFilterList() {
-        return filterlist;
+    public FilterList getFilterList() {
+        return filterList;
     }
 
     /**
-     * Returns the plugin configuration
-     * @return Configuration
+     * Returns all currently registered flag handlers.
+     *
+     * @return List of {@link FlagHandler}
      */
-    public static Configuration getConfig() {
-        return config;
+    public Set<FlagHandler> getFlagHandlers() {
+        return flagHandlers;
     }
 
     /**
-     * Returns the current game
-     * @return Game
+     * Returns a specific handler for a given parameter
+     *
+     * @param flag {@link String} flag name
+     * @return The {@link FlagHandler}, or empty if unsupported
      */
-    public static Game getGame() {
-        return game;
+    public Optional<FlagHandler> getFlagHandler(String flag) {
+        for (FlagHandler flagHandler : getFlagHandlers()) {
+            if (flagHandler.handles(flag)) {
+                return Optional.of(flagHandler);
+            }
+        }
+
+        return Optional.empty();
     }
 
     /**
-     * Injected Game instance.
-     * @param injectGame Game
+     * Register a flag handler.
+     *
+     * @param flagHandler {@link FlagHandler}
+     * @return True if the {@link FlagHandler} was registered
      */
-    @Inject
-    public void setGame(Game injectGame) {
-        game = injectGame;
+    public boolean registerFlagHandler(FlagHandler flagHandler) {
+        Preconditions.checkNotNull(flagHandler);
+        return getFlagHandlers().add(flagHandler);
     }
 
     /**
@@ -213,204 +313,75 @@ final public class Prism {
      *
      * @return A map of players' UUIDs to a list of their {@link ActionableResult}s
      */
-    public static Map<UUID, List<ActionableResult>> getLastActionResults() {
+    public Map<UUID, List<ActionableResult>> getLastActionResults() {
         return lastActionResults;
     }
 
     /**
-     * Returns the Logger instance for this plugin.
-     * @return Logger instance
-     */
-    public static Logger getLogger() {
-        return logger;
-    }
-
-    /**
-     * Returns a specific handler for a given parameter
-     * @param flag String flag name
-     * @return
-     */
-    public static Optional<FlagHandler> getFlagHandler(String flag) {
-        FlagHandler result = null;
-        for(FlagHandler handler : Prism.getFlagHandlers()) {
-            if (handler.handles(flag)) {
-                result = handler;
-            }
-        }
-
-        return Optional.ofNullable(result);
-    }
-
-    /**
-     * Returns all currently registered flag handlers.
-     * @return List of {@link FlagHandler}
-     */
-    public static List<FlagHandler> getFlagHandlers() {
-        return flagHandlers;
-    }
-
-    /**
-     * Returns a specific handler for a given parameter
-     * @param parameter String parameter name
-     * @return
-     */
-    public static Optional<ParameterHandler> getParameterHandler(String parameter) {
-        ParameterHandler result = null;
-        for(ParameterHandler handler : Prism.getParameterHandlers()) {
-            if (handler.handles(parameter)) {
-                result = handler;
-            }
-        }
-
-        return Optional.ofNullable(result);
-    }
-
-    /**
      * Returns all currently registered parameter handlers.
+     *
      * @return List of {@link ParameterHandler}
      */
-    public static List<ParameterHandler> getParameterHandlers() {
-        return handlers;
+    public Set<ParameterHandler> getParameterHandlers() {
+        return parameterHandlers;
     }
 
     /**
-     * Get parent directory.
-     * @return File
-     */
-    public static File getParentDirectory() {
-        return parentDirectory;
-    }
-
-    /**
+     * Returns a specific handler for a given parameter
      *
-     * @return
+     * @param alias {@link String} parameter name
+     * @return The {@link ParameterHandler}, or empty if unsupported
      */
-    public static Object getPlugin() {
-        return plugin;
+    public Optional<ParameterHandler> getParameterHandler(String alias) {
+        for (ParameterHandler parameterHandler : getParameterHandlers()) {
+            if (parameterHandler.handles(alias)) {
+                return Optional.of(parameterHandler);
+            }
+        }
+
+        return Optional.empty();
     }
 
     /**
-     * Returns the result record for a given event.
-     * @param eventName Event name.
-     * @return Result record class.
-     */
-    public static Class<? extends Result> getResultRecord(String eventName) {
-        return resultRecords.get(eventName);
-    }
-
-    /**
-     * Returns our storage/database adapter.
-     * @return Storage adapter.
-     */
-    public static StorageAdapter getStorageAdapter() {
-        return storageAdapter;
-    }
-
-    /**
-     * Injects the Logger instance for this plugin
-     * @param log Logger
-     */
-    @Inject
-    private void setLogger(Logger log) {
-        logger = log;
-    }
-
-    /**
-     * Registers all default event names and their handling classes
-     */
-    private void registerEventResultRecords() {
-        registerResultRecord("break", BlockResult.class);
-        registerResultRecord("decay", BlockResult.class);
-        registerResultRecord("grow", BlockResult.class);
-        registerResultRecord("place", BlockResult.class);
-        registerResultRecord("death", EntityResult.class);
-    }
-
-    /**
-     * Register a flag handler.
-     * @param handler
-     */
-    private void registerFlagHandler(FlagHandler handler) {
-        checkNotNull(handler);
-        // @todo validate flag doesn't exist
-        flagHandlers.add(handler);
-    }
-
-    /**
-     * Registers all default flag handlers
-     */
-    private void registerFlagHandlers() {
-        registerFlagHandler(new FlagClean());
-        registerFlagHandler(new FlagDrain());
-        registerFlagHandler(new FlagExtended());
-        registerFlagHandler(new FlagNoGroup());
-        registerFlagHandler(new FlagOrder());
-    }
-
-    /**
+     * Register a parameter handler.
      *
-     * @param handler
+     * @param parameterHandler {@link ParameterHandler}
+     * @return True if the {@link ParameterHandler} was registered
      */
-    public void registerParameterHandler(ParameterHandler handler) {
-        checkNotNull(handler);
-        // @todo validate alias doesn't exist
-        handlers.add(handler);
+    public boolean registerParameterHandler(ParameterHandler parameterHandler) {
+        Preconditions.checkNotNull(parameterHandler);
+        return getParameterHandlers().add(parameterHandler);
     }
 
     /**
-     * Registers all default parameter handlers
+     * Returns all currently registered result records.
+     *
+     * @return Map of event names to their {@link Result} class
      */
-    private void registerParameterHandlers() {
-        registerParameterHandler(new ParameterBlock());
-        registerParameterHandler(new ParameterCause());
-        registerParameterHandler(new ParameterEventName());
-        registerParameterHandler(new ParameterPlayer());
-        registerParameterHandler(new ParameterRadius());
-        registerParameterHandler(new ParameterTime());
+    private Map<String, Class<? extends Result>> getResultRecords() {
+        return resultRecords;
+    }
+
+    /**
+     * Returns the result record class for a given event
+     *
+     * @param event event name
+     * @return {@link Result} Record class, or null if unsupported
+     */
+    public Class<? extends Result> getResultRecord(String event) {
+        return getResultRecords().get(event);
     }
 
     /**
      * Register a custom result record for a given event name.
-     * @param eventName
-     * @param clazz
+     *
+     * @param event        {@link String} event name
+     * @param resultRecord {@link Result} Record class
+     * @return True if the {@link Result} Record class was registered
      */
-    public void registerResultRecord(String eventName, Class<? extends Result> clazz) {
-        if (resultRecords.containsKey(eventName)) {
-            throw new IllegalArgumentException("A result record is already registered for event \"" + eventName + "\"");
-        }
-
-        resultRecords.put(eventName, clazz);
-    }
-
-    /**
-     * Register all event listeners.
-     */
-    private void registerSpongeEventListeners(EventManager eventManager) {
-        eventManager.unregisterPluginListeners(this);
-
-        eventManager.registerListeners(this, new ChangeBlockListener());
-
-        if (listening.DEATH) {
-            eventManager.registerListeners(this, new DeathListener());
-        }
-
-        if (listening.DROP) {
-            eventManager.registerListeners(this, new DropItemListener());
-        }
-
-        if (listening.JOIN) {
-            eventManager.registerListeners(this, new JoinListener());
-        }
-
-        if (listening.PICKUP) {
-            eventManager.registerListeners(this, new ChangeInventoryListener());
-        }
-
-        if (listening.QUIT) {
-            eventManager.registerListeners(this, new QuitListener());
-        }
-
-        // Events required for internal operation
-        eventManager.registerListeners(this, new RequiredInteractListener());
+    public boolean registerResultRecord(String event, Class<? extends Result> resultRecord) {
+        Preconditions.checkNotNull(event);
+        Preconditions.checkNotNull(resultRecord);
+        return getResultRecords().putIfAbsent(event, resultRecord) == null;
     }
 }

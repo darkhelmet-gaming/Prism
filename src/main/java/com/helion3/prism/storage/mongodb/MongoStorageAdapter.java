@@ -52,7 +52,7 @@ public class MongoStorageAdapter implements StorageAdapter {
      *
      */
     public MongoStorageAdapter() {
-        databaseName = Prism.getConfig().getNode("db", "name").getString();
+        databaseName = Prism.getInstance().getConfiguration().getNode("db", "name").getString();
 
         // Collections
         collectionEventRecordsName = "records";
@@ -68,14 +68,14 @@ public class MongoStorageAdapter implements StorageAdapter {
     @Override
     public boolean connect() throws Exception {
         ServerAddress address = new ServerAddress(
-            Prism.getConfig().getNode("db", "mongo", "host").getString(),
-            Prism.getConfig().getNode("db", "mongo", "port").getInt()
+            Prism.getInstance().getConfiguration().getNode("db", "mongo", "host").getString(),
+            Prism.getInstance().getConfiguration().getNode("db", "mongo", "port").getInt()
         );
 
         MongoCredential credential = MongoCredential.createCredential(
-                Prism.getConfig().getNode("db", "mongo", "user").getString(),
+                Prism.getInstance().getConfiguration().getNode("db", "mongo", "user").getString(),
                 databaseName,
-                Prism.getConfig().getNode("db", "mongo", "pass").getString().toCharArray()
+                Prism.getInstance().getConfiguration().getNode("db", "mongo", "pass").getString().toCharArray()
         );
 
         mongoClient = new MongoClient(address, credential, MongoClientOptions.builder().build());

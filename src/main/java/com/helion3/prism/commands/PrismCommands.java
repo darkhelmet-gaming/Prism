@@ -26,6 +26,7 @@ package com.helion3.prism.commands;
 import java.util.List;
 
 import com.helion3.prism.api.query.Sort;
+import com.helion3.prism.util.Reference;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -62,11 +63,12 @@ public class PrismCommands {
                 // Check permission here, so the node doesn't apply to all child commands
                 if (source.hasPermission("prism.info")) {
                     source.sendMessage(Text.of(
-                            Format.heading(TextColors.GRAY, "By ", TextColors.GOLD, "viveleroi.\n"),
+                            Format.heading(TextColors.GRAY, "By ", TextColors.GOLD, "viveleroi", TextColors.GRAY, ".\n"),
                             TextColors.DARK_AQUA, "Tracking so good the NSA stole our name.\n",
                             TextColors.GRAY, "Help: ", TextColors.WHITE, "/pr ?\n",
                             TextColors.GRAY, "IRC: ", TextColors.WHITE, "irc.esper.net #prism\n",
-                            TextColors.GRAY, "Site: ", TextColors.WHITE, "http://discover-prism.com"
+                            TextColors.GRAY, "Site: ", Format.url(Reference.WEBSITE), "\n",
+                            TextColors.GRAY, "Source: ", Format.url(Reference.SOURCE)
                     ));
 
                     return CommandResult.success();

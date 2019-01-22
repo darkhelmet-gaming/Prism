@@ -29,11 +29,11 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.profile.GameProfile;
 
 import com.google.common.collect.ImmutableList;
-import com.helion3.prism.Prism;
 import com.helion3.prism.api.query.FieldCondition;
 import com.helion3.prism.api.query.MatchRule;
 import com.helion3.prism.api.query.Query;
@@ -62,7 +62,7 @@ public class ParameterPlayer extends SimpleParameterHandler {
 
     @Override
     public Optional<CompletableFuture<?>> process(QuerySession session, String parameter, String value, Query query) {
-        CompletableFuture<GameProfile> future = Prism.getGame().getServer().getGameProfileManager().get(value, true);
+        CompletableFuture<GameProfile> future = Sponge.getServer().getGameProfileManager().get(value, true);
 
         future.thenAccept(profile -> query.addCondition(FieldCondition.of(DataQueries.Player, MatchRule.EQUALS, profile.getUniqueId().toString())));
 

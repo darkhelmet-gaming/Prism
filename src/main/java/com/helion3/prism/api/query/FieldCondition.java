@@ -33,7 +33,7 @@ import com.google.common.collect.Range;
  * Represents a condition for a specific field. May exist alone
  * in a query, or within a group.
  */
-final public class FieldCondition implements Condition {
+public final class FieldCondition implements Condition {
     private final DataQuery field;
     private final MatchRule matchRule;
     private final Object value;

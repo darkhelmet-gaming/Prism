@@ -26,13 +26,13 @@ package com.helion3.prism.api.records;
 import java.util.Optional;
 
 import com.google.common.base.Preconditions;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.block.BlockSnapshot.Builder;
 
-import com.helion3.prism.Prism;
 import com.helion3.prism.util.BlockUtil;
 import com.helion3.prism.util.DataQueries;
 import org.spongepowered.api.world.BlockChangeFlags;
@@ -66,7 +66,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         // Format
         finalBlock = formatBlockData(finalBlock, optionalLocation.get());
 
-        Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(finalBlock);
+        Optional<BlockSnapshot> optionalSnapshot = Sponge.getRegistry().createBuilder(Builder.class).build(finalBlock);
         if (!optionalSnapshot.isPresent()) {
             return ActionableResult.skipped(SkipReason.INVALID);
         }
@@ -144,7 +144,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         // Format
         finalBlock = formatBlockData(finalBlock, optionalLocation.get());
 
-        Optional<BlockSnapshot> optionalSnapshot = Prism.getGame().getRegistry().createBuilder(Builder.class).build(finalBlock);
+        Optional<BlockSnapshot> optionalSnapshot = Sponge.getRegistry().createBuilder(Builder.class).build(finalBlock);
         if (!optionalSnapshot.isPresent()) {
             return ActionableResult.skipped(SkipReason.INVALID);
         }

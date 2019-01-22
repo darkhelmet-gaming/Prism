@@ -1,55 +1,79 @@
-// Apply plugins
-plugins {
-    id 'java'
-    id 'idea'
-    id 'maven'
-    id 'eclipse'
-    id 'checkstyle'
-    id 'com.github.hierynomus.license' version '0.14.0'
-    id 'com.github.johnrengelman.shadow' version '2.0.4'
-}
-
-def getVersionName = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'describe', '--tags'
-        standardOutput = stdout
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "gradle"
+            url = "https://plugins.gradle.org/m2"
+        }
     }
-    return stdout.toString().trim()
+
+    dependencies {
+        classpath("com.github.jengelman.gradle.plugins:shadow:4.0.3")
+        classpath("gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.15.0")
+    }
 }
 
-version = getVersionName()
+apply plugin: "checkstyle"
+apply plugin: "com.github.hierynomus.license"
+apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "java"
+apply plugin: "maven"
 
-// Default tasks
-defaultTasks 'licenseFormat', 'check', 'build', 'shadowJar'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-// Extended project information
-ext.projectName = 'Prism'
-ext.inceptionYear = '2015'
-ext.packaging = 'jar'
-ext.url = 'http://helion3.com/'
-ext.description = 'Prism'
-ext.organization = 'Helion3'
+group = "com.helion3"
+archivesBaseName = "prism"
+version = "git describe --tags".execute().text.trim()
 
-// Define variables
-ext.buildNumber = project.hasProperty("buildNumber") ? buildNumber : '0'
-ext.ciSystem = project.hasProperty("ciSystem") ? ciSystem : 'unknown'
-ext.commit = project.hasProperty("commit") ? commit : 'unknown'
+checkstyle {
+    configFile = file("checkstyle.xml")
+}
 
-// Project repositories
+license {
+    exclude("**/*.info")
+    exclude("assets/**")
+    header = file("HEADER.txt")
+    ignoreFailures = false
+    strictCheck = true
+    mapping {
+        java = "SLASHSTAR_STYLE"
+    }
+}
+
+configurations {
+    provided {
+        compile.extendsFrom(provided)
+    }
+
+    compileJava.options.compilerArgs += ["-Xlint:all", "-Xlint:-path", "-Xlint:-processing"]
+    compileJava.options.deprecation = true
+    compileJava.options.encoding = "utf8"
+    jar.dependsOn("shadowJar")
+    licenseMain.ext.name = project.archivesBaseName
+    licenseMain.ext.organization = "Helion3"
+    licenseMain.ext.url = "http://helion3.com/"
+    licenseMain.ext.year = "2015"
+    project.ext.buildNumber = project.hasProperty("buildNumber") ? buildNumber : "0"
+    project.ext.ciSystem = project.hasProperty("ciSystem") ? ciSystem : "unknown"
+    project.ext.commit = project.hasProperty("commit") ? commit : "unknown"
+}
+
 repositories {
     jcenter()
     maven {
-        name 'Sponge Maven Repository'
-        url 'https://repo.spongepowered.org/maven'
+        name = "spongepowered"
+        url = "https://repo.spongepowered.org/maven"
     }
 }
 
-// Project dependencies
 dependencies {
-    compile 'com.zaxxer:HikariCP:2.6.3'
-    shadow 'org.mongodb:mongo-java-driver:3.8.1'
-    compile 'org.spongepowered:spongeapi:7.1.0'
+    provided("com.zaxxer:HikariCP:2.6.3")
+    shadow("org.mongodb:mongo-java-driver:3.8.1")
+    annotationProcessor("org.spongepowered:spongeapi:7.1.0")
+    provided("org.spongepowered:spongeapi:7.1.0")
 }
 
 shadowJar {
@@ -58,50 +82,25 @@ shadowJar {
     relocate("org.bson", "com.helion3.prism.lib.bson")
 }
 
-// Filter, process, and include resources
-processResources {
-    // Include in final JAR
-    from 'LICENSE.txt'
-}
+jar {
+    manifest {
+        attributes(
+                "Built-By": System.properties["user.name"],
+                "Created-By": System.properties["java.vm.version"] + " (" + System.properties["java.vm.vendor"] + ")",
+                "Implementation-Title": project.archivesBaseName,
+                "Implementation-Version": version + "+" + ciSystem + "-b" + buildNumber + ".git-" + commit,
+                "Implementation-Vendor": licenseMain.url
+        )
+    }
 
-// License header formatting
-license {
-    ext.name = project.projectName
-    ext.organization = project.organization
-    ext.url = project.url
-    ext.year = project.inceptionYear
-    exclude "**/*.info"
-    exclude "assets/**"
-    header file('HEADER.txt')
-    sourceSets = project.sourceSets
-    ignoreFailures false
-    strictCheck true
-    mapping {
-        java = 'SLASHSTAR_STYLE'
+    from {
+        (configurations.compile - configurations.provided).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
     }
 }
 
-checkstyle {
-    configProperties = [
-        "name" : project.name,
-        "organization" : project.organization,
-        "url" : project.url,
-        "year" : project.inceptionYear
-    ]
-    configFile = file("checkstyle.xml")
+processResources {
+    from("LICENSE.txt")
+    rename("LICENSE.txt", "LICENSE-" + archivesBaseName + ".txt")
 }
-
-// Source compiler configuration
-configure([compileJava, compileTestJava]) {
-    options.compilerArgs += [ '-Xlint:all', '-Xlint:-path' ]
-    options.deprecation = true
-    options.encoding = 'utf8'
-}
-
-// JAR manifest configuration
-jar.manifest.mainAttributes(
-    "Built-By": System.properties['user.name'],
-    "Created-By": System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
-    "Implementation-Title": name,
-    "Implementation-Version": version + "+" + ciSystem + "-b" + buildNumber + ".git-" + commit,
-    "Implementation-Vendor": url)

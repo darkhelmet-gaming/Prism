@@ -21,35 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.listeners;
 
-import com.helion3.prism.api.records.PrismRecord;
-import org.spongepowered.api.data.Transaction;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.Item;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.item.inventory.DropItemEvent;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+package com.helion3.prism.util;
 
-public class DropItemListener {
-    /**
-     * Saves event records when a player drops an item.
-     *
-     * @param event Dispense event.
-     */
-    @Listener(order = Order.POST)
-    public void onDrop(final DropItemEvent.Dispense event, @Root Player spawnCause) {
-        for (Entity entity : event.getEntities()) {
-            if (!(entity instanceof Item)) {
-                continue;
-            }
+public final class Reference {
 
-            Item item = (Item) entity;
-            Transaction<ItemStackSnapshot> transaction = new Transaction<>(ItemStackSnapshot.NONE, item.item().get());
-            PrismRecord.create().entity(spawnCause).dropped(transaction).save();
-        }
+    private Reference() {
     }
+
+    public static final String ID = "prism";
+    public static final String NAME = "Prism";
+    public static final String VERSION = "3.0.0";
+    public static final String DESCRIPTION = "A rollback/restore grief-prevention plugin.";
+    public static final String AUTHORS = "viveleroi";
+    public static final String SOURCE = "https://github.com/prism/Prism";
+    public static final String WEBSITE = "https://github.com/prism/Prism/wiki";
 }

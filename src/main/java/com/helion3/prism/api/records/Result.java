@@ -98,7 +98,7 @@ abstract public class Result {
             result = new ResultAggregate();
         } else {
             // Pull record class for this event, if any
-            Class<? extends Result> clazz = Prism.getResultRecord(eventName);
+            Class<? extends Result> clazz = Prism.getInstance().getResultRecord(eventName);
             if (clazz != null){
                 result = clazz.newInstance();
             } else {

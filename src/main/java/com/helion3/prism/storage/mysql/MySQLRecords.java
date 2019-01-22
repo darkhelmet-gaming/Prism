@@ -56,7 +56,7 @@ import com.helion3.prism.util.DataUtil;
 import com.helion3.prism.util.TypeUtil;
 
 public class MySQLRecords implements StorageAdapterRecords {
-    private final String tablePrefix = Prism.getConfig().getNode("db", "mysql", "tablePrefix").getString();
+    private final String tablePrefix = Prism.getInstance().getConfiguration().getNode("db", "mysql", "tablePrefix").getString();
 
     @Override
     public StorageWriteResult write(List<DataContainer> containers) throws Exception {
@@ -116,7 +116,7 @@ public class MySQLRecords implements StorageAdapterRecords {
             }
 
             if (containers.size() != extraData.size()) {
-                Prism.getLogger().debug("Container has more information than we have extra entries for.");
+                Prism.getInstance().getLogger().debug("Container has more information than we have extra entries for.");
             }
 
             writeExtraData(extraDataMap);
@@ -154,7 +154,7 @@ public class MySQLRecords implements StorageAdapterRecords {
 
         // Build query
         SQLQuery query = MySQLQuery.from(session);
-        Prism.getLogger().debug("MySQL Query: " + query);
+        Prism.getInstance().getLogger().debug("MySQL Query: " + query);
 
         try (Connection conn = MySQLStorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(query.toString()); ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {

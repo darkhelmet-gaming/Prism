@@ -192,7 +192,7 @@ public class PrismRecord {
             if (source.getSource() instanceof Locatable) {
                 data.set(DataQueries.Location, ((Locatable) source.getSource()).getLocation().toContainer());
             }
-            
+
             writeItemTransaction(transaction);
             return new PrismRecord(source, this);
         }
@@ -220,7 +220,7 @@ public class PrismRecord {
             if (source.getSource() instanceof Entity) {
                 data.set(DataQueries.Location, ((Locatable) source.getSource()).getLocation().toContainer());
             }
-            
+
             writeItemTransaction(transaction);
             return new PrismRecord(source, this);
         }
@@ -315,13 +315,13 @@ public class PrismRecord {
          */
         private void writeItemTransaction(Transaction<ItemStackSnapshot> transaction) {
             checkNotNull(transaction);
-            
+
             String itemId = transaction.getFinal().getType().getId();
             int itemQuantity = transaction.getFinal().getQuantity();
             if (transaction.getOriginal().getType() != ItemTypes.NONE) {
                 itemQuantity -= transaction.getOriginal().getQuantity();
             }
-            
+
             data.set(DataQueries.Target, itemId);
             data.set(DataQueries.Quantity, itemQuantity);
         }

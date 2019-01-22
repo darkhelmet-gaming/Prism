@@ -45,7 +45,7 @@ import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageAdapterSettings;
 
 public class H2StorageAdapter implements StorageAdapter {
-    
+
     private final String expiration = Prism.getInstance().getConfiguration().getNode("storage", "expireRecords").getString();
     private final String tablePrefix = Prism.getInstance().getConfiguration().getNode("db", "h2", "tablePrefix").getString();
     private final int purgeBatchLimit = Prism.getInstance().getConfiguration().getNode("storage", "purgeBatchLimit").getInt();
@@ -84,14 +84,14 @@ public class H2StorageAdapter implements StorageAdapter {
 
             // Create table if needed
             createTables();
-    
+
             // Purge async
             Task.builder()
                     .async()
                     .name("PrismH2Purge")
                     .execute(this::purge)
                     .submit(Prism.getInstance().getPluginContainer());
-            
+
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -142,7 +142,7 @@ public class H2StorageAdapter implements StorageAdapter {
             conn.prepareStatement(extraIndex).execute();
         }
     }
-    
+
     /**
      * Removes expires records and extra information from the database.
      */
@@ -155,17 +155,17 @@ public class H2StorageAdapter implements StorageAdapter {
                 if (count == 0) {
                     break;
                 }
-                
+
                 purged += count;
                 Prism.getInstance().getLogger().info("Deleted {} records", purged);
             }
-            
+
             Prism.getInstance().getLogger().info("Finished purging H2 database");
         } catch (Exception ex) {
             Prism.getInstance().getLogger().error("Encountered an error while purging H2 database", ex);
         }
     }
-    
+
     /**
      * Removes expires records from the database.
      *
@@ -177,11 +177,11 @@ public class H2StorageAdapter implements StorageAdapter {
         if (date == null) {
             throw new IllegalArgumentException("Failed to parse expiration");
         }
-        
+
         if (purgeBatchLimit <= 0) {
             throw new IllegalArgumentException("PurgeBatchLimit cannot be equal to or lower than 0");
         }
-        
+
         String sql = "DELETE FROM " + tablePrefix + "records "
                 + "WHERE " + tablePrefix + "records.created <= ? "
                 + "LIMIT ?;";

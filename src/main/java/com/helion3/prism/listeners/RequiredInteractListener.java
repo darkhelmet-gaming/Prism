@@ -57,41 +57,41 @@ public class RequiredInteractListener {
         if (!Prism.getInstance().getActiveWands().contains(player.getUniqueId())) {
             return;
         }
-        
+
         event.setCancelled(true);
-        
+
         // Ignore OffHand events
         if (event instanceof InteractBlockEvent.Primary.OffHand || event instanceof InteractBlockEvent.Secondary.OffHand) {
             return;
         }
-        
+
         // Verify target block is valid
         if (event.getTargetBlock() == BlockSnapshot.NONE || !event.getTargetBlock().getLocation().isPresent()) {
             return;
         }
-        
+
         // Location of block
         Location<World> location = event.getTargetBlock().getLocation().get();
-        
+
         // Secondary click gets location relative to side clicked
         if (event instanceof InteractBlockEvent.Secondary) {
             location = location.getRelative(event.getTargetSide());
         }
-        
+
         QuerySession session = new QuerySession(player);
         // session.addFlag(Flag.EXTENDED);
         session.addFlag(Flag.NO_GROUP);
         session.newQuery().addCondition(ConditionGroup.from(location));
-        
+
         player.sendMessage(Text.of(
                 Format.prefix(), TextColors.GOLD,
                 "--- Inspecting ", Format.item(location.getBlockType().getId(), true),
                 " at ", location.getBlockX(), " ", location.getBlockY(), " ", location.getBlockZ(), " ---"));
-        
+
         // Pass off to an async lookup helper
         AsyncUtil.lookup(session);
     }
-    
+
     /**
      * Listens for interactions by Players with active inspection wands.
      *
@@ -106,14 +106,14 @@ public class RequiredInteractListener {
         if (!Prism.getInstance().getActiveWands().contains(player.getUniqueId())) {
             return;
         }
-        
+
         event.setCancelled(true);
-        
+
         // Ignore OffHand events
         if (event instanceof InteractEntityEvent.Primary.OffHand || event instanceof InteractEntityEvent.Secondary.OffHand) {
             return;
         }
-        
+
         player.sendMessage(Format.error(Text.of("Cannot interact with entities while inspection is active!")));
     }
 }

@@ -183,7 +183,7 @@ public class SQLQuery {
          */
         public SQLQuery build() {
             StringBuilder sql = new StringBuilder(mode.name() + " ");
-            
+
             // Columns
             sql.append(String.join(", ", columns)).append(" ");
 

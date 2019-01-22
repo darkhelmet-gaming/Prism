@@ -46,7 +46,7 @@ public class DropItemListener {
             if (!(entity instanceof Item)) {
                 continue;
             }
-            
+
             Item item = (Item) entity;
             Transaction<ItemStackSnapshot> transaction = new Transaction<>(ItemStackSnapshot.NONE, item.item().get());
             PrismRecord.create().entity(spawnCause).dropped(transaction).save();

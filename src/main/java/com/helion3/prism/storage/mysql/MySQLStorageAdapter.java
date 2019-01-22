@@ -41,7 +41,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.spongepowered.api.scheduler.Task;
 
 public class MySQLStorageAdapter implements StorageAdapter {
-    
+
     private final String expiration = Prism.getInstance().getConfiguration().getNode("storage", "expireRecords").getString();
     private final String tablePrefix = Prism.getInstance().getConfiguration().getNode("db", "mysql", "tablePrefix").getString();
     private final int purgeBatchLimit = Prism.getInstance().getConfiguration().getNode("storage", "purgeBatchLimit").getInt();
@@ -83,7 +83,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
 
             // Create table if needed
             createTables();
-            
+
             // Purge async
             Task.builder()
                     .async()
@@ -144,7 +144,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
             conn.prepareStatement(extra).execute();
         }
     }
-    
+
     /**
      * Removes expires records and extra information from the database.
      */
@@ -157,17 +157,17 @@ public class MySQLStorageAdapter implements StorageAdapter {
                 if (count == 0) {
                     break;
                 }
-                
+
                 purged += count;
                 Prism.getInstance().getLogger().info("Deleted {} records", purged);
             }
-            
+
             Prism.getInstance().getLogger().info("Finished purging MySQL database");
         } catch (Exception ex) {
             Prism.getInstance().getLogger().error("Encountered an error while purging MySQL database", ex);
         }
     }
-    
+
     /**
      * Removes expires records from the database.
      *
@@ -179,11 +179,11 @@ public class MySQLStorageAdapter implements StorageAdapter {
         if (date == null) {
             throw new IllegalArgumentException("Failed to parse expiration");
         }
-        
+
         if (purgeBatchLimit <= 0) {
             throw new IllegalArgumentException("PurgeBatchLimit cannot be equal to or lower than 0");
         }
-        
+
         String sql = "DELETE FROM " + tablePrefix + "records "
                 + "WHERE " + tablePrefix + "records.created <= ? "
                 + "LIMIT ?;";
@@ -193,7 +193,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
             return statement.executeUpdate();
         }
     }
-    
+
     @Override
     public StorageAdapterRecords records() {
         return records;

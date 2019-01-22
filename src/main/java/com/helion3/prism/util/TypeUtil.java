@@ -127,7 +127,7 @@ public class TypeUtil {
         completeUuid += "-" + uuid.substring(20);
         return completeUuid.toLowerCase();
     }
-    
+
     /**
      * Converts an object to a UUID.
      *
@@ -140,7 +140,7 @@ public class TypeUtil {
             } else if (uniqueId instanceof UUID) {
                 return Optional.of((UUID) uniqueId);
             }
-            
+
             return Optional.empty();
         } catch (IllegalArgumentException ex) {
             return Optional.empty();

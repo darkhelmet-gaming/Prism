@@ -99,45 +99,45 @@ import java.util.concurrent.TimeUnit;
         url = Reference.WEBSITE
 )
 public final class Prism {
-    
+
     private static Prism instance;
-    
+
     @Inject
     private PluginContainer pluginContainer;
-    
+
     @Inject
     private Logger logger;
-    
+
     @Inject
     @DefaultConfig(sharedRoot = false)
     private Path path;
-    
+
     @Inject
     @DefaultConfig(sharedRoot = false)
     private ConfigurationLoader<CommentedConfigurationNode> configurationLoader;
-    
+
     private Configuration configuration;
     private Listening listening;
     private StorageAdapter storageAdapter;
-    
+
     private final Set<UUID> activeWands = Sets.newHashSet();
     private final FilterList filterList = new FilterList(FilterMode.BLACKLIST);
     private final Set<FlagHandler> flagHandlers = Sets.newHashSet();
     private final Map<UUID, List<ActionableResult>> lastActionResults = Maps.newHashMap();
     private final Set<ParameterHandler> parameterHandlers = Sets.newHashSet();
     private final Map<String, Class<? extends Result>> resultRecords = Maps.newHashMap();
-    
+
     @Listener
     public void onConstruction(GameConstructionEvent event) {
         instance = this;
     }
-    
+
     @Listener
     public void onPreInitialization(GamePreInitializationEvent event) {
         configuration = new Configuration(path.toFile(), configurationLoader);
         listening = new Listening();
     }
-    
+
     @Listener
     public void onInitialization(GameInitializationEvent event) {
         // Register FlagHandlers
@@ -146,7 +146,7 @@ public final class Prism {
         registerFlagHandler(new FlagExtended());
         registerFlagHandler(new FlagNoGroup());
         registerFlagHandler(new FlagOrder());
-        
+
         // Register ParameterHandlers
         registerParameterHandler(new ParameterBlock());
         registerParameterHandler(new ParameterCause());
@@ -154,48 +154,48 @@ public final class Prism {
         registerParameterHandler(new ParameterPlayer());
         registerParameterHandler(new ParameterRadius());
         registerParameterHandler(new ParameterTime());
-        
+
         // Register ResultRecords
         registerResultRecord("break", BlockResult.class);
         registerResultRecord("decay", BlockResult.class);
         registerResultRecord("grow", BlockResult.class);
         registerResultRecord("place", BlockResult.class);
         registerResultRecord("death", EntityResult.class);
-        
+
         // Register Commands
         Sponge.getCommandManager().register(this, PrismCommands.getCommand(), Reference.ID, "pr");
-        
+
         // Register Listeners
         Sponge.getEventManager().registerListeners(getPluginContainer(), new ChangeBlockListener());
-        
+
         if (getListening().DEATH) {
             Sponge.getEventManager().registerListeners(getPluginContainer(), new DeathListener());
         }
-        
+
         if (getListening().DROP) {
             Sponge.getEventManager().registerListeners(getPluginContainer(), new DropItemListener());
         }
-        
+
         if (getListening().JOIN) {
             Sponge.getEventManager().registerListeners(getPluginContainer(), new JoinListener());
         }
-        
+
         if (getListening().PICKUP) {
             Sponge.getEventManager().registerListeners(getPluginContainer(), new ChangeInventoryListener());
         }
-        
+
         if (getListening().QUIT) {
             Sponge.getEventManager().registerListeners(getPluginContainer(), new QuitListener());
         }
-        
+
         // Events required for internal operation
         Sponge.getEventManager().registerListeners(getPluginContainer(), new RequiredInteractListener());
     }
-    
+
     @Listener
     public void onPostInitialization(GamePostInitializationEvent event) {
     }
-    
+
     @Listener
     public void onStartedServer(GameStartedServerEvent event) {
         String engine = getConfiguration().getNode("storage", "engine").getString();
@@ -209,9 +209,9 @@ public final class Prism {
             } else {
                 throw new Exception("Invalid storage engine configured.");
             }
-            
+
             Preconditions.checkArgument(getStorageAdapter().connect());
-            
+
             // Initialize the recording queue manager
             Task.builder()
                     .async()
@@ -225,35 +225,35 @@ public final class Prism {
             getLogger().error("Encountered an error processing {}::onStartedServer", "Prism", ex);
         }
     }
-    
+
     public static Prism getInstance() {
         return instance;
     }
-    
+
     public PluginContainer getPluginContainer() {
         return pluginContainer;
     }
-    
+
     public Logger getLogger() {
         return logger;
     }
-    
+
     public Path getPath() {
         return path;
     }
-    
+
     public Configuration getConfiguration() {
         return configuration;
     }
-    
+
     public Listening getListening() {
         return listening;
     }
-    
+
     public StorageAdapter getStorageAdapter() {
         return storageAdapter;
     }
-    
+
     /**
      * Returns a list of players who have active inspection wands.
      *
@@ -262,7 +262,7 @@ public final class Prism {
     public Set<UUID> getActiveWands() {
         return activeWands;
     }
-    
+
     /**
      * Returns the blacklist manager.
      *
@@ -271,7 +271,7 @@ public final class Prism {
     public FilterList getFilterList() {
         return filterList;
     }
-    
+
     /**
      * Returns all currently registered flag handlers.
      *
@@ -280,7 +280,7 @@ public final class Prism {
     public Set<FlagHandler> getFlagHandlers() {
         return flagHandlers;
     }
-    
+
     /**
      * Returns a specific handler for a given parameter
      *
@@ -293,10 +293,10 @@ public final class Prism {
                 return Optional.of(flagHandler);
             }
         }
-        
+
         return Optional.empty();
     }
-    
+
     /**
      * Register a flag handler.
      *
@@ -307,7 +307,7 @@ public final class Prism {
         Preconditions.checkNotNull(flagHandler);
         return getFlagHandlers().add(flagHandler);
     }
-    
+
     /**
      * Get a map of players and their last available actionable results.
      *
@@ -316,7 +316,7 @@ public final class Prism {
     public Map<UUID, List<ActionableResult>> getLastActionResults() {
         return lastActionResults;
     }
-    
+
     /**
      * Returns all currently registered parameter handlers.
      *
@@ -325,7 +325,7 @@ public final class Prism {
     public Set<ParameterHandler> getParameterHandlers() {
         return parameterHandlers;
     }
-    
+
     /**
      * Returns a specific handler for a given parameter
      *
@@ -338,10 +338,10 @@ public final class Prism {
                 return Optional.of(parameterHandler);
             }
         }
-        
+
         return Optional.empty();
     }
-    
+
     /**
      * Register a parameter handler.
      *
@@ -352,7 +352,7 @@ public final class Prism {
         Preconditions.checkNotNull(parameterHandler);
         return getParameterHandlers().add(parameterHandler);
     }
-    
+
     /**
      * Returns all currently registered result records.
      *
@@ -361,7 +361,7 @@ public final class Prism {
     private Map<String, Class<? extends Result>> getResultRecords() {
         return resultRecords;
     }
-    
+
     /**
      * Returns the result record class for a given event
      *
@@ -371,7 +371,7 @@ public final class Prism {
     public Class<? extends Result> getResultRecord(String event) {
         return getResultRecords().get(event);
     }
-    
+
     /**
      * Register a custom result record for a given event name.
      *

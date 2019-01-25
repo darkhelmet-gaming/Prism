@@ -43,7 +43,7 @@ public final class DataQueries {
     public static final DataQuery Entity = of("Entity");
     public static final DataQuery EntityType = of("EntityType");
     public static final DataQuery EventName = of("EventName");
-    public static final DataQuery id = of("Id");
+    public static final DataQuery Id = of("Id");
     public static final DataQuery Location = of("Location");
     public static final DataQuery OriginalBlock = of("Original");
     public static final DataQuery Player = of("Player");

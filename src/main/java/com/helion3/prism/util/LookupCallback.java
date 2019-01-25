@@ -102,6 +102,11 @@ public class LookupCallback extends AsyncCallback {
             hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Target: ", TextColors.WHITE, target, Text.NEW_LINE));
         }
 
+        String id = result.data.getString(DataQueries.Id).orElse(null);
+        if (StringUtils.isNotBlank(id)) {
+            hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Id: ", TextColors.WHITE, id, Text.NEW_LINE));
+        }
+
         String container = result.data.getString(DataQueries.Container).orElse(null);
         if (StringUtils.isNotBlank(container)) {
             hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Container: ", TextColors.WHITE, container, Text.NEW_LINE));

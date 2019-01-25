@@ -35,6 +35,7 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
@@ -44,6 +45,7 @@ import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDama
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -219,8 +221,9 @@ public class PrismRecord {
                 entityData.set(DataQueries.UnsafeData, unsafeData);
             }
 
-            DataUtil.writeToDataView(getDataContainer(), DataQueries.Target, entity.getType().getId().replace("_", " "));
             DataUtil.writeToDataView(getDataContainer(), DataQueries.Entity, entityData);
+            DataUtil.writeToDataView(getDataContainer(), DataQueries.Id, entity.getType().getId());
+            DataUtil.writeToDataView(getDataContainer(), DataQueries.Target, entity.get(Keys.DISPLAY_NAME).map(Text::toPlain).orElse(entity.getType().getName()));
             return this;
         }
 

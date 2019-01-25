@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.helion3.prism.api.records;
 
-import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataContainer;
 
@@ -34,6 +34,7 @@ import org.spongepowered.api.data.DataContainer;
  * that without having to wrap/extend the transaction class.
  */
 public class SerializableNonExistent implements DataSerializable {
+
     @Override
     public int getContentVersion() {
         return 1;

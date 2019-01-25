@@ -21,9 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.helion3.prism.listeners;
 
+import com.helion3.prism.Prism;
 import com.helion3.prism.api.flags.Flag;
+import com.helion3.prism.api.query.ConditionGroup;
+import com.helion3.prism.api.query.QuerySession;
+import com.helion3.prism.util.AsyncUtil;
+import com.helion3.prism.util.Format;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -36,19 +42,14 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.query.ConditionGroup;
-import com.helion3.prism.api.query.QuerySession;
-import com.helion3.prism.util.AsyncUtil;
-import com.helion3.prism.util.Format;
-
 public class RequiredInteractListener {
+
     /**
      * Listens for interactions by Players with active inspection wands.
-     *
+     * <br>
      * This listener is required and does not track any events.
      *
-     * @param event InteractBlockEvent
+     * @param event  InteractBlockEvent
      * @param player Player
      */
     @Listener(order = Order.EARLY)
@@ -94,10 +95,10 @@ public class RequiredInteractListener {
 
     /**
      * Listens for interactions by Players with active inspection wands.
-     *
+     * <br>
      * This listener is required and does not track any events.
      *
-     * @param event InteractEntityEvent
+     * @param event  InteractEntityEvent
      * @param player Player
      */
     @Listener(order = Order.EARLY)

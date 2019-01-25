@@ -51,42 +51,6 @@ public class TypeUtil {
     }
 
     /**
-     * A simple, specific method to translate an event group to its past tense.
-     *
-     * @param word String event name group.
-     * @return String past-tense verb.
-     * @todo move this to lang file
-     */
-    public static String translateToPastTense(String word) {
-        String verb;
-
-        switch(word) {
-            case "break":
-                verb = "broke";
-                break;
-            case "decay":
-                verb = "decayed";
-                break;
-            case "grow":
-                verb = "grew";
-                break;
-            case "join":
-                verb = "joined";
-                break;
-            case "place":
-                verb = "placed";
-                break;
-            case "death":
-                verb = "killed";
-                break;
-            default:
-                verb = word;
-        }
-
-        return verb;
-    }
-
-    /**
      * Converts UUID to a string ready for use against a MySQL database.
      *
      * @param id UUID

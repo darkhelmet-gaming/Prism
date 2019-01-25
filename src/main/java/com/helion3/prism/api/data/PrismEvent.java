@@ -21,35 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.helion3.prism.listeners;
 
-import com.helion3.prism.api.records.PrismRecord;
-import org.spongepowered.api.data.Transaction;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.Item;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.item.inventory.DropItemEvent;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+package com.helion3.prism.api.data;
 
-public class DropItemListener {
-    /**
-     * Saves event records when a player drops an item.
-     *
-     * @param event Dispense event.
-     */
-    @Listener(order = Order.POST)
-    public void onDrop(final DropItemEvent.Dispense event, @Root Player spawnCause) {
-        for (Entity entity : event.getEntities()) {
-            if (!(entity instanceof Item)) {
-                continue;
-            }
+import com.helion3.prism.api.records.Result;
 
-            Item item = (Item) entity;
-            Transaction<ItemStackSnapshot> transaction = new Transaction<>(ItemStackSnapshot.NONE, item.item().get());
-            PrismRecord.create().entity(spawnCause).dropped(transaction).save();
-        }
+public class PrismEvent {
+
+    private final String id;
+    private final String name;
+    private final String pastTense;
+    private final Class<? extends Result> resultClass;
+
+    private PrismEvent(String id, String name, String pastTense, Class<? extends Result> resultClass) {
+        this.id = id;
+        this.name = name;
+        this.pastTense = pastTense;
+        this.resultClass = resultClass;
+    }
+
+    public static PrismEvent of(String id, String name, String pastTense, Class<? extends Result> resultClass) {
+        return new PrismEvent(id, name, pastTense, resultClass);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPastTense() {
+        return pastTense;
+    }
+
+    public Class<? extends Result> getResultClass() {
+        return resultClass;
     }
 }

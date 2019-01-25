@@ -21,65 +21,99 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.helion3.prism.listeners;
 
-import java.util.Optional;
-
+import com.helion3.prism.Prism;
+import com.helion3.prism.api.records.PrismRecord;
+import com.helion3.prism.util.BlockUtil;
+import com.helion3.prism.util.EventUtil;
+import com.helion3.prism.util.PrismEvents;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 
-import com.helion3.prism.Prism;
-import com.helion3.prism.api.records.PrismRecord;
-import com.helion3.prism.api.records.PrismRecord.PrismRecordEventBuilder;
-import com.helion3.prism.util.BlockUtil;
-import com.helion3.prism.util.EventUtil;
-
 public class ChangeBlockListener {
+
     /**
      * Listens to the base change block event.
      *
-     * @param event
+     * @param event ChangeBlockEvent
      */
-    @Listener
-    public void onChangeBlock(final ChangeBlockEvent event) {
-        Optional<Player> playerCause = event.getCause().first(Player.class);
-        if (playerCause.isPresent() && Prism.getInstance().getActiveWands().contains(playerCause.get().getUniqueId())) {
+    @Listener(order = Order.POST)
+    public void onChangeBlock(ChangeBlockEvent event) {
+        if (event.getCause().first(Player.class).map(Player::getUniqueId).map(Prism.getInstance().getActiveWands()::contains).orElse(false)) {
             // Cancel and exit event here, not supposed to place/track a block with an active wand.
             event.setCancelled(true);
             return;
         }
+
+        if (event.getTransactions().isEmpty()
+                || (!Prism.getInstance().getListening().blockBreak
+                && !Prism.getInstance().getListening().blockDecay
+                && !Prism.getInstance().getListening().blockGrow
+                && !Prism.getInstance().getListening().blockPlace)) {
+            return;
+        }
+
         for (Transaction<BlockSnapshot> transaction : event.getTransactions()) {
-            if (!transaction.isValid()) {
+            if (!transaction.isValid() || !transaction.getOriginal().getLocation().isPresent()) {
                 continue;
             }
 
-            PrismRecordEventBuilder record = PrismRecord.create().source(event.getCause());
+            BlockType originalBlockType = transaction.getOriginal().getState().getType();
+            BlockType finalBlockType = transaction.getFinal().getState().getType();
 
-            BlockType original = transaction.getOriginal().getState().getType();
-            BlockType finalBlock = transaction.getFinal().getState().getType();
+            PrismRecord.EventBuilder eventBuilder = PrismRecord.create()
+                    .source(event.getCause())
+                    .writeBlockOriginal(transaction.getOriginal())
+                    .writeBlockReplacement(transaction.getFinal())
+                    .writeLocation(transaction.getOriginal().getLocation().get());
 
             if (event instanceof ChangeBlockEvent.Break) {
-                if (Prism.getInstance().getListening().BREAK &&
-                        !BlockUtil.rejectBreakCombination(original, finalBlock) &&
-                        !EventUtil.rejectBreakEventIdentity(original, finalBlock, event.getCause())) {
-                    record.brokeBlock(transaction).save();
+                if (!Prism.getInstance().getListening().blockBreak
+                        || BlockUtil.rejectBreakCombination(originalBlockType, finalBlockType)
+                        || EventUtil.rejectBreakEventIdentity(originalBlockType, finalBlockType, event.getCause())) {
+                    continue;
                 }
-            }
-            else if (event instanceof ChangeBlockEvent.Place) {
-                if (Prism.getInstance().getListening().PLACE &&
-                        !BlockUtil.rejectPlaceCombination(original, finalBlock) &&
-                        !EventUtil.rejectPlaceEventIdentity(original, finalBlock, event.getCause())) {
-                    record.placedBlock(transaction).save();
+
+                eventBuilder
+                        .event(PrismEvents.BLOCK_BREAK)
+                        .writeTarget(originalBlockType.getId().replace("_", " "))
+                        .buildAndSave();
+            } else if (event instanceof ChangeBlockEvent.Decay) {
+                if (!Prism.getInstance().getListening().blockDecay) {
+                    continue;
                 }
-            }
-            else if (event instanceof ChangeBlockEvent.Decay) {
-                if (Prism.getInstance().getListening().DECAY) {
-                    record.decayedBlock(transaction).save();
+
+                eventBuilder
+                        .event(PrismEvents.BLOCK_DECAY)
+                        .writeTarget(originalBlockType.getId().replace("_", " "))
+                        .buildAndSave();
+            } else if (event instanceof ChangeBlockEvent.Grow) {
+                if (!Prism.getInstance().getListening().blockGrow) {
+                    continue;
                 }
+
+                eventBuilder
+                        .event(PrismEvents.BLOCK_GROW)
+                        .writeTarget(finalBlockType.getId().replace("_", " "))
+                        .buildAndSave();
+            } else if (event instanceof ChangeBlockEvent.Place) {
+                if (!Prism.getInstance().getListening().blockGrow
+                        || BlockUtil.rejectPlaceCombination(originalBlockType, finalBlockType)
+                        || EventUtil.rejectPlaceEventIdentity(originalBlockType, finalBlockType, event.getCause())) {
+                    continue;
+                }
+
+                eventBuilder
+                        .event(PrismEvents.BLOCK_PLACE)
+                        .writeTarget(finalBlockType.getId().replace("_", " "))
+                        .buildAndSave();
             }
         }
     }

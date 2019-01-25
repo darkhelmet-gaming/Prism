@@ -21,15 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.helion3.prism.api.records;
 
 import com.helion3.prism.Prism;
+import com.helion3.prism.api.data.PrismEvent;
+import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.data.DataContainer;
 
 import com.helion3.prism.util.DataQueries;
-import com.helion3.prism.util.TypeUtil;
 
-abstract public class Result {
+public abstract class Result {
+
     public DataContainer data;
 
     /**
@@ -38,7 +41,28 @@ abstract public class Result {
      * @return String verb variant of event group.
      */
     public String getEventVerb() {
-        return TypeUtil.translateToPastTense(getEventName());
+        String id = getEventId();
+        PrismEvent event = Prism.getInstance().getPrismEvent(id).orElse(null);
+        if (event != null) {
+            if (StringUtils.isNotBlank(event.getPastTense())) {
+                return event.getPastTense();
+            }
+
+            if (StringUtils.isNotBlank(event.getName())) {
+                return event.getName();
+            }
+        }
+
+        return id;
+    }
+
+    /**
+     * Returns the event id.
+     *
+     * @return String event id.
+     */
+    public String getEventId() {
+        return data.getString(DataQueries.EventName).orElse("unknown");
     }
 
     /**
@@ -47,7 +71,13 @@ abstract public class Result {
      * @return String event name.
      */
     public String getEventName() {
-        return data.getString(DataQueries.EventName).orElse("unknown");
+        String id = getEventId();
+        PrismEvent event = Prism.getInstance().getPrismEvent(id).orElse(null);
+        if (event != null && StringUtils.isNotBlank(event.getName())) {
+            return event.getName();
+        }
+
+        return id;
     }
 
     /**
@@ -85,27 +115,24 @@ abstract public class Result {
 
     /**
      * Instantiate an appropriate Result for the event.
-     * @param eventName String name of event
+     *
+     * @param id String id of event
      * @param isAggregate boolean if aggregate
      * @return Result
      * @throws IllegalAccessException
      * @throws InstantiationException
+     * @throws UnsupportedOperationException
      */
-    public static Result from(String eventName, boolean isAggregate) throws IllegalAccessException, InstantiationException {
-        // Build our result object
-        final Result result;
+    public static Result from(String id, boolean isAggregate) throws IllegalAccessException, InstantiationException {
         if (isAggregate) {
-            result = new ResultAggregate();
-        } else {
-            // Pull record class for this event, if any
-            Class<? extends Result> clazz = Prism.getInstance().getResultRecord(eventName);
-            if (clazz != null){
-                result = clazz.newInstance();
-            } else {
-                result = new ResultComplete();
-            }
+            return new ResultAggregate();
         }
 
-        return result;
+        // Pull record class for this event, if any
+        Class<? extends Result> resultRecordClass = Prism.getInstance().getPrismEvent(id)
+                .map(PrismEvent::getResultClass)
+                .orElseThrow(() -> new UnsupportedOperationException(id + " is not supported"));
+
+        return resultRecordClass.newInstance();
     }
 }

@@ -21,28 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.helion3.prism;
 
-public class Listening {
-    public final boolean BREAK;
-    public final boolean DEATH;
-    public final boolean DECAY;
-    public final boolean DROP;
-    public final boolean GROW;
-    public final boolean JOIN;
-    public final boolean PICKUP;
-    public final boolean PLACE;
-    public final boolean QUIT;
+public final class Listening {
 
-    public Listening() {
-        BREAK = Prism.getInstance().getConfiguration().getNode("events", "break").getBoolean();
-        DEATH = Prism.getInstance().getConfiguration().getNode("events", "death").getBoolean();
-        DECAY = Prism.getInstance().getConfiguration().getNode("events", "decay").getBoolean();
-        DROP = Prism.getInstance().getConfiguration().getNode("events", "drop").getBoolean();
-        GROW = Prism.getInstance().getConfiguration().getNode("events", "grow").getBoolean();
-        JOIN = Prism.getInstance().getConfiguration().getNode("events", "join").getBoolean();
-        PICKUP = Prism.getInstance().getConfiguration().getNode("events", "pickup").getBoolean();
-        PLACE = Prism.getInstance().getConfiguration().getNode("events", "place").getBoolean();
-        QUIT = Prism.getInstance().getConfiguration().getNode("events", "quit").getBoolean();
-    }
+    public final boolean blockBreak = Prism.getInstance().getConfiguration().getNode("events", "break").getBoolean();
+    public final boolean blockDecay = Prism.getInstance().getConfiguration().getNode("events", "decay").getBoolean();
+    public final boolean blockGrow = Prism.getInstance().getConfiguration().getNode("events", "grow").getBoolean();
+    public final boolean blockPlace = Prism.getInstance().getConfiguration().getNode("events", "place").getBoolean();
+    public final boolean entityDeath = Prism.getInstance().getConfiguration().getNode("events", "death").getBoolean();
+    public final boolean commandExecute = Prism.getInstance().getConfiguration().getNode("events", "command").getBoolean();
+    public final boolean itemDrop = Prism.getInstance().getConfiguration().getNode("events", "drop").getBoolean();
+    public final boolean itemInsert = Prism.getInstance().getConfiguration().getNode("events", "insert").getBoolean();
+    public final boolean itemPickup = Prism.getInstance().getConfiguration().getNode("events", "pickup").getBoolean();
+    public final boolean itemRemove = Prism.getInstance().getConfiguration().getNode("events", "remove").getBoolean();
+    public final boolean playerDisconnect = Prism.getInstance().getConfiguration().getNode("events", "quit").getBoolean();
+    public final boolean playerJoin = Prism.getInstance().getConfiguration().getNode("events", "join").getBoolean();
 }

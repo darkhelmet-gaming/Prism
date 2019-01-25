@@ -111,7 +111,7 @@ public class InventoryListener {
                         continue;
                     }
 
-                    Prism.getInstance().getLogger().info("Item Remove - {} x{}",
+                    Prism.getInstance().getLogger().debug("Item Remove - {} x{}",
                             transaction.getOriginal().getType().getId(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity());
 
                     eventBuilder
@@ -249,7 +249,6 @@ public class InventoryListener {
      */
     @Listener(order = Order.POST)
     public void onInteractInventory(InteractInventoryEvent event, @Root Player player) {
-        Prism.getInstance().getLogger().info("InteractInventoryEvent");
         if (!(event.getTargetInventory() instanceof CarriedInventory)
                 || (!Prism.getInstance().getListening().inventoryClose && !Prism.getInstance().getListening().inventoryOpen)) {
             return;

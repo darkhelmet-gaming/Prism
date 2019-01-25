@@ -128,11 +128,11 @@ public class LookupCallback extends AsyncCallback {
                 int z = location.getInt(DataQueries.Z).orElse(0);
                 World world = location.get(DataQueries.WorldUuid).flatMap(TypeUtil::uuidFromObject).flatMap(Sponge.getServer()::getWorld).orElse(null);
 
+                hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Location: ", TextColors.WHITE, Format.location(x, y, z, world, false)));
                 if (this.querySession.hasFlag(Flag.EXTENDED)) {
                     resultMessage.append(Text.of(Text.NEW_LINE, TextColors.GRAY, " - ", Format.location(x, y, z, world, true)));
+                    hoverMessage.append(Text.of(Text.NEW_LINE, Text.NEW_LINE, TextColors.GRAY, "Click location to teleport."));
                 }
-
-                hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Location: ", TextColors.WHITE, Format.location(x, y, z, world, false)));
             }
         }
 

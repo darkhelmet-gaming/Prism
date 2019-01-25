@@ -36,6 +36,7 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -68,6 +69,9 @@ public class InventoryListener {
             }
 
             CarriedInventory<? extends Carrier> carriedInventory = (CarriedInventory<? extends Carrier>) transaction.getSlot().parent();
+            if (carriedInventory.getCarrier().filter(Player.class::isInstance).isPresent()) {
+                return;
+            }
 
             // Get the location of the inventory otherwise fallback on the players location
             Location<World> location = carriedInventory.getCarrier()
@@ -234,6 +238,50 @@ public class InventoryListener {
                     .writeItemStack(itemStack)
                     .writeLocation(player.getLocation())
                     .buildAndSave();
+        }
+    }
+
+    /**
+     * Saves event records when a player closes or opens an Inventory.
+     *
+     * @param event  InteractInventoryEvent
+     * @param player Player
+     */
+    @Listener(order = Order.POST)
+    public void onInteractInventory(InteractInventoryEvent event, @Root Player player) {
+        Prism.getInstance().getLogger().info("InteractInventoryEvent");
+        if (!(event.getTargetInventory() instanceof CarriedInventory)
+                || (!Prism.getInstance().getListening().inventoryClose && !Prism.getInstance().getListening().inventoryOpen)) {
+            return;
+        }
+
+        CarriedInventory<? extends Carrier> carriedInventory = (CarriedInventory<? extends Carrier>) event.getTargetInventory();
+        if (carriedInventory.getCarrier().filter(Player.class::isInstance).isPresent()) {
+            return;
+        }
+
+        // Get the location of the inventory otherwise fallback on the players location
+        Location<World> location = carriedInventory.getCarrier()
+                .filter(Locatable.class::isInstance)
+                .map(Locatable.class::cast)
+                .map(Locatable::getLocation)
+                .orElse(player.getLocation());
+
+        // Get the title of the inventory otherwise fallback on the class name
+        String title = carriedInventory.getProperty(InventoryTitle.class, InventoryTitle.PROPERTY_NAME)
+                .map(InventoryTitle::getValue)
+                .map(Text::toPlain)
+                .orElse(carriedInventory.getClass().getSimpleName());
+
+        PrismRecord.EventBuilder eventBuilder = PrismRecord.create()
+                .source(event.getCause())
+                .writeContainer(title)
+                .writeLocation(location);
+
+        if (event instanceof InteractInventoryEvent.Close && Prism.getInstance().getListening().inventoryClose) {
+            eventBuilder.event(PrismEvents.INVENTORY_CLOSE).buildAndSave();
+        } else if (event instanceof InteractInventoryEvent.Open && Prism.getInstance().getListening().inventoryOpen) {
+            eventBuilder.event(PrismEvents.INVENTORY_OPEN).buildAndSave();
         }
     }
 }

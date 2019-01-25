@@ -158,6 +158,8 @@ public final class Prism {
         registerPrismEvent(PrismEvents.BLOCK_PLACE);
         registerPrismEvent(PrismEvents.ENTITY_DEATH);
         registerPrismEvent(PrismEvents.COMMAND_EXECUTE);
+        registerPrismEvent(PrismEvents.INVENTORY_CLOSE);
+        registerPrismEvent(PrismEvents.INVENTORY_OPEN);
         registerPrismEvent(PrismEvents.ITEM_DROP);
         registerPrismEvent(PrismEvents.ITEM_INSERT);
         registerPrismEvent(PrismEvents.ITEM_PICKUP);

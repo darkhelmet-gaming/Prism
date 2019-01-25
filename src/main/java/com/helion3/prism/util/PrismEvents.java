@@ -46,6 +46,10 @@ public final class PrismEvents {
 
     public static final PrismEvent COMMAND_EXECUTE = PrismEvent.of("command", "Command Execute", "executed", ResultComplete.class);
 
+    public static final PrismEvent INVENTORY_CLOSE = PrismEvent.of("close", "Inventory Close", "closed", ResultComplete.class);
+
+    public static final PrismEvent INVENTORY_OPEN = PrismEvent.of("open", "Inventory Open", "opened", ResultComplete.class);
+
     public static final PrismEvent ITEM_DROP = PrismEvent.of("drop", "Item Drop", "dropped", ResultComplete.class);
 
     public static final PrismEvent ITEM_INSERT = PrismEvent.of("insert", "Item Insert", "inserted", ResultComplete.class);

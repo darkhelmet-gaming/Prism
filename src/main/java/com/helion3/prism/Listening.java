@@ -32,6 +32,8 @@ public final class Listening {
     public final boolean blockPlace = Prism.getInstance().getConfiguration().getNode("events", "place").getBoolean();
     public final boolean entityDeath = Prism.getInstance().getConfiguration().getNode("events", "death").getBoolean();
     public final boolean commandExecute = Prism.getInstance().getConfiguration().getNode("events", "command").getBoolean();
+    public final boolean inventoryClose = Prism.getInstance().getConfiguration().getNode("events", "close").getBoolean();
+    public final boolean inventoryOpen = Prism.getInstance().getConfiguration().getNode("events", "open").getBoolean();
     public final boolean itemDrop = Prism.getInstance().getConfiguration().getNode("events", "drop").getBoolean();
     public final boolean itemInsert = Prism.getInstance().getConfiguration().getNode("events", "insert").getBoolean();
     public final boolean itemPickup = Prism.getInstance().getConfiguration().getNode("events", "pickup").getBoolean();

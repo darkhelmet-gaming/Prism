@@ -179,6 +179,16 @@ public class Configuration {
                 eventCommand.setValue(false);
             }
 
+            ConfigurationNode eventInventoryClose = rootNode.getNode("events", "close");
+            if (eventInventoryClose.isVirtual()) {
+                eventInventoryClose.setValue(false);
+            }
+
+            ConfigurationNode eventInventoryOpen = rootNode.getNode("events", "open");
+            if (eventInventoryOpen.isVirtual()) {
+                eventInventoryOpen.setValue(false);
+            }
+
             ConfigurationNode eventItemDrop = rootNode.getNode("events", "drop");
             if (eventItemDrop.isVirtual()) {
                 eventItemDrop.setValue(false);

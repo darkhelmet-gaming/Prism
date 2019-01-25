@@ -21,18 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.helion3.prism.util;
 
 import static org.spongepowered.api.data.DataQuery.of;
 
 import org.spongepowered.api.data.DataQuery;
 
-public class DataQueries {
-    private DataQueries() {}
+public final class DataQueries {
+
+    private DataQueries() {
+    }
 
     public static final DataQuery BlockType = of("BlockType");
     public static final DataQuery BlockState = of("BlockState");
     public static final DataQuery Cause = of("Cause");
+    public static final DataQuery Container = of("Container");
     public static final DataQuery ContentVersion = of("ContentVersion");
     public static final DataQuery Count = of("Count");
     public static final DataQuery Created = of("Created");

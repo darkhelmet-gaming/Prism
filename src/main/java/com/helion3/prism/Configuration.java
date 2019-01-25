@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.helion3.prism;
 
 import java.io.File;
@@ -158,19 +159,9 @@ public class Configuration {
                 eventBlockDecay.setValue(true);
             }
 
-            ConfigurationNode eventItemDrop = rootNode.getNode("events", "drop");
-            if (eventItemDrop.isVirtual()) {
-                eventItemDrop.setValue(false);
-            }
-
             ConfigurationNode eventBlockGrow = rootNode.getNode("events", "grow");
             if (eventBlockGrow.isVirtual()) {
                 eventBlockGrow.setValue(true);
-            }
-
-            ConfigurationNode eventItemPickup = rootNode.getNode("events", "pickup");
-            if (eventItemPickup.isVirtual()) {
-                eventItemPickup.setValue(false);
             }
 
             ConfigurationNode eventBlockPlace = rootNode.getNode("events", "place");
@@ -183,14 +174,39 @@ public class Configuration {
                 eventEntityDeath.setValue(true);
             }
 
-            ConfigurationNode eventPlayerJoin = rootNode.getNode("events", "join");
-            if (eventPlayerJoin.isVirtual()) {
-                eventPlayerJoin.setValue(false);
+            ConfigurationNode eventCommand = rootNode.getNode("events", "command");
+            if (eventCommand.isVirtual()) {
+                eventCommand.setValue(false);
+            }
+
+            ConfigurationNode eventItemDrop = rootNode.getNode("events", "drop");
+            if (eventItemDrop.isVirtual()) {
+                eventItemDrop.setValue(false);
+            }
+
+            ConfigurationNode eventItemInsert = rootNode.getNode("events", "insert");
+            if (eventItemInsert.isVirtual()) {
+                eventItemInsert.setValue(false);
+            }
+
+            ConfigurationNode eventItemPickup = rootNode.getNode("events", "pickup");
+            if (eventItemPickup.isVirtual()) {
+                eventItemPickup.setValue(false);
+            }
+
+            ConfigurationNode eventItemRemove = rootNode.getNode("events", "remove");
+            if (eventItemRemove.isVirtual()) {
+                eventItemRemove.setValue(false);
             }
 
             ConfigurationNode eventPlayerQuit = rootNode.getNode("events", "quit");
             if (eventPlayerQuit.isVirtual()) {
                 eventPlayerQuit.setValue(false);
+            }
+
+            ConfigurationNode eventPlayerJoin = rootNode.getNode("events", "join");
+            if (eventPlayerJoin.isVirtual()) {
+                eventPlayerJoin.setValue(false);
             }
 
             // Default parameters

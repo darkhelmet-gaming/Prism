@@ -102,13 +102,10 @@ public class LookupCallback extends AsyncCallback {
             hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Target: ", TextColors.WHITE, target, Text.NEW_LINE));
         }
 
-        /*
-        // This is for Item Insert and Item Remove logging which may be added in a future Prism version.
         String container = result.data.getString(DataQueries.Container).orElse(null);
         if (StringUtils.isNotBlank(container)) {
             hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Container: ", TextColors.WHITE, container, Text.NEW_LINE));
         }
-        */
 
         if (result instanceof ResultAggregate) {
             int count = result.data.getInt(DataQueries.Count).orElse(0);

@@ -99,8 +99,8 @@ public class InventoryListener {
 
             PrismRecord.EventBuilder eventBuilder = PrismRecord.create()
                     .source(event.getCause())
-                    .writeContainer(title)
-                    .writeLocation(location);
+                    .container(title)
+                    .location(location);
 
 
             if (transaction.getOriginal().getType() == transaction.getFinal().getType()) {
@@ -116,7 +116,7 @@ public class InventoryListener {
 
                     eventBuilder
                             .event(PrismEvents.ITEM_INSERT)
-                            .writeItemStack(transaction.getOriginal(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity())
+                            .itemStack(transaction.getOriginal(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity())
                             .buildAndSave();
 
                     continue;
@@ -133,7 +133,7 @@ public class InventoryListener {
 
                     eventBuilder
                             .event(PrismEvents.ITEM_REMOVE)
-                            .writeItemStack(transaction.getFinal(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity())
+                            .itemStack(transaction.getFinal(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity())
                             .buildAndSave();
 
                     continue;
@@ -151,7 +151,7 @@ public class InventoryListener {
 
                 eventBuilder
                         .event(PrismEvents.ITEM_REMOVE)
-                        .writeItemStack(transaction.getOriginal(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity())
+                        .itemStack(transaction.getOriginal(), transaction.getOriginal().getQuantity() - transaction.getFinal().getQuantity())
                         .buildAndSave();
 
                 continue;
@@ -167,7 +167,7 @@ public class InventoryListener {
                         transaction.getFinal().getType().getId(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity());
 
                 eventBuilder.event(PrismEvents.ITEM_INSERT)
-                        .writeItemStack(transaction.getFinal(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity())
+                        .itemStack(transaction.getFinal(), transaction.getFinal().getQuantity() - transaction.getOriginal().getQuantity())
                         .buildAndSave();
 
                 continue;
@@ -201,8 +201,8 @@ public class InventoryListener {
             PrismRecord.create()
                     .source(event.getCause())
                     .event(PrismEvents.ITEM_PICKUP)
-                    .writeItemStack(itemStack, quantity)
-                    .writeLocation(player.getLocation())
+                    .itemStack(itemStack, quantity)
+                    .location(player.getLocation())
                     .buildAndSave();
         }
     }
@@ -235,8 +235,8 @@ public class InventoryListener {
             PrismRecord.create()
                     .source(event.getCause())
                     .event(PrismEvents.ITEM_DROP)
-                    .writeItemStack(itemStack)
-                    .writeLocation(player.getLocation())
+                    .itemStack(itemStack)
+                    .location(player.getLocation())
                     .buildAndSave();
         }
     }
@@ -274,8 +274,8 @@ public class InventoryListener {
 
         PrismRecord.EventBuilder eventBuilder = PrismRecord.create()
                 .source(event.getCause())
-                .writeContainer(title)
-                .writeLocation(location);
+                .container(title)
+                .location(location);
 
         if (event instanceof InteractInventoryEvent.Close && Prism.getInstance().getListening().inventoryClose) {
             eventBuilder.event(PrismEvents.INVENTORY_CLOSE).buildAndSave();

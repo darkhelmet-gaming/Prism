@@ -60,7 +60,7 @@ import java.util.Optional;
  * PrismRecord.create()
  *          .player(player)
  *          .event(PrismEvents.PLAYER_JOIN)
- *          .writeLocation(player.getLocation())
+ *          .location(player.getLocation())
  *          .buildAndSave();
  * }</pre>
  */
@@ -163,7 +163,7 @@ public class PrismRecord {
          *
          * @param block The original BlockSnapshot to write
          */
-        public EventBuilder writeBlockOriginal(BlockSnapshot block) {
+        public EventBuilder blockOriginal(BlockSnapshot block) {
             Preconditions.checkNotNull(block);
 
             DataUtil.writeToDataView(getDataContainer(), DataQueries.OriginalBlock, formatBlockDataContainer(block));
@@ -175,7 +175,7 @@ public class PrismRecord {
          *
          * @param block The replacement BlockSnapshot to write
          */
-        public EventBuilder writeBlockReplacement(BlockSnapshot block) {
+        public EventBuilder blockReplacement(BlockSnapshot block) {
             Preconditions.checkNotNull(block);
 
             DataUtil.writeToDataView(getDataContainer(), DataQueries.ReplacementBlock, formatBlockDataContainer(block));
@@ -187,7 +187,7 @@ public class PrismRecord {
          *
          * @param container The container name to write
          */
-        public EventBuilder writeContainer(String container) {
+        public EventBuilder container(String container) {
             Preconditions.checkNotNull(container);
 
             DataUtil.writeToDataView(getDataContainer(), DataQueries.Container, container);
@@ -199,7 +199,7 @@ public class PrismRecord {
          *
          * @param entity The Entity to write
          */
-        public EventBuilder writeEntity(Entity entity) {
+        public EventBuilder entity(Entity entity) {
             Preconditions.checkNotNull(entity);
 
             DataContainer entityData = entity.toContainer();
@@ -232,12 +232,12 @@ public class PrismRecord {
          *
          * @param item The Item to write
          */
-        public EventBuilder writeItem(Item item) {
+        public EventBuilder item(Item item) {
             Preconditions.checkNotNull(item);
             Preconditions.checkArgument(item.item().exists());
 
-            writeItemStack(item.item().get());
-            writeLocation(item.getLocation());
+            itemStack(item.item().get());
+            location(item.getLocation());
             return this;
         }
 
@@ -246,9 +246,9 @@ public class PrismRecord {
          *
          * @param itemStack The ItemStack to write
          */
-        public EventBuilder writeItemStack(ItemStack itemStack) {
+        public EventBuilder itemStack(ItemStack itemStack) {
             Preconditions.checkNotNull(itemStack);
-            return writeItemStack(itemStack, itemStack.getQuantity());
+            return itemStack(itemStack, itemStack.getQuantity());
         }
 
         /**
@@ -257,7 +257,7 @@ public class PrismRecord {
          * @param itemStack The ItemStack to write
          * @param quantity  The quantity to write
          */
-        public EventBuilder writeItemStack(ItemStack itemStack, int quantity) {
+        public EventBuilder itemStack(ItemStack itemStack, int quantity) {
             Preconditions.checkNotNull(itemStack);
             Preconditions.checkArgument(itemStack.getType() != ItemTypes.NONE);
 
@@ -271,9 +271,9 @@ public class PrismRecord {
          *
          * @param itemStack The ItemStackSnapshot to write
          */
-        public EventBuilder writeItemStack(ItemStackSnapshot itemStack) {
+        public EventBuilder itemStack(ItemStackSnapshot itemStack) {
             Preconditions.checkNotNull(itemStack);
-            return writeItemStack(itemStack, itemStack.getQuantity());
+            return itemStack(itemStack, itemStack.getQuantity());
         }
 
         /**
@@ -282,7 +282,7 @@ public class PrismRecord {
          * @param itemStack The ItemStackSnapshot to write
          * @param quantity  The quantity to write
          */
-        public EventBuilder writeItemStack(ItemStackSnapshot itemStack, int quantity) {
+        public EventBuilder itemStack(ItemStackSnapshot itemStack, int quantity) {
             Preconditions.checkNotNull(itemStack);
             Preconditions.checkArgument(itemStack.getType() != ItemTypes.NONE);
 
@@ -296,7 +296,7 @@ public class PrismRecord {
          *
          * @param location The location to write
          */
-        public EventBuilder writeLocation(Location<World> location) {
+        public EventBuilder location(Location<World> location) {
             Preconditions.checkNotNull(location);
 
             DataContainer container = location.toContainer();
@@ -312,7 +312,7 @@ public class PrismRecord {
          *
          * @param target The target to write
          */
-        public EventBuilder writeTarget(String target) {
+        public EventBuilder target(String target) {
             Preconditions.checkNotNull(target);
 
             DataUtil.writeToDataView(getDataContainer(), DataQueries.Target, target);

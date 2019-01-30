@@ -53,7 +53,7 @@ public class EntityListener {
         PrismRecord.create()
                 .player(player)
                 .event(PrismEvents.PLAYER_DISCONNECT)
-                .writeLocation(player.getLocation())
+                .location(player.getLocation())
                 .buildAndSave();
     }
 
@@ -71,7 +71,7 @@ public class EntityListener {
         PrismRecord.create()
                 .player(player)
                 .event(PrismEvents.PLAYER_JOIN)
-                .writeLocation(player.getLocation())
+                .location(player.getLocation())
                 .buildAndSave();
     }
 
@@ -89,7 +89,7 @@ public class EntityListener {
         PrismRecord.create()
                 .source(event.getCause())
                 .event(PrismEvents.ENTITY_DEATH)
-                .writeEntity(event.getTargetEntity())
+                .entity(event.getTargetEntity())
                 .buildAndSave();
     }
 
@@ -107,8 +107,8 @@ public class EntityListener {
         PrismRecord.create()
                 .source(event.getCause())
                 .event(PrismEvents.COMMAND_EXECUTE)
-                .writeLocation(player.getLocation())
-                .writeTarget(event.getCommand())
+                .location(player.getLocation())
+                .target(event.getCommand())
                 .buildAndSave();
     }
 }

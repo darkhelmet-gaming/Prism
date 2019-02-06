@@ -81,7 +81,7 @@ public class H2Records implements StorageAdapterRecords {
                 statement.setInt(4, location.getInt(DataQueries.X).get());
                 statement.setInt(5, location.getInt(DataQueries.Y).get());
                 statement.setInt(6, location.getInt(DataQueries.Z).get());
-                statement.setString(7, container.getString(DataQueries.Target).get());
+                statement.setString(7, container.getString(DataQueries.Target).orElse(null));
                 statement.setString(8, playerUUID);
                 statement.setString(9, container.getString(DataQueries.Cause).orElse(null));
 

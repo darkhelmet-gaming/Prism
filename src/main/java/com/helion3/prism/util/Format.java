@@ -21,15 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.helion3.prism.util;
 
 import static com.google.common.base.Preconditions.*;
 
-import com.helion3.prism.Prism;
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
@@ -39,7 +38,8 @@ import java.net.URL;
 
 public class Format {
 
-    private Format() {}
+    private Format() {
+    }
 
     /**
      * Returns content formatted as an error message

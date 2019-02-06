@@ -28,6 +28,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
+import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.filters.FilterList;
 import com.helion3.prism.api.filters.FilterMode;
 import com.helion3.prism.api.flags.FlagClean;
@@ -44,22 +45,17 @@ import com.helion3.prism.api.parameters.ParameterPlayer;
 import com.helion3.prism.api.parameters.ParameterRadius;
 import com.helion3.prism.api.parameters.ParameterTime;
 import com.helion3.prism.api.records.ActionableResult;
-import com.helion3.prism.api.records.BlockResult;
-import com.helion3.prism.api.records.EntityResult;
-import com.helion3.prism.api.records.Result;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.listeners.ChangeBlockListener;
-import com.helion3.prism.listeners.ChangeInventoryListener;
-import com.helion3.prism.listeners.DeathListener;
-import com.helion3.prism.listeners.DropItemListener;
-import com.helion3.prism.listeners.JoinListener;
-import com.helion3.prism.listeners.QuitListener;
+import com.helion3.prism.listeners.EntityListener;
+import com.helion3.prism.listeners.InventoryListener;
 import com.helion3.prism.listeners.RequiredInteractListener;
 import com.helion3.prism.queues.RecordingQueueManager;
 import com.helion3.prism.storage.h2.H2StorageAdapter;
 import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 import com.helion3.prism.storage.mysql.MySQLStorageAdapter;
+import com.helion3.prism.util.PrismEvents;
 import com.helion3.prism.util.Reference;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -125,7 +121,7 @@ public final class Prism {
     private final Set<FlagHandler> flagHandlers = Sets.newHashSet();
     private final Map<UUID, List<ActionableResult>> lastActionResults = Maps.newHashMap();
     private final Set<ParameterHandler> parameterHandlers = Sets.newHashSet();
-    private final Map<String, Class<? extends Result>> resultRecords = Maps.newHashMap();
+    private final Set<PrismEvent> prismEvents = Sets.newHashSet();
 
     @Listener
     public void onConstruction(GameConstructionEvent event) {
@@ -155,38 +151,29 @@ public final class Prism {
         registerParameterHandler(new ParameterRadius());
         registerParameterHandler(new ParameterTime());
 
-        // Register ResultRecords
-        registerResultRecord("break", BlockResult.class);
-        registerResultRecord("decay", BlockResult.class);
-        registerResultRecord("grow", BlockResult.class);
-        registerResultRecord("place", BlockResult.class);
-        registerResultRecord("death", EntityResult.class);
+        // Register PrismEvents
+        registerPrismEvent(PrismEvents.BLOCK_BREAK);
+        registerPrismEvent(PrismEvents.BLOCK_DECAY);
+        registerPrismEvent(PrismEvents.BLOCK_GROW);
+        registerPrismEvent(PrismEvents.BLOCK_PLACE);
+        registerPrismEvent(PrismEvents.ENTITY_DEATH);
+        registerPrismEvent(PrismEvents.COMMAND_EXECUTE);
+        registerPrismEvent(PrismEvents.INVENTORY_CLOSE);
+        registerPrismEvent(PrismEvents.INVENTORY_OPEN);
+        registerPrismEvent(PrismEvents.ITEM_DROP);
+        registerPrismEvent(PrismEvents.ITEM_INSERT);
+        registerPrismEvent(PrismEvents.ITEM_PICKUP);
+        registerPrismEvent(PrismEvents.ITEM_REMOVE);
+        registerPrismEvent(PrismEvents.PLAYER_DISCONNECT);
+        registerPrismEvent(PrismEvents.PLAYER_JOIN);
 
         // Register Commands
         Sponge.getCommandManager().register(this, PrismCommands.getCommand(), Reference.ID, "pr");
 
         // Register Listeners
         Sponge.getEventManager().registerListeners(getPluginContainer(), new ChangeBlockListener());
-
-        if (getListening().DEATH) {
-            Sponge.getEventManager().registerListeners(getPluginContainer(), new DeathListener());
-        }
-
-        if (getListening().DROP) {
-            Sponge.getEventManager().registerListeners(getPluginContainer(), new DropItemListener());
-        }
-
-        if (getListening().JOIN) {
-            Sponge.getEventManager().registerListeners(getPluginContainer(), new JoinListener());
-        }
-
-        if (getListening().PICKUP) {
-            Sponge.getEventManager().registerListeners(getPluginContainer(), new ChangeInventoryListener());
-        }
-
-        if (getListening().QUIT) {
-            Sponge.getEventManager().registerListeners(getPluginContainer(), new QuitListener());
-        }
+        Sponge.getEventManager().registerListeners(getPluginContainer(), new EntityListener());
+        Sponge.getEventManager().registerListeners(getPluginContainer(), new InventoryListener());
 
         // Events required for internal operation
         Sponge.getEventManager().registerListeners(getPluginContainer(), new RequiredInteractListener());
@@ -210,7 +197,7 @@ public final class Prism {
                 throw new Exception("Invalid storage engine configured.");
             }
 
-            Preconditions.checkArgument(getStorageAdapter().connect());
+            Preconditions.checkState(getStorageAdapter().connect());
 
             // Initialize the recording queue manager
             Task.builder()
@@ -354,34 +341,31 @@ public final class Prism {
     }
 
     /**
-     * Returns all currently registered result records.
+     * Returns all currently registered prism events.
      *
-     * @return Map of event names to their {@link Result} class
+     * @return List of {@link PrismEvent}
      */
-    private Map<String, Class<? extends Result>> getResultRecords() {
-        return resultRecords;
+    public Set<PrismEvent> getPrismEvents() {
+        return prismEvents;
+    }
+
+    public Optional<PrismEvent> getPrismEvent(String id) {
+        for (PrismEvent prismEvent : getPrismEvents()) {
+            if (StringUtils.equals(prismEvent.getId(), id)) {
+                return Optional.of(prismEvent);
+            }
+        }
+
+        return Optional.empty();
     }
 
     /**
-     * Returns the result record class for a given event
+     * Register a prism event.
      *
-     * @param event event name
-     * @return {@link Result} Record class, or null if unsupported
+     * @param prismEvent
      */
-    public Class<? extends Result> getResultRecord(String event) {
-        return getResultRecords().get(event);
-    }
-
-    /**
-     * Register a custom result record for a given event name.
-     *
-     * @param event        {@link String} event name
-     * @param resultRecord {@link Result} Record class
-     * @return True if the {@link Result} Record class was registered
-     */
-    public boolean registerResultRecord(String event, Class<? extends Result> resultRecord) {
-        Preconditions.checkNotNull(event);
-        Preconditions.checkNotNull(resultRecord);
-        return getResultRecords().putIfAbsent(event, resultRecord) == null;
+    public boolean registerPrismEvent(PrismEvent prismEvent) {
+        Preconditions.checkNotNull(prismEvent);
+        return getPrismEvents().add(prismEvent);
     }
 }

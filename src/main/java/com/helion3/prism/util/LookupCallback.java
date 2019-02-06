@@ -102,13 +102,15 @@ public class LookupCallback extends AsyncCallback {
             hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Target: ", TextColors.WHITE, target, Text.NEW_LINE));
         }
 
-        /*
-        // This is for Item Insert and Item Remove logging which may be added in a future Prism version.
+        String id = result.data.getString(DataQueries.Id).orElse(null);
+        if (StringUtils.isNotBlank(id)) {
+            hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Id: ", TextColors.WHITE, id, Text.NEW_LINE));
+        }
+
         String container = result.data.getString(DataQueries.Container).orElse(null);
         if (StringUtils.isNotBlank(container)) {
             hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Container: ", TextColors.WHITE, container, Text.NEW_LINE));
         }
-        */
 
         if (result instanceof ResultAggregate) {
             int count = result.data.getInt(DataQueries.Count).orElse(0);
@@ -131,11 +133,11 @@ public class LookupCallback extends AsyncCallback {
                 int z = location.getInt(DataQueries.Z).orElse(0);
                 World world = location.get(DataQueries.WorldUuid).flatMap(TypeUtil::uuidFromObject).flatMap(Sponge.getServer()::getWorld).orElse(null);
 
+                hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Location: ", TextColors.WHITE, Format.location(x, y, z, world, false)));
                 if (this.querySession.hasFlag(Flag.EXTENDED)) {
                     resultMessage.append(Text.of(Text.NEW_LINE, TextColors.GRAY, " - ", Format.location(x, y, z, world, true)));
+                    hoverMessage.append(Text.of(Text.NEW_LINE, Text.NEW_LINE, TextColors.GRAY, "Click location to teleport."));
                 }
-
-                hoverMessage.append(Text.of(TextColors.DARK_GRAY, "Location: ", TextColors.WHITE, Format.location(x, y, z, world, false)));
             }
         }
 

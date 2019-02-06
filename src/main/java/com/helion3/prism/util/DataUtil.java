@@ -21,13 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.helion3.prism.util;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.Map.Entry;
 
+import com.google.common.base.Preconditions;
 import com.helion3.prism.api.records.Result;
+import com.helion3.prism.util.DataQueries;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -43,7 +46,9 @@ import com.helion3.prism.Prism;
 import org.spongepowered.api.profile.GameProfile;
 
 public class DataUtil {
-    private DataUtil() {}
+
+    private DataUtil() {
+    }
 
     /**
      * Checks an object against known primitive object types.
@@ -213,5 +218,30 @@ public class DataUtil {
         });
 
         return future;
+    }
+
+    /**
+     * Helper method for writing values to a {@link DataView DataView}.
+     *
+     * @param dataView DataView
+     * @param path DataQuery
+     * @param value Object
+     * @throws IllegalArgumentException If an attempt is made to change an existing value.
+     */
+    public static void writeToDataView(DataView dataView, DataQuery path, Object value) throws IllegalArgumentException {
+        Preconditions.checkNotNull(dataView);
+        Preconditions.checkNotNull(path);
+
+        Object currentValue = dataView.get(path).orElse(null);
+        if (currentValue != null) {
+            if (!currentValue.equals(value)) {
+                throw new IllegalArgumentException("Attempted to overwrite " + path.toString());
+            }
+
+            Prism.getInstance().getLogger().warn("Attempted to overwrite {} with the same value", path.toString(), new Exception());
+            return;
+        }
+
+        dataView.set(path, value);
     }
 }

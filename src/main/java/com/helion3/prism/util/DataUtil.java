@@ -30,7 +30,6 @@ import java.util.Map.Entry;
 
 import com.google.common.base.Preconditions;
 import com.helion3.prism.api.records.Result;
-import com.helion3.prism.util.DataQueries;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -157,6 +156,10 @@ public class DataUtil {
                             JsonArray array = gson.toJsonTree(optional.get()).getAsJsonArray();
                             convertedList.add(array);
                             break;
+                        }
+                        else if (object.getClass().isArray()) {
+                            JsonArray array = gson.toJsonTree(object).getAsJsonArray();
+                            convertedList.add(array);
                         }
                         else {
                             Prism.getInstance().getLogger().error("Unsupported json list data type: " + object.getClass().getName() + " for key " + key);

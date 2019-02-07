@@ -327,6 +327,7 @@ public class PrismRecord {
          */
         private DataContainer formatBlockDataContainer(BlockSnapshot block) {
             Preconditions.checkNotNull(block);
+            Preconditions.checkNotNull(block.getState(), "Missing BlockState: " + block.toString());
 
             DataContainer blockData = block.toContainer();
             blockData.remove(DataQueries.Position);
@@ -341,7 +342,6 @@ public class PrismRecord {
             }
 
             return blockData;
-
         }
 
         /**

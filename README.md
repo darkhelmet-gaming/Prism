@@ -12,7 +12,7 @@ Because of this, our feature set is growing. File an issue or let us know in IRC
 
 ## Downloads
 
-- [Builds](http://dhmc.us:8080/job/Prism/)
+- [Builds](http://helion3.com:8080/job/Prism/)
 
 If using Mongo, download the `Prism-(version)-all.jar` file. Otherwise, download `Prism-(version).jar`.
 
@@ -73,7 +73,7 @@ Coming soon. Bug vive about this.
 
 Prism supports a variety of databases. We work hard to ensure is Prism is fast and efficient, but there are a lot of variables and no matter how much we tweak the "out-of-box" experience, the location, hardware, and configuration of your database servers can be a crucial factor.
 
-###Mongo (Recommended)
+### Mongo (Recommended)
 
 [MongoDB](https://www.mongodb.com/) is a "no-sql" database, meaning it works very differently from sql-based databases. Rather than define fixed schemas, we store records as "documents". Given the variable nature of Minecraft and Mod data, it's difficult to work with a fixed schema.
 
@@ -81,13 +81,13 @@ We really appreciate other features like it's incredible performance.
 
 Mongo can be installed and run similarly to other database servers.
 
-###MySQL/MariaDB
+### MySQL/MariaDB
 
 MySQL and the MariaDB fork are familiar products, especially for users of Prism 1/2. We continue to support these two products although native JSON support is essentially unavailable
 
 Recent versions of MySQL support native JSON, while MariaDB has some support - although they've diverged in their handling. Supporting would require special work for each and is not a priority at this time.
 
-###H2
+### H2
 
 H2 is a file-based storage engine which does not require any servers or setup on your part. It's useful only for testing or small servers. File-based storage engines are quite limited compared to database servers.
 
@@ -95,7 +95,7 @@ Unfortunately, H2 does not fully support batch inserts the way Prism needs -  th
 
 Also, H2 doesn't seem to have a way of grouping by formatted data - in this case the date. It has to group on the column itself which would defeat the purpose. For now, records are grouped but without dates.
 
-###Others?
+### Others?
 
 Prism can be extended with support for additional storage engines. We always are open to PRs if you would like to submit further support.
 

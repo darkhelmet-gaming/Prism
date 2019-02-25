@@ -52,7 +52,7 @@ public class H2StorageAdapter implements StorageAdapter {
     private final SqlService sql = Sponge.getServiceManager().provide(SqlService.class).get();
     private final Path dbPath = Prism.getInstance().getPath().getParent().resolve(Prism.getInstance().getConfiguration().getNode("db", "name").getString());
     private final StorageAdapterRecords records;
-    private static DataSource db;
+    private static HikariDataSource db;
 
     /**
      * Create a new instance of the H2 storage adapter.
@@ -205,7 +205,7 @@ public class H2StorageAdapter implements StorageAdapter {
 
     @Override
     public void close() {
-        // @todo implement
+        db.close();
     }
 
     @Override

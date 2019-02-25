@@ -46,7 +46,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
     private final String tablePrefix = Prism.getInstance().getConfiguration().getNode("db", "mysql", "tablePrefix").getString();
     private final int purgeBatchLimit = Prism.getInstance().getConfiguration().getNode("storage", "purgeBatchLimit").getInt();
     private final StorageAdapterRecords records;
-    private static DataSource db;
+    private static HikariDataSource db;
     private final String dns;
 
     /**
@@ -207,7 +207,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
 
     @Override
     public void close() {
-        // @todo implement
+        db.close();
     }
 
     @Override

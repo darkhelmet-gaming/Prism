@@ -33,7 +33,7 @@ import com.helion3.prism.Prism;
 public class RecordingQueueManager implements Runnable {
 
     @Override
-    public void run() {
+    public synchronized void run() {
         List<DataContainer> eventsSaveBatch = new ArrayList<>();
 
         // Assume we're iterating everything in the queue

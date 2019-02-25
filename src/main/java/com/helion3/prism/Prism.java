@@ -69,6 +69,7 @@ import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
@@ -122,6 +123,7 @@ public final class Prism {
     private final Map<UUID, List<ActionableResult>> lastActionResults = Maps.newHashMap();
     private final Set<ParameterHandler> parameterHandlers = Sets.newHashSet();
     private final Set<PrismEvent> prismEvents = Sets.newHashSet();
+    private final RecordingQueueManager recordingQueueManager = new RecordingQueueManager();
 
     @Listener
     public void onConstruction(GameConstructionEvent event) {
@@ -204,13 +206,26 @@ public final class Prism {
                     .async()
                     .name("PrismRecordingQueueManager")
                     .interval(1, TimeUnit.SECONDS)
-                    .execute(new RecordingQueueManager())
+                    .execute(recordingQueueManager)
                     .submit(getPluginContainer());
             getLogger().info("Prism started successfully. Bad guys beware.");
         } catch (Exception ex) {
             Sponge.getEventManager().unregisterPluginListeners(getPluginContainer());
             getLogger().error("Encountered an error processing {}::onStartedServer", "Prism", ex);
         }
+    }
+
+    @Listener
+    public void onStoppedServer(GameStoppedServerEvent event) {
+        // Cancel all scheduled tasks
+        Sponge.getScheduler().getScheduledTasks(getInstance()).forEach(Task::cancel);
+
+        // Flush any pending records
+        // If the scheduled task is still running this will block until it completes
+        recordingQueueManager.run();
+
+        // Shutdown storage
+        getStorageAdapter().close();
     }
 
     public static Prism getInstance() {

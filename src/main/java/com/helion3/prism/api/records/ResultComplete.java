@@ -38,7 +38,8 @@ import com.helion3.prism.util.DateUtil;
  *
  */
 public class ResultComplete extends Result {
-    private final SimpleDateFormat dateFormatter = new SimpleDateFormat(Prism.getInstance().getConfiguration().getNode("display", "dateFormat").getString());
+
+    private final SimpleDateFormat dateFormatter = new SimpleDateFormat(Prism.getInstance().getConfig().getGeneralCategory().getDateFormat());
 
     /**
      * Returns a user-friendly relative "time since" value.

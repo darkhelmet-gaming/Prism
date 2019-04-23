@@ -114,7 +114,7 @@ public class QueryBuilder {
             future.complete(query);
         }
 
-        if (Prism.getInstance().getConfiguration().getNode("defaults", "enabled").getBoolean()) {
+        if (Prism.getInstance().getConfig().getDefaultCategory().isEnabled()) {
             // Require any parameter defaults
             StringBuilder defaultsUsed = new StringBuilder();
             for (ParameterHandler handler : Prism.getInstance().getParameterHandlers()) {

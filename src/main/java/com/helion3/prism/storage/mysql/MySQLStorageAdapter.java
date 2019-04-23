@@ -42,9 +42,9 @@ import org.spongepowered.api.scheduler.Task;
 
 public class MySQLStorageAdapter implements StorageAdapter {
 
-    private final String expiration = Prism.getInstance().getConfiguration().getNode("storage", "expireRecords").getString();
-    private final String tablePrefix = Prism.getInstance().getConfiguration().getNode("db", "mysql", "tablePrefix").getString();
-    private final int purgeBatchLimit = Prism.getInstance().getConfiguration().getNode("storage", "purgeBatchLimit").getInt();
+    private final String expiration = Prism.getInstance().getConfig().getStorageCategory().getExpireRecords();
+    private final String tablePrefix = Prism.getInstance().getConfig().getStorageCategory().getTablePrefix();
+    private final int purgeBatchLimit = Prism.getInstance().getConfig().getStorageCategory().getPurgeBatchLimit();
     private final StorageAdapterRecords records;
     private static HikariDataSource db;
     private final String dns;
@@ -54,8 +54,11 @@ public class MySQLStorageAdapter implements StorageAdapter {
      */
     public MySQLStorageAdapter() {
         records = new MySQLRecords();
-        dns = "jdbc:mysql://" + Prism.getInstance().getConfiguration().getNode("db", "mysql", "host").getString() + ":"
-                + Prism.getInstance().getConfiguration().getNode("db", "mysql", "port").getString() + "/" + Prism.getInstance().getConfiguration().getNode("db", "name").getString();
+
+        dns = String.format("jdbc:mysql://%s/%s",
+                Prism.getInstance().getConfig().getStorageCategory().getAddress(),
+                Prism.getInstance().getConfig().getStorageCategory().getDatabase()
+        );
     }
 
     /**
@@ -74,10 +77,10 @@ public class MySQLStorageAdapter implements StorageAdapter {
             // Get data source
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl(dns);
-            config.setUsername(Prism.getInstance().getConfiguration().getNode("db", "mysql", "user").getString());
-            config.setPassword(Prism.getInstance().getConfiguration().getNode("db", "mysql", "pass").getString());
-            config.setMaximumPoolSize(Prism.getInstance().getConfiguration().getNode("storage", "maxPoolSize").getInt());
-            config.setMinimumIdle(Prism.getInstance().getConfiguration().getNode("storage", "minPoolSize").getInt());
+            config.setUsername(Prism.getInstance().getConfig().getStorageCategory().getUsername());
+            config.setPassword(Prism.getInstance().getConfig().getStorageCategory().getPassword());
+            config.setMaximumPoolSize(Prism.getInstance().getConfig().getStorageCategory().getMaximumPoolSize());
+            config.setMinimumIdle(Prism.getInstance().getConfig().getStorageCategory().getMinimumIdle());
 
             db = new HikariDataSource(config);
 

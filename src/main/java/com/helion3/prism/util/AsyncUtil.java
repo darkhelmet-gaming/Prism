@@ -41,7 +41,7 @@ public class AsyncUtil {
      */
     public static void lookup(final QuerySession session) {
         // Enforce lookup limits
-        session.getQuery().setLimit(Prism.getInstance().getConfiguration().getNode("query", "lookup", "limit").getInt());
+        session.getQuery().setLimit(Prism.getInstance().getConfig().getLimitCategory().getMaximumLookup());
         async(session, new LookupCallback(session));
     }
 

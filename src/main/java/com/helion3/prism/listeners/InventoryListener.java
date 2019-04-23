@@ -59,7 +59,9 @@ public class InventoryListener {
      */
     @Listener(order = Order.POST)
     public void onClickInventory(ClickInventoryEvent event, @Root Player player) {
-        if (event.getTransactions().isEmpty() || (!Prism.getInstance().getListening().itemInsert && !Prism.getInstance().getListening().itemRemove)) {
+        if (event.getTransactions().isEmpty()
+                || (!Prism.getInstance().getConfig().getEventCategory().isItemInsert()
+                && !Prism.getInstance().getConfig().getEventCategory().isItemRemove())) {
             return;
         }
 
@@ -107,7 +109,7 @@ public class InventoryListener {
 
                 // Remove - Splitting stack
                 if (transaction.getOriginal().getQuantity() > transaction.getFinal().getQuantity()) {
-                    if (!Prism.getInstance().getListening().itemRemove) {
+                    if (!Prism.getInstance().getConfig().getEventCategory().isItemRemove()) {
                         continue;
                     }
 
@@ -124,7 +126,7 @@ public class InventoryListener {
 
                 // Insert - Existing stack
                 if (transaction.getOriginal().getQuantity() < transaction.getFinal().getQuantity()) {
-                    if (!Prism.getInstance().getListening().itemInsert) {
+                    if (!Prism.getInstance().getConfig().getEventCategory().isItemInsert()) {
                         continue;
                     }
 
@@ -142,7 +144,7 @@ public class InventoryListener {
 
             // Remove
             if (transaction.getOriginal().getType() != ItemTypes.NONE) {
-                if (!Prism.getInstance().getListening().itemRemove) {
+                if (!Prism.getInstance().getConfig().getEventCategory().isItemRemove()) {
                     continue;
                 }
 
@@ -159,7 +161,7 @@ public class InventoryListener {
 
             // Insert
             if (transaction.getOriginal().getType() == ItemTypes.NONE) {
-                if (!Prism.getInstance().getListening().itemInsert) {
+                if (!Prism.getInstance().getConfig().getEventCategory().isItemInsert()) {
                     continue;
                 }
 
@@ -185,7 +187,7 @@ public class InventoryListener {
      */
     @Listener(order = Order.POST)
     public void onChangeInventoryPickup(ChangeInventoryEvent.Pickup event, @Root Player player) {
-        if (event.getTransactions().isEmpty() || !Prism.getInstance().getListening().itemPickup) {
+        if (event.getTransactions().isEmpty() || !Prism.getInstance().getConfig().getEventCategory().isItemPickup()) {
             return;
         }
 
@@ -215,7 +217,7 @@ public class InventoryListener {
      */
     @Listener(order = Order.POST)
     public void onDropItemDispense(DropItemEvent.Dispense event, @Root Player player) {
-        if (event.getEntities().isEmpty() || !Prism.getInstance().getListening().itemDrop) {
+        if (event.getEntities().isEmpty() || !Prism.getInstance().getConfig().getEventCategory().isItemDrop()) {
             return;
         }
 
@@ -250,7 +252,7 @@ public class InventoryListener {
     @Listener(order = Order.POST)
     public void onInteractInventory(InteractInventoryEvent event, @Root Player player) {
         if (!(event.getTargetInventory() instanceof CarriedInventory)
-                || (!Prism.getInstance().getListening().inventoryClose && !Prism.getInstance().getListening().inventoryOpen)) {
+                || (!Prism.getInstance().getConfig().getEventCategory().isInventoryClose() && !Prism.getInstance().getConfig().getEventCategory().isInventoryOpen())) {
             return;
         }
 
@@ -277,9 +279,9 @@ public class InventoryListener {
                 .container(title)
                 .location(location);
 
-        if (event instanceof InteractInventoryEvent.Close && Prism.getInstance().getListening().inventoryClose) {
+        if (event instanceof InteractInventoryEvent.Close && Prism.getInstance().getConfig().getEventCategory().isInventoryClose()) {
             eventBuilder.event(PrismEvents.INVENTORY_CLOSE).buildAndSave();
-        } else if (event instanceof InteractInventoryEvent.Open && Prism.getInstance().getListening().inventoryOpen) {
+        } else if (event instanceof InteractInventoryEvent.Open && Prism.getInstance().getConfig().getEventCategory().isInventoryOpen()) {
             eventBuilder.event(PrismEvents.INVENTORY_OPEN).buildAndSave();
         }
     }

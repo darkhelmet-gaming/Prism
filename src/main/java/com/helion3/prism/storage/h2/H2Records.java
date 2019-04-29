@@ -52,7 +52,8 @@ import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.DataUtil;
 
 public class H2Records implements StorageAdapterRecords {
-    private final String tablePrefix = Prism.getInstance().getConfiguration().getNode("db", "h2", "tablePrefix").getString();
+
+    private final String tablePrefix = Prism.getInstance().getConfig().getStorageCategory().getTablePrefix();
 
     @Override
     public StorageWriteResult write(List<DataContainer> containers) throws Exception {

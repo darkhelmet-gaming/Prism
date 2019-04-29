@@ -46,11 +46,11 @@ import com.helion3.prism.api.storage.StorageAdapterSettings;
 
 public class H2StorageAdapter implements StorageAdapter {
 
-    private final String expiration = Prism.getInstance().getConfiguration().getNode("storage", "expireRecords").getString();
-    private final String tablePrefix = Prism.getInstance().getConfiguration().getNode("db", "h2", "tablePrefix").getString();
-    private final int purgeBatchLimit = Prism.getInstance().getConfiguration().getNode("storage", "purgeBatchLimit").getInt();
+    private final String expiration = Prism.getInstance().getConfig().getStorageCategory().getExpireRecords();
+    private final String tablePrefix = Prism.getInstance().getConfig().getStorageCategory().getTablePrefix();
+    private final int purgeBatchLimit = Prism.getInstance().getConfig().getStorageCategory().getPurgeBatchLimit();
     private final SqlService sql = Sponge.getServiceManager().provide(SqlService.class).get();
-    private final Path dbPath = Prism.getInstance().getPath().getParent().resolve(Prism.getInstance().getConfiguration().getNode("db", "name").getString());
+    private final Path dbPath = Prism.getInstance().getPath().getParent().resolve(Prism.getInstance().getConfig().getStorageCategory().getDatabase());
     private final StorageAdapterRecords records;
     private static HikariDataSource db;
 
@@ -77,8 +77,8 @@ public class H2StorageAdapter implements StorageAdapter {
             // Get data source
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl("jdbc:h2:" + dbPath.toString());
-            config.setMaximumPoolSize(Prism.getInstance().getConfiguration().getNode("storage", "maxPoolSize").getInt());
-            config.setMinimumIdle(Prism.getInstance().getConfiguration().getNode("storage", "minPoolSize").getInt());
+            config.setMaximumPoolSize(Prism.getInstance().getConfig().getStorageCategory().getMaximumPoolSize());
+            config.setMinimumIdle(Prism.getInstance().getConfig().getStorageCategory().getMinimumIdle());
 
             db = new HikariDataSource(config);
 

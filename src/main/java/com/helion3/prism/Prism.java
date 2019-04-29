@@ -47,6 +47,8 @@ import com.helion3.prism.api.parameters.ParameterTime;
 import com.helion3.prism.api.records.ActionableResult;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
+import com.helion3.prism.configuration.Config;
+import com.helion3.prism.configuration.Configuration;
 import com.helion3.prism.listeners.ChangeBlockListener;
 import com.helion3.prism.listeners.EntityListener;
 import com.helion3.prism.listeners.InventoryListener;
@@ -57,8 +59,6 @@ import com.helion3.prism.storage.mongodb.MongoStorageAdapter;
 import com.helion3.prism.storage.mysql.MySQLStorageAdapter;
 import com.helion3.prism.util.PrismEvents;
 import com.helion3.prism.util.Reference;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -109,12 +109,7 @@ public final class Prism {
     @DefaultConfig(sharedRoot = false)
     private Path path;
 
-    @Inject
-    @DefaultConfig(sharedRoot = false)
-    private ConfigurationLoader<CommentedConfigurationNode> configurationLoader;
-
     private Configuration configuration;
-    private Listening listening;
     private StorageAdapter storageAdapter;
 
     private final Set<UUID> activeWands = Sets.newHashSet();
@@ -128,12 +123,12 @@ public final class Prism {
     @Listener
     public void onConstruction(GameConstructionEvent event) {
         instance = this;
+        configuration = new Configuration(getPath());
     }
 
     @Listener
     public void onPreInitialization(GamePreInitializationEvent event) {
-        configuration = new Configuration(path.toFile(), configurationLoader);
-        listening = new Listening();
+        getConfiguration().loadConfiguration();
     }
 
     @Listener
@@ -183,11 +178,12 @@ public final class Prism {
 
     @Listener
     public void onPostInitialization(GamePostInitializationEvent event) {
+        getConfiguration().saveConfiguration();
     }
 
     @Listener
     public void onStartedServer(GameStartedServerEvent event) {
-        String engine = getConfiguration().getNode("storage", "engine").getString();
+        String engine = getConfig().getStorageCategory().getEngine();
         try {
             if (StringUtils.equalsIgnoreCase(engine, "h2")) {
                 storageAdapter = new H2StorageAdapter();
@@ -248,8 +244,9 @@ public final class Prism {
         return configuration;
     }
 
-    public Listening getListening() {
-        return listening;
+    public Config getConfig() {
+        Preconditions.checkState(getConfiguration() != null, "Prism has not been initialized!");
+        return getConfiguration().getConfig();
     }
 
     public StorageAdapter getStorageAdapter() {

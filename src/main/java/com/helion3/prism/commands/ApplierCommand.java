@@ -65,7 +65,7 @@ public class ApplierCommand {
                 // Ignore user order flag, if used, for proper rollback/restore order to be used.
                 session.setSortBy(sort);
                 future.thenAccept((v) -> {
-                    session.getQuery().setLimit(Prism.getInstance().getConfiguration().getNode("query", "actionable", "limit").getInt());
+                    session.getQuery().setLimit(Prism.getInstance().getConfig().getLimitCategory().getMaximumActionable());
 
                     try {
                         List<ActionableResult> actionResults = new ArrayList<>();

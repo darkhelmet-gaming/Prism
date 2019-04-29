@@ -46,7 +46,7 @@ public class EntityListener {
      */
     @Listener(order = Order.POST)
     public void onClientConnectionDisconnect(ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") Player player) {
-        if (!Prism.getInstance().getListening().playerDisconnect) {
+        if (!Prism.getInstance().getConfig().getEventCategory().isPlayerDisconnect()) {
             return;
         }
 
@@ -64,7 +64,7 @@ public class EntityListener {
      */
     @Listener(order = Order.POST)
     public void onClientConnectionJoin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
-        if (!Prism.getInstance().getListening().playerJoin) {
+        if (!Prism.getInstance().getConfig().getEventCategory().isPlayerJoin()) {
             return;
         }
 
@@ -82,7 +82,7 @@ public class EntityListener {
      */
     @Listener(order = Order.POST)
     public void onDestructEntityDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Entity entity) {
-        if (!Prism.getInstance().getListening().entityDeath) {
+        if (!Prism.getInstance().getConfig().getEventCategory().isEntityDeath()) {
             return;
         }
 
@@ -100,7 +100,7 @@ public class EntityListener {
      */
     @Listener(order = Order.POST)
     public void onSendCommand(SendCommandEvent event, @Root Player player) {
-        if (!Prism.getInstance().getListening().commandExecute) {
+        if (!Prism.getInstance().getConfig().getEventCategory().isCommandExecute()) {
             return;
         }
 

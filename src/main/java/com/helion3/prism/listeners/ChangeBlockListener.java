@@ -53,10 +53,10 @@ public class ChangeBlockListener {
         }
 
         if (event.getTransactions().isEmpty()
-                || (!Prism.getInstance().getListening().blockBreak
-                && !Prism.getInstance().getListening().blockDecay
-                && !Prism.getInstance().getListening().blockGrow
-                && !Prism.getInstance().getListening().blockPlace)) {
+                || (!Prism.getInstance().getConfig().getEventCategory().isBlockBreak()
+                && !Prism.getInstance().getConfig().getEventCategory().isBlockDecay()
+                && !Prism.getInstance().getConfig().getEventCategory().isBlockGrow()
+                && !Prism.getInstance().getConfig().getEventCategory().isBlockPlace())) {
             return;
         }
 
@@ -75,7 +75,7 @@ public class ChangeBlockListener {
                     .location(transaction.getOriginal().getLocation().get());
 
             if (event instanceof ChangeBlockEvent.Break) {
-                if (!Prism.getInstance().getListening().blockBreak
+                if (!Prism.getInstance().getConfig().getEventCategory().isBlockBreak()
                         || BlockUtil.rejectBreakCombination(originalBlockType, finalBlockType)
                         || EventUtil.rejectBreakEventIdentity(originalBlockType, finalBlockType, event.getCause())) {
                     continue;
@@ -86,7 +86,7 @@ public class ChangeBlockListener {
                         .target(originalBlockType.getId().replace("_", " "))
                         .buildAndSave();
             } else if (event instanceof ChangeBlockEvent.Decay) {
-                if (!Prism.getInstance().getListening().blockDecay) {
+                if (!Prism.getInstance().getConfig().getEventCategory().isBlockDecay()) {
                     continue;
                 }
 
@@ -95,7 +95,7 @@ public class ChangeBlockListener {
                         .target(originalBlockType.getId().replace("_", " "))
                         .buildAndSave();
             } else if (event instanceof ChangeBlockEvent.Grow) {
-                if (!Prism.getInstance().getListening().blockGrow) {
+                if (!Prism.getInstance().getConfig().getEventCategory().isBlockGrow()) {
                     continue;
                 }
 
@@ -104,7 +104,7 @@ public class ChangeBlockListener {
                         .target(finalBlockType.getId().replace("_", " "))
                         .buildAndSave();
             } else if (event instanceof ChangeBlockEvent.Place) {
-                if (!Prism.getInstance().getListening().blockGrow
+                if (!Prism.getInstance().getConfig().getEventCategory().isBlockGrow()
                         || BlockUtil.rejectPlaceCombination(originalBlockType, finalBlockType)
                         || EventUtil.rejectPlaceEventIdentity(originalBlockType, finalBlockType, event.getCause())) {
                     continue;

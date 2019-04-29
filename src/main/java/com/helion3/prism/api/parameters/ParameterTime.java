@@ -89,7 +89,7 @@ public class ParameterTime extends SimpleParameterHandler {
 
     @Override
     public Optional<Pair<String, String>> processDefault(QuerySession session, Query query) {
-        String since = Prism.getInstance().getConfiguration().getNode("defaults", "since").getString();
+        String since = Prism.getInstance().getConfig().getDefaultCategory().getSince();
 
         try {
             Date date = DateUtil.parseTimeStringToDate(since, false);

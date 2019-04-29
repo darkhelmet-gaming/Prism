@@ -56,7 +56,8 @@ import com.helion3.prism.util.DataUtil;
 import com.helion3.prism.util.TypeUtil;
 
 public class MySQLRecords implements StorageAdapterRecords {
-    private final String tablePrefix = Prism.getInstance().getConfiguration().getNode("db", "mysql", "tablePrefix").getString();
+
+    private final String tablePrefix = Prism.getInstance().getConfig().getStorageCategory().getTablePrefix();
 
     @Override
     public StorageWriteResult write(List<DataContainer> containers) throws Exception {

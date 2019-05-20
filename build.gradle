@@ -71,7 +71,7 @@ repositories {
 
 dependencies {
     provided("com.zaxxer:HikariCP:2.6.3")
-    shadow("org.mongodb:mongo-java-driver:3.10.1")
+    shadow("org.mongodb:mongo-java-driver:3.10.2")
     annotationProcessor("org.spongepowered:spongeapi:7.1.0")
     provided("org.spongepowered:spongeapi:7.1.0")
 }

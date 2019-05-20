@@ -21,12 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.helion3.prism.storage.mongodb;
 
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
 import com.helion3.prism.api.storage.StorageAdapterSettings;
+import com.helion3.prism.storage.mongodb.codec.PrimitiveArrayCodec;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
@@ -38,6 +40,8 @@ import com.mongodb.client.model.IndexOptions;
 import java.util.concurrent.TimeUnit;
 
 import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
 
 public class MongoStorageAdapter implements StorageAdapter {
 
@@ -75,7 +79,12 @@ public class MongoStorageAdapter implements StorageAdapter {
                 Prism.getInstance().getConfig().getStorageCategory().getPassword().toCharArray()
         );
 
-        mongoClient = new MongoClient(address, credential, MongoClientOptions.builder().build());
+        CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
+                MongoClient.getDefaultCodecRegistry(),
+                CodecRegistries.fromCodecs(new PrimitiveArrayCodec())
+        );
+
+        mongoClient = new MongoClient(address, credential, MongoClientOptions.builder().codecRegistry(codecRegistry).build());
 
         // @todo support auth: boolean auth = db.authenticate(myUserName, myPassword);
 

@@ -29,8 +29,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
 
-import javax.sql.DataSource;
-
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.DateUtil;
 import com.zaxxer.hikari.HikariConfig;
@@ -114,7 +112,7 @@ public class H2StorageAdapter implements StorageAdapter {
                     + DataQueries.X + " int, "
                     + DataQueries.Y + " smallint, "
                     + DataQueries.Z + " int, "
-                    + DataQueries.Target + " varchar(55), "
+                    + DataQueries.Target + " varchar(255), "
                     + DataQueries.Player + " UUID, "
                     + DataQueries.Cause + " varchar(64))";
             conn.prepareStatement(records).execute();
@@ -122,7 +120,7 @@ public class H2StorageAdapter implements StorageAdapter {
             String extra = "CREATE TABLE IF NOT EXISTS " + tablePrefix + "extra ("
                     + "id int primary key auto_increment, "
                     + "record_id int, "
-                    + "json varchar(30000),"
+                    + "json varchar(65535),"
                     + "CONSTRAINT " + tablePrefix + "extra_ibfk_1 "
                     + "FOREIGN KEY (record_id) "
                     + "REFERENCES " + tablePrefix + "records (id) "
@@ -140,6 +138,22 @@ public class H2StorageAdapter implements StorageAdapter {
 
             String extraIndex = "CREATE INDEX IF NOT EXISTS recordId ON " + tablePrefix + "extra(record_id)";
             conn.prepareStatement(extraIndex).execute();
+
+            if (Prism.getInstance().getConfig().getGeneralCategory().getSchemaVersion() == 1) {
+                // Expand target: 55 -> 255
+                conn.prepareStatement(String.format("ALTER TABLE %srecords ALTER COLUMN %s varchar(255);",
+                        tablePrefix,
+                        DataQueries.Target
+                )).execute();
+
+                // Expand json: varchar(30000) -> varchar(65535)
+                conn.prepareStatement(String.format("ALTER TABLE %sextra ALTER COLUMN json varchar(65535);",
+                        tablePrefix
+                )).execute();
+
+                Prism.getInstance().getConfig().getGeneralCategory().setSchemaVersion(2);
+                Prism.getInstance().getConfiguration().saveConfiguration();
+            }
         }
     }
 

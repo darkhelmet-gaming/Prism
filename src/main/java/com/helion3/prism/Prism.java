@@ -187,7 +187,7 @@ public final class Prism {
         try {
             if (StringUtils.equalsIgnoreCase(engine, "h2")) {
                 storageAdapter = new H2StorageAdapter();
-            } else if (StringUtils.equalsIgnoreCase(engine, "mongo")) {
+            } else if (StringUtils.equalsAnyIgnoreCase(engine, "mongo", "mongodb")) {
                 storageAdapter = new MongoStorageAdapter();
             } else if (StringUtils.equalsIgnoreCase(engine, "mysql")) {
                 storageAdapter = new MySQLStorageAdapter();

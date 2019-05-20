@@ -105,6 +105,7 @@ public class Configuration {
             }
 
             getConfig().getStorageCategory().setDatabase(configurationNode.getNode("db", "name").getString("prism"));
+            getConfig().getGeneralCategory().setSchemaVersion(1);
         }
 
         ConfigurationNode defaults = configurationNode.getNode("defaults");

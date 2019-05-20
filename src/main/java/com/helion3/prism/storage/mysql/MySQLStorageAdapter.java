@@ -28,8 +28,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
 
-import javax.sql.DataSource;
-
 import com.helion3.prism.Prism;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.api.storage.StorageAdapterRecords;
@@ -117,7 +115,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
                     + DataQueries.X + " int(10) NOT NULL, "
                     + DataQueries.Y + " smallint(5) NOT NULL, "
                     + DataQueries.Z + " int(10) NOT NULL, "
-                    + DataQueries.Target + " varchar(55), "
+                    + DataQueries.Target + " varchar(255), "
                     + DataQueries.Player + " binary(16), "
                     + DataQueries.Cause + " varchar(55), "
                     + "PRIMARY KEY (`id`), "
@@ -145,6 +143,17 @@ public class MySQLStorageAdapter implements StorageAdapter {
                     + ") ENGINE=InnoDB DEFAULT CHARACTER SET utf8 "
                     + "DEFAULT COLLATE utf8_general_ci;";
             conn.prepareStatement(extra).execute();
+
+            if (Prism.getInstance().getConfig().getGeneralCategory().getSchemaVersion() == 1) {
+                // Expand target: 55 -> 255
+                conn.prepareStatement(String.format("ALTER TABLE %srecords ALTER COLUMN %s varchar(255);",
+                        tablePrefix,
+                        DataQueries.Target
+                )).execute();
+
+                Prism.getInstance().getConfig().getGeneralCategory().setSchemaVersion(2);
+                Prism.getInstance().getConfiguration().saveConfiguration();
+            }
         }
     }
 

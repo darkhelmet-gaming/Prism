@@ -37,7 +37,7 @@ public class GeneralCategory {
     private boolean debug = false;
 
     @Setting(value = "schema-version")
-    private int schemaVersion = 1;
+    private int schemaVersion = 2;
 
     public String getDateFormat() {
         return dateFormat;

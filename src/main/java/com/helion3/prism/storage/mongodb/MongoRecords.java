@@ -21,20 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package com.helion3.prism.storage.mongodb;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import com.google.common.collect.Lists;
 import com.helion3.prism.api.flags.Flag;
 import com.helion3.prism.api.query.*;
 import com.helion3.prism.api.records.Result;
+import com.helion3.prism.util.PrimitiveArray;
 import org.bson.Document;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -72,45 +75,43 @@ public class MongoRecords implements StorageAdapterRecords {
 
         Set<DataQuery> keys = view.getKeys(false);
         for (DataQuery query : keys) {
-            Optional<Object> optional = view.get(query);
-            if (optional.isPresent()) {
-                String key = query.asString(".");
+            String key = DataUtil.escapeQuery(query);
+            Object value = view.get(query).orElse(null);
 
-                if (optional.get() instanceof List) {
-                    List<Object> convertedList = new ArrayList<>();
-                    for (Object object : (List<?>) optional.get()) {
-
-                        if (object instanceof DataView) {
-                            convertedList.add(documentFromView((DataView) object));
-                        }
-                        else if (object.getClass().isEnum()) {
-                            // Ignoring, this data should exist elsewhere in the document.
-                            // this is ConnectedDirections and other vanilla manipulators
-                            //convertedList.add(object.toString());
-                        }
-                        else if (DataUtil.isPrimitiveType(object)) {
-                            convertedList.add(optional.get());
-                            break;
-                        }
-                        else {
-                            Prism.getInstance().getLogger().error("Unsupported list data type: " + object.getClass().getName());
-                        }
-                    }
-
-                    if (!convertedList.isEmpty()) {
-                        document.append(key, convertedList);
+            if (value == null) {
+                // continue
+            } else if (value instanceof Collection) {
+                List<Object> convertedList = Lists.newArrayList();
+                for (Object object : (Collection<?>) value) {
+                    if (object == null) {
+                        // continue
+                    } else if (object instanceof DataView) {
+                        convertedList.add(documentFromView((DataView) object));
+                    } else if (DataUtil.isPrimitiveType(object)) {
+                        convertedList.add(object);
+                    } else if (object.getClass().isArray()) {
+                        document.append(key, new PrimitiveArray(object));
+                    } else if (object.getClass().isEnum()) {
+                        // Ignoring, this data should exist elsewhere in the document.
+                        // this is ConnectedDirections and other vanilla manipulators
+                        // convertedList.add(object.toString());
+                    }  else {
+                        Prism.getInstance().getLogger().error("Unsupported list data type: " + object.getClass().getName());
                     }
                 }
-                else if (optional.get() instanceof DataView) {
-                    DataView subView = (DataView) optional.get();
-                    document.append(key, documentFromView(subView));
+
+                if (!convertedList.isEmpty()) {
+                    document.append(key, convertedList);
                 }
-                else {
-                    if (key.equals(DataQueries.Player.toString())) {
-                        document.append(DataQueries.Player.toString(), optional.get());
-                    } else {
-                        document.append(key, optional.get());
-                    }
+            } else if (value instanceof DataView) {
+                document.append(key, documentFromView((DataView) value));
+            } else if (value.getClass().isArray()) {
+                document.append(key, new PrimitiveArray(value));
+            } else {
+                if (key.equals(DataQueries.Player.toString())) {
+                    document.append(DataQueries.Player.toString(), value);
+                } else {
+                    document.append(key, value);
                 }
             }
         }
@@ -127,13 +128,19 @@ public class MongoRecords implements StorageAdapterRecords {
         DataContainer result = DataContainer.createNew();
 
         for (String key : document.keySet()) {
-            DataQuery keyQuery = DataQuery.of(key);
-            Object object = document.get(key);
+            DataQuery query = DataUtil.unescapeQuery(key);
+            Object value = document.get(key);
 
-            if (object instanceof Document) {
-                result.set(keyQuery, documentToDataContainer((Document) object));
+            if (value instanceof Document) {
+                PrimitiveArray primitiveArray = PrimitiveArray.of((Document) value);
+                if (primitiveArray != null) {
+                    result.set(query, primitiveArray.getArray());
+                    continue;
+                }
+
+                result.set(query, documentToDataContainer((Document) value));
             } else {
-                result.set(keyQuery, object);
+                result.set(query, value);
             }
         }
 
@@ -149,7 +156,7 @@ public class MongoRecords implements StorageAdapterRecords {
        for (DataContainer container : containers) {
            Document document = documentFromView(container);
 
-           //Prism.getInstance().getLogger().debug(DataUtil.jsonFromDataView(container).toString());
+           // Prism.getInstance().getLogger().debug(DataUtil.jsonFromDataView(container).toString());
 
            // TTL
            document.append("Expires", DateUtil.parseTimeStringToDate(expiration, true));

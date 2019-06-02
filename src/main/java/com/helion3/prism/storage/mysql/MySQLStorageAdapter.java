@@ -146,7 +146,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
 
             if (Prism.getInstance().getConfig().getGeneralCategory().getSchemaVersion() == 1) {
                 // Expand target: 55 -> 255
-                conn.prepareStatement(String.format("ALTER TABLE %srecords ALTER COLUMN %s varchar(255);",
+                conn.prepareStatement(String.format("ALTER TABLE %srecords MODIFY %s varchar(255);",
                         tablePrefix,
                         DataQueries.Target
                 )).execute();

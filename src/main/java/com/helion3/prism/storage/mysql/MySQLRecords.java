@@ -181,11 +181,16 @@ public class MySQLRecords implements StorageAdapterRecords {
                     data.set(DataQueries.Location, loc);
 
                     if (rs.getString("json") != null) {
-                        JsonObject json = new JsonParser().parse(rs.getString("json")).getAsJsonObject();
-                        DataView extra = DataUtil.dataViewFromJson(json);
+                        try {
+                            JsonObject json = new JsonParser().parse(rs.getString("json")).getAsJsonObject();
+                            DataView extra = DataUtil.dataViewFromJson(json);
 
-                        for (DataQuery key : extra.getKeys(false)) {
-                            data.set(key, extra.get(key).get());
+                            for (DataQuery key : extra.getKeys(false)) {
+                                data.set(key, extra.get(key).get());
+                            }
+                        } catch (Exception ex) {
+                            Prism.getInstance().getLogger().error("Failed to deserialize {} at {}", target, loc.toString());
+                            throw ex;
                         }
                     }
                 }

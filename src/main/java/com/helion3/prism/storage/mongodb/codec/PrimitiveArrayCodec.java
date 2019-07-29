@@ -51,7 +51,7 @@ public class PrimitiveArrayCodec implements Codec<PrimitiveArray> {
         reader.readStartDocument();
         String key = reader.readString("key");
 
-        List<Object> value = Lists.newArrayList();
+        List<Number> value = Lists.newArrayList();
         if (StringUtils.equals(key, PrimitiveArray.BYTE_ARRAY_ID)) {
             reader.readName("value");
             reader.readStartArray();

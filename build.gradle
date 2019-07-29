@@ -56,6 +56,10 @@ configurations {
     licenseMain.ext.organization = "Helion3"
     licenseMain.ext.url = "http://helion3.com/"
     licenseMain.ext.year = "2015"
+    licenseTest.ext.name = licenseMain.ext.name
+    licenseTest.ext.organization = licenseMain.ext.organization
+    licenseTest.ext.url = licenseMain.ext.url
+    licenseTest.ext.year = licenseMain.ext.year
     project.ext.buildNumber = project.hasProperty("buildNumber") ? buildNumber : "0"
     project.ext.ciSystem = project.hasProperty("ciSystem") ? ciSystem : "unknown"
     project.ext.commit = project.hasProperty("commit") ? commit : "unknown"

@@ -71,7 +71,9 @@ repositories {
 
 dependencies {
     provided("com.zaxxer:HikariCP:2.6.3")
+    testCompile("org.junit.jupiter:junit-jupiter-engine:5.5.1")
     shadow("org.mongodb:mongo-java-driver:3.10.2")
+    testCompile("org.mongodb:mongo-java-driver:3.10.2")
     annotationProcessor("org.spongepowered:spongeapi:7.1.0")
     provided("org.spongepowered:spongeapi:7.1.0")
 }
@@ -103,4 +105,13 @@ jar {
 processResources {
     from("LICENSE.txt")
     rename("LICENSE.txt", "LICENSE-" + archivesBaseName + ".txt")
+}
+
+test {
+    testLogging {
+        exceptionFormat = "full"
+        showStandardStreams = true
+    }
+    
+    useJUnitPlatform()
 }

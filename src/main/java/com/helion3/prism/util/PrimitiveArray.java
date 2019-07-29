@@ -43,7 +43,7 @@ public class PrimitiveArray {
     public static final String INT_ARRAY_ID = String.format("%s:int", Reference.ID);
     public static final String LONG_ARRAY_ID = String.format("%s:long", Reference.ID);
     private final String key;
-    private final List<?> value;
+    private final List<? extends Number> value;
 
     public PrimitiveArray(Object object) {
         Preconditions.checkArgument(object != null);
@@ -63,7 +63,7 @@ public class PrimitiveArray {
         }
     }
 
-    public PrimitiveArray(String key, List<?> value) {
+    public PrimitiveArray(String key, List<? extends Number> value) {
         Preconditions.checkArgument(StringUtils.equalsAny(key, BYTE_ARRAY_ID, INT_ARRAY_ID, LONG_ARRAY_ID));
         this.key = key;
         this.value = value;
@@ -83,7 +83,7 @@ public class PrimitiveArray {
             return null;
         }
 
-        List<?> value = (List<?>) document.get("value");
+        List<Number> value = document.getList("value", Number.class);
         if (value == null) {
             return null;
         }
@@ -123,10 +123,10 @@ public class PrimitiveArray {
         }
     }
 
-    private byte[] toByteArray(List<?> list) {
+    private byte[] toByteArray(List<? extends Number> list) {
         byte[] array = new byte[list.size()];
         for (int index = 0; index < list.size(); index++) {
-            array[index] = (Byte) list.get(index);
+            array[index] = list.get(index).byteValue();
         }
 
         return array;
@@ -141,10 +141,10 @@ public class PrimitiveArray {
         return list;
     }
 
-    private int[] toIntArray(List<?> list) {
+    private int[] toIntArray(List<? extends Number> list) {
         int[] array = new int[list.size()];
         for (int index = 0; index < list.size(); index++) {
-            array[index] = (Integer) list.get(index);
+            array[index] = list.get(index).intValue();
         }
 
         return array;
@@ -159,10 +159,10 @@ public class PrimitiveArray {
         return list;
     }
 
-    private long[] toLongArray(List<?> list) {
+    private long[] toLongArray(List<? extends Number> list) {
         long[] array = new long[list.size()];
         for (int index = 0; index < list.size(); index++) {
-            array[index] = (Long) list.get(index);
+            array[index] = list.get(index).longValue();
         }
 
         return array;

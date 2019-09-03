@@ -216,12 +216,14 @@ public final class Prism {
         // Cancel all scheduled tasks
         Sponge.getScheduler().getScheduledTasks(getInstance()).forEach(Task::cancel);
 
-        // Flush any pending records
-        // If the scheduled task is still running this will block until it completes
-        recordingQueueManager.run();
+        if (getStorageAdapter() != null) {
+            // Flush any pending records
+            // If the scheduled task is still running this will block until it completes
+            recordingQueueManager.run();
 
-        // Shutdown storage
-        getStorageAdapter().close();
+            // Shutdown storage
+            getStorageAdapter().close();
+        }
     }
 
     public static Prism getInstance() {

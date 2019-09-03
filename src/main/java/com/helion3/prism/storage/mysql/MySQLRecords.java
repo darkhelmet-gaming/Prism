@@ -133,6 +133,8 @@ public class MySQLRecords implements StorageAdapterRecords {
 
         String sql = "INSERT INTO " + tablePrefix + "extra(record_id, json) values(?, ?)";
         try (Connection conn = MySQLStorageAdapter.getConnection(); PreparedStatement statement = conn.prepareStatement(sql)) {
+            conn.setAutoCommit(false);
+
             for (Entry<Integer, String> data : extraDataMap.entrySet()) {
                 statement.setInt(1, data.getKey());
                 statement.setString(2, data.getValue());

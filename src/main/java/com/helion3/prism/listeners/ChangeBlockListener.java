@@ -104,7 +104,7 @@ public class ChangeBlockListener {
                         .target(finalBlockType.getId().replace("_", " "))
                         .buildAndSave();
             } else if (event instanceof ChangeBlockEvent.Place) {
-                if (!Prism.getInstance().getConfig().getEventCategory().isBlockGrow()
+                if (!Prism.getInstance().getConfig().getEventCategory().isBlockPlace()
                         || BlockUtil.rejectPlaceCombination(originalBlockType, finalBlockType)
                         || EventUtil.rejectPlaceEventIdentity(originalBlockType, finalBlockType, event.getCause())) {
                     continue;

@@ -34,7 +34,7 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
  * plugins can catch this event and read the PrismRecord or cancel the
  * event.
  */
-public class PrismRecordEvent extends AbstractEvent implements Cancellable {
+public class PrismRecordPreSaveEvent extends AbstractEvent implements Cancellable {
 
   private boolean cancelled = false;
   private final PrismRecord prismRecord;
@@ -47,7 +47,7 @@ public class PrismRecordEvent extends AbstractEvent implements Cancellable {
    * @param prismRecord The record sent through the event
    * @param cause       The cause of the event
    */
-  PrismRecordEvent(PrismRecord prismRecord, Cause cause) {
+  PrismRecordPreSaveEvent(PrismRecord prismRecord, Cause cause) {
     this.prismRecord = prismRecord;
     this.cause = cause;
   }

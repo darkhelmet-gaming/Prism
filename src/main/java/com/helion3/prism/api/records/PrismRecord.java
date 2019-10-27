@@ -126,13 +126,13 @@ public class PrismRecord {
         PluginContainer plugin = Prism.getInstance().getPluginContainer();
         EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
 
-        PrismRecordEvent event = new PrismRecordEvent(this,
+        PrismRecordPreSaveEvent preSaveEvent = new PrismRecordPreSaveEvent(this,
             Cause.of(eventContext, plugin));
 
         // Tell Sponge that this PrismRecordEvent has occurred
-        Sponge.getEventManager().post(event);
+        Sponge.getEventManager().post(preSaveEvent);
 
-        if (!event.isCancelled()) {
+        if (!preSaveEvent.isCancelled()) {
             // Queue the finished record for saving
             RecordingQueue.add(getDataContainer());
         }

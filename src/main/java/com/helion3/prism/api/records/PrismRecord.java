@@ -30,6 +30,7 @@ import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.queues.RecordingQueue;
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.DataUtil;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
@@ -40,11 +41,14 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -118,8 +122,20 @@ public class PrismRecord {
             return;
         }
 
-        // Queue the finished record for saving
-        RecordingQueue.add(getDataContainer());
+        // Prepare PrismRecord for sending to a PrismRecordEvent
+        PluginContainer plugin = Prism.getInstance().getPluginContainer();
+        EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
+
+        PrismRecordEvent event = new PrismRecordEvent(this,
+            Cause.of(eventContext, plugin));
+
+        // Tell Sponge that this PrismRecordEvent has occurred
+        Sponge.getEventManager().post(event);
+
+        if (!event.isCancelled()) {
+            // Queue the finished record for saving
+            RecordingQueue.add(getDataContainer());
+        }
     }
 
     /**

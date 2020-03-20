@@ -84,11 +84,13 @@ public class H2StorageAdapter implements StorageAdapter {
             createTables();
 
             // Purge async
-            Task.builder()
+            if (Prism.getInstance().getConfig().getStorageCategory().isShouldExpire()) {
+                Task.builder()
                     .async()
                     .name("PrismH2Purge")
                     .execute(this::purge)
                     .submit(Prism.getInstance().getPluginContainer());
+            }
 
             return true;
         } catch (SQLException e) {

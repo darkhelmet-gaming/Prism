@@ -63,6 +63,7 @@ public class MongoRecords implements StorageAdapterRecords {
 
     private final BulkWriteOptions bulkWriteOptions = new BulkWriteOptions().ordered(false);
     private final String expiration = Prism.getInstance().getConfig().getStorageCategory().getExpireRecords();
+    private final boolean expires = Prism.getInstance().getConfig().getStorageCategory().isShouldExpire();
 
     /**
      * Converts a DataView to a Document, recursively if needed.
@@ -159,7 +160,9 @@ public class MongoRecords implements StorageAdapterRecords {
            // Prism.getInstance().getLogger().debug(DataUtil.jsonFromDataView(container).toString());
 
            // TTL
-           document.append("Expires", DateUtil.parseTimeStringToDate(expiration, true));
+           if (expires) {
+               document.append("Expires", DateUtil.parseTimeStringToDate(expiration, true));
+           }
 
            // Insert
            documents.add(new InsertOneModel<>(document));

@@ -94,11 +94,13 @@ public class MySQLStorageAdapter implements StorageAdapter {
             createTables();
 
             // Purge async
-            Task.builder()
+            if (Prism.getInstance().getConfig().getStorageCategory().isShouldExpire()) {
+                Task.builder()
                     .async()
                     .name("PrismMySQLPurge")
                     .execute(this::purge)
                     .submit(Prism.getInstance().getPluginContainer());
+            }
 
             return true;
         } catch (SQLException e) {

@@ -150,16 +150,34 @@ public final class ConditionGroup implements Condition {
         conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.WorldUuid), MatchRule.EQUALS, extent.getUniqueId().toString()));
 
         // X
-        Range<Integer> xRange = Range.closed(Math.min(blockLocation1.getX(), blockLocation2.getX()), Math.max(blockLocation1.getX(), blockLocation2.getX()));
-        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.X), xRange));
+        conditions.add(FieldCondition.of(
+            DataQueries.Location.then(DataQueries.X),
+            MatchRule.GREATER_THAN_EQUAL,
+            Math.min(blockLocation1.getX(), blockLocation2.getX())));
+        conditions.add(FieldCondition.of(
+            DataQueries.Location.then(DataQueries.X),
+            MatchRule.LESS_THAN_EQUAL,
+            Math.max(blockLocation1.getX(), blockLocation2.getX())));
 
         // Y
-        Range<Integer> yRange = Range.closed(Math.min(blockLocation1.getY(), blockLocation2.getY()), Math.max(blockLocation1.getY(), blockLocation2.getY()));
-        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Y), yRange));
+        conditions.add(FieldCondition.of(
+            DataQueries.Location.then(DataQueries.Y),
+            MatchRule.GREATER_THAN_EQUAL,
+            Math.min(blockLocation1.getY(), blockLocation2.getY())));
+        conditions.add(FieldCondition.of(
+            DataQueries.Location.then(DataQueries.Y),
+            MatchRule.LESS_THAN_EQUAL,
+            Math.max(blockLocation1.getY(), blockLocation2.getY())));
 
         // Z
-        Range<Integer> zRange = Range.closed(Math.min(blockLocation1.getZ(), blockLocation2.getZ()), Math.max(blockLocation1.getZ(), blockLocation2.getZ()));
-        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Z), zRange));
+        conditions.add(FieldCondition.of(
+            DataQueries.Location.then(DataQueries.Z),
+            MatchRule.GREATER_THAN_EQUAL,
+            Math.min(blockLocation1.getZ(), blockLocation2.getZ())));
+        conditions.add(FieldCondition.of(
+            DataQueries.Location.then(DataQueries.Z),
+            MatchRule.LESS_THAN_EQUAL,
+            Math.max(blockLocation1.getZ(), blockLocation2.getZ())));
 
         return conditions;
     }

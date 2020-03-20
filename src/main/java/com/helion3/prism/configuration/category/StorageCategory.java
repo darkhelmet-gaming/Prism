@@ -43,6 +43,12 @@ public class StorageCategory {
             + "   (H2, MongoDB, MySQL)")
     private String engine = "h2";
 
+    @Setting(value = "mysqlDriver", comment = ""
+            + "The SQL driver to use when using"
+            + "MySQL storage engine\n"
+            + "(MySQL, MariaDB)")
+    private String mysqlDriver = "MySQL";
+
     @Setting(value = "expire-records", comment = "The amount of time records are stored for")
     private String expireRecords = "4w";
 
@@ -142,5 +148,13 @@ public class StorageCategory {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getMysqlDriver() {
+        return mysqlDriver;
+    }
+
+    public void setMysqlDriver(String mysqlDriver) {
+        this.mysqlDriver = mysqlDriver;
     }
 }

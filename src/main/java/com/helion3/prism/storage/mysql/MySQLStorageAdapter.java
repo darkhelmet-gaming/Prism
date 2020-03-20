@@ -53,7 +53,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
     public MySQLStorageAdapter() {
         records = new MySQLRecords();
 
-        dns = String.format("jdbc:mysql://%s/%s",
+        dns = String.format("jdbc:mysql://%s/%s?useSSL=false",
                 Prism.getInstance().getConfig().getStorageCategory().getAddress(),
                 Prism.getInstance().getConfig().getStorageCategory().getDatabase()
         );
@@ -75,6 +75,14 @@ public class MySQLStorageAdapter implements StorageAdapter {
             // Get data source
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl(dns);
+            String mysqlDriver = Prism.getInstance().getConfig().getStorageCategory().getMysqlDriver();
+            if (mysqlDriver.equalsIgnoreCase("MySQL")) {
+                config.setDriverClassName("com.mysql.jdbc.Driver");
+            } else if (mysqlDriver.equalsIgnoreCase("MariaDB")) {
+                config.setDriverClassName("org.mariadb.jdbc.Driver");
+            } else {
+                Prism.getInstance().getLogger().error("Invalid input for MySQL Driver configuration: " + mysqlDriver);
+            }
             config.setUsername(Prism.getInstance().getConfig().getStorageCategory().getUsername());
             config.setPassword(Prism.getInstance().getConfig().getStorageCategory().getPassword());
             config.setMaximumPoolSize(Prism.getInstance().getConfig().getStorageCategory().getMaximumPoolSize());

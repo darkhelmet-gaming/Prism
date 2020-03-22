@@ -77,7 +77,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
             config.setJdbcUrl(dns);
             String mysqlDriver = Prism.getInstance().getConfig().getStorageCategory().getMysqlDriver();
             if (mysqlDriver.equalsIgnoreCase("MySQL")) {
-                config.setDriverClassName("com.mysql.jdbc.Driver");
+                config.setDriverClassName("com.mysql.cj.jdbc.Driver");
             } else if (mysqlDriver.equalsIgnoreCase("MariaDB")) {
                 config.setDriverClassName("org.mariadb.jdbc.Driver");
             } else {

@@ -74,7 +74,7 @@ repositories {
 }
 
 dependencies {
-    shadow("mysql:mysql-connector-java:5.1.44")
+    shadow("mysql:mysql-connector-java:8.0.19")
     shadow("org.mariadb.jdbc:mariadb-java-client:2.5.4")
     provided("com.zaxxer:HikariCP:3.4.2")
     testCompile("org.junit.jupiter:junit-jupiter-engine:5.5.1")

@@ -65,6 +65,9 @@ Thumbs.db
 .project
 .settings
 eclipse
+gradle
+gradlew
+gradlew.bat
 nbproject
 atlassian-ide-plugin.xml
 build.xml

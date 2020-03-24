@@ -53,7 +53,7 @@ public class MySQLStorageAdapter implements StorageAdapter {
     public MySQLStorageAdapter() {
         records = new MySQLRecords();
 
-        dns = String.format("jdbc:mysql://%s/%s?useSSL=false",
+        dns = String.format("jdbc:mysql://%s/%s",
                 Prism.getInstance().getConfig().getStorageCategory().getAddress(),
                 Prism.getInstance().getConfig().getStorageCategory().getDatabase()
         );

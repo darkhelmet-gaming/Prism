@@ -43,6 +43,15 @@ public class StorageCategory {
             + "   (H2, MongoDB, MySQL)")
     private String engine = "h2";
 
+    @Setting(value = "mysql-driver", comment = ""
+            + "The SQL driver to use when using "
+            + "MySQL storage engine\n"
+            + "   (MySQL, MariaDB)")
+    private String mysqlDriver = "mysql";
+
+    @Setting(value = "should-expire", comment = "Should records expire (be removed) after a specified amount of time?")
+    private boolean shouldExpire = true;
+
     @Setting(value = "expire-records", comment = "The amount of time records are stored for")
     private String expireRecords = "4w";
 
@@ -142,5 +151,21 @@ public class StorageCategory {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getMysqlDriver() {
+        return mysqlDriver;
+    }
+
+    public void setMysqlDriver(String mysqlDriver) {
+        this.mysqlDriver = mysqlDriver;
+    }
+
+    public boolean isShouldExpire() {
+        return shouldExpire;
+    }
+
+    public void setShouldExpire(boolean shouldExpire) {
+        this.shouldExpire = shouldExpire;
     }
 }

@@ -26,10 +26,12 @@ package com.helion3.prism.api.query;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.world.Location;
 
 import com.google.common.collect.Range;
 import com.helion3.prism.util.DataQueries;
+import org.spongepowered.api.world.extent.Extent;
 
 /**
  * Contains a group of conditions. Each group should be compared
@@ -129,6 +131,53 @@ public final class ConditionGroup implements Condition {
         // Z
         Range<Integer> zRange = Range.open(location.getBlockZ() - radius, location.getBlockZ() + radius);
         conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.Z), zRange));
+
+        return conditions;
+    }
+
+    /**
+     * Convenience method to build conditions for a prismatic region marked with two corners.
+     *
+     * @param extent Extent of both block locations
+     * @param blockLocation1 vector describing first location
+     * @param blockLocation2 vector describing second location
+     * @return ConditionGroup
+     */
+    public static ConditionGroup from(Extent extent, Vector3i blockLocation1, Vector3i blockLocation2) {
+        ConditionGroup conditions = new ConditionGroup(Operator.AND);
+
+        // World
+        conditions.add(FieldCondition.of(DataQueries.Location.then(DataQueries.WorldUuid), MatchRule.EQUALS, extent.getUniqueId().toString()));
+
+        // X
+        conditions.add(FieldCondition.of(
+            DataQueries.Location.then(DataQueries.X),
+            MatchRule.GREATER_THAN_EQUAL,
+            Math.min(blockLocation1.getX(), blockLocation2.getX())));
+        conditions.add(FieldCondition.of(
+            DataQueries.Location.then(DataQueries.X),
+            MatchRule.LESS_THAN_EQUAL,
+            Math.max(blockLocation1.getX(), blockLocation2.getX())));
+
+        // Y
+        conditions.add(FieldCondition.of(
+            DataQueries.Location.then(DataQueries.Y),
+            MatchRule.GREATER_THAN_EQUAL,
+            Math.min(blockLocation1.getY(), blockLocation2.getY())));
+        conditions.add(FieldCondition.of(
+            DataQueries.Location.then(DataQueries.Y),
+            MatchRule.LESS_THAN_EQUAL,
+            Math.max(blockLocation1.getY(), blockLocation2.getY())));
+
+        // Z
+        conditions.add(FieldCondition.of(
+            DataQueries.Location.then(DataQueries.Z),
+            MatchRule.GREATER_THAN_EQUAL,
+            Math.min(blockLocation1.getZ(), blockLocation2.getZ())));
+        conditions.add(FieldCondition.of(
+            DataQueries.Location.then(DataQueries.Z),
+            MatchRule.LESS_THAN_EQUAL,
+            Math.max(blockLocation1.getZ(), blockLocation2.getZ())));
 
         return conditions;
     }

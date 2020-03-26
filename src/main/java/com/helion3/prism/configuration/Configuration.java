@@ -104,6 +104,10 @@ public class Configuration {
                 getConfig().getStorageCategory().setUsername(database.getNode("user").getString());
             }
 
+            // Setting 'should-expire' is unnecessary because @Setting in StorageCategory.java does it automatically,
+            // but put it anyway
+            getConfig().getStorageCategory().setShouldExpire(configurationNode.getNode("should-expire").getBoolean());
+            getConfig().getStorageCategory().setMysqlDriver(configurationNode.getNode("mysql-driver").getString());
             getConfig().getStorageCategory().setDatabase(configurationNode.getNode("db", "name").getString("prism"));
             getConfig().getGeneralCategory().setSchemaVersion(1);
         }

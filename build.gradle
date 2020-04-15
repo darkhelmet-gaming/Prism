@@ -55,7 +55,7 @@ configurations {
     licenseMain.ext.name = project.archivesBaseName
     licenseMain.ext.organization = "Helion3"
     licenseMain.ext.url = "http://helion3.com/"
-    licenseMain.ext.year = "2015"
+    licenseMain.ext.year = "2020"
     licenseTest.ext.name = licenseMain.ext.name
     licenseTest.ext.organization = licenseMain.ext.organization
     licenseTest.ext.url = licenseMain.ext.url

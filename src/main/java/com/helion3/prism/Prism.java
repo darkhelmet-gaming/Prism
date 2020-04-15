@@ -124,6 +124,7 @@ public final class Prism {
     public void onConstruction(GameConstructionEvent event) {
         instance = this;
         configuration = new Configuration(getPath());
+        Sponge.getRegistry().registerModule(PrismEvent.class, PrismEvents.REGISTRY_MODULE);
     }
 
     @Listener

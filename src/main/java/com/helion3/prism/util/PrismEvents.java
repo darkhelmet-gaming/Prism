@@ -24,10 +24,19 @@
 
 package com.helion3.prism.util;
 
+import com.google.common.collect.Lists;
 import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.records.BlockResult;
 import com.helion3.prism.api.records.EntityResult;
 import com.helion3.prism.api.records.ResultComplete;
+import org.spongepowered.api.registry.CatalogRegistryModule;
+
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public final class PrismEvents {
 
@@ -61,4 +70,40 @@ public final class PrismEvents {
     public static final PrismEvent PLAYER_DISCONNECT = PrismEvent.of("disconnect", "Player Disconnect", "left", ResultComplete.class);
 
     public static final PrismEvent PLAYER_JOIN = PrismEvent.of("join", "Player Join", "joined", ResultComplete.class);
+
+    public static final CatalogRegistryModule<PrismEvent> REGISTRY_MODULE = new
+        CatalogRegistryModule<PrismEvent>() {
+            private final List<PrismEvent> prismEvents = Lists.newArrayList(
+                BLOCK_BREAK,
+                BLOCK_DECAY,
+                BLOCK_GROW,
+                BLOCK_PLACE,
+                ENTITY_DEATH,
+                COMMAND_EXECUTE,
+                INVENTORY_CLOSE,
+                INVENTORY_OPEN,
+                ITEM_DROP,
+                ITEM_INSERT,
+                ITEM_PICKUP,
+                ITEM_REMOVE,
+                PLAYER_DISCONNECT,
+                PLAYER_JOIN
+            );
+            private final Map<String, PrismEvent> prismEventMap = new HashMap<String, PrismEvent>() {{
+              prismEvents.forEach(prismEvent -> put(prismEvent.getId(), prismEvent));
+            }};
+
+            @Nonnull
+            @Override
+            public Optional<PrismEvent> getById(@Nonnull String id) {
+                return Optional.ofNullable(prismEventMap.get(id));
+            }
+
+            @Nonnull
+            @Override
+            public Collection<PrismEvent> getAll() {
+                return prismEvents;
+            }
+        };
+
 }

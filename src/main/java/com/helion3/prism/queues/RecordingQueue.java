@@ -25,25 +25,30 @@ package com.helion3.prism.queues;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.helion3.prism.api.records.PrismRecord;
 import org.spongepowered.api.data.DataContainer;
 
 public class RecordingQueue {
 
-    private static final LinkedBlockingQueue<DataContainer> queue = new LinkedBlockingQueue<>();
+    private static final LinkedBlockingQueue<PrismRecord> queue = new LinkedBlockingQueue<>();
 
     private RecordingQueue(){}
 
     /**
      * Adds a new Event to the recording queue.
      *
-     * @param container Event to be queued for database write
+     * @param record Event to be queued for database write
      */
-    public static void add(final DataContainer container) {
-        if (container == null) {
-            throw new IllegalArgumentException("Null container given to Prism recording queue.");
+    public static void add(final PrismRecord record) {
+        if (record == null) {
+            throw new IllegalArgumentException("null PrismRecord given to Prism recording queue");
         }
 
-        queue.add(container);
+        if (record.getDataContainer() == null) {
+            throw new IllegalArgumentException("PrismRecord with null container given to Prism recording queue.");
+        }
+
+        queue.add(record);
     }
 
     /**
@@ -51,7 +56,7 @@ public class RecordingQueue {
      *
      * @return Current unsaved {@link DataContainer} queue
      */
-    public static LinkedBlockingQueue<DataContainer> getQueue() {
+    public static LinkedBlockingQueue<PrismRecord> getQueue() {
         return queue;
     }
 }

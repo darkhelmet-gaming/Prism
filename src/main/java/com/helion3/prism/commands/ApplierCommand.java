@@ -93,17 +93,25 @@ public class ApplierCommand {
                 } else {
                     try {
                         // Iterate record results
-                        for (Result result : results) {
-                            if (result instanceof Actionable) {
-                                Actionable actionable = (Actionable) result;
+                        CompletableFuture.allOf(results.stream()
+                            .filter(result -> result instanceof Actionable)
+                            .map(result -> {
+                                try {
+                                    Actionable actionable = (Actionable) result;
 
-                                if (sort.equals(Sort.NEWEST_FIRST)) {
-                                    actionResults.add(actionable.rollback());
-                                } else {
-                                    actionResults.add(actionable.restore());
+                                    if (sort.equals(Sort.NEWEST_FIRST)) {
+                                        return actionable.rollback().thenAccept(actionResults::add);
+                                    } else {
+                                        return actionable.restore().thenAccept(actionResults::add);
+                                    }
+                                } catch (Exception e) {
+                                    source.sendMessage(Format.error(Text.of(e.getMessage())));
+                                    e.printStackTrace();
+                                    return new CompletableFuture<Void>();
                                 }
-                            }
-                        }
+                            })
+                            .toArray(CompletableFuture[]::new))
+                            .thenRun(() -> sendResults(source, actionResults));
                     } catch(Exception e) {
                         e.printStackTrace();
                     }
@@ -127,40 +135,43 @@ public class ApplierCommand {
                         }
                     }
 
-                    int appliedCount = 0;
-                    int skippedCount = 0;
-                    for (ActionableResult result : actionResults) {
-                        if (result.applied()) {
-                            appliedCount++;
-                        } else {
-                            skippedCount++;
-                        }
-                    }
-
-                    Map<String, String> tokens = new HashMap<>();
-                    tokens.put("appliedCount", ""+appliedCount);
-                    tokens.put("skippedCount", ""+skippedCount);
-
-                    final String messageTemplate;
-                    if (skippedCount > 0) {
-                        messageTemplate = Translation.from("rollback.success.withskipped");
-                    } else {
-                        messageTemplate = Translation.from("rollback.success");
-                    }
-
-                    source.sendMessage(Format.heading(
-                        Text.of(Template.parseTemplate(messageTemplate, tokens)),
-                        " ", Format.bonus(Translation.from("rollback.success.bonus"))
-                    ));
-
-                    if (source instanceof Player) {
-                        Prism.getInstance().getLastActionResults().put(((Player) source).getUniqueId(), actionResults);
-                    }
                 }
             });
         } catch (Exception e) {
             source.sendMessage(Format.error(Text.of(e.getMessage())));
             e.printStackTrace();
+        }
+    }
+
+    private static void sendResults(CommandSource source, List<ActionableResult> actionResults) {
+        int appliedCount = 0;
+        int skippedCount = 0;
+        for (ActionableResult result : actionResults) {
+            if (result.applied()) {
+                appliedCount++;
+            } else {
+                skippedCount++;
+            }
+        }
+
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("appliedCount", ""+appliedCount);
+        tokens.put("skippedCount", ""+skippedCount);
+
+        final String messageTemplate;
+        if (skippedCount > 0) {
+            messageTemplate = Translation.from("rollback.success.withskipped");
+        } else {
+            messageTemplate = Translation.from("rollback.success");
+        }
+
+        source.sendMessage(Format.heading(
+            Text.of(Template.parseTemplate(messageTemplate, tokens)),
+            " ", Format.bonus(Translation.from("rollback.success.bonus"))
+        ));
+
+        if (source instanceof Player) {
+            Prism.getInstance().getLastActionResults().put(((Player) source).getUniqueId(), actionResults);
         }
     }
 }

@@ -26,6 +26,7 @@ package com.helion3.prism.api.records;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataView;
@@ -37,34 +38,45 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntitySnapshot.Builder;
 
 import com.helion3.prism.util.DataQueries;
+import org.spongepowered.api.scheduler.Task;
 
 public class EntityResult extends ResultComplete implements Actionable {
     @Override
-    public ActionableResult rollback() throws Exception {
+    public CompletableFuture<ActionableResult> rollback() throws Exception {
+        CompletableFuture<ActionableResult> result = new CompletableFuture<>();
+
         DataView entityData = formatEntityData();
 
         Optional<EntitySnapshot> snapshot = Sponge.getRegistry().createBuilder(Builder.class).build(entityData);
         if (!snapshot.isPresent()) {
-            return ActionableResult.skipped(SkipReason.INVALID);
+            result.complete(ActionableResult.skipped(SkipReason.INVALID));
+            return result;
         }
 
-        Optional<Entity> entity = snapshot.get().restore();
-        if (!entity.isPresent()) {
-            return ActionableResult.skipped(SkipReason.INVALID);
-        }
+        Task.builder().execute(() -> {
+            Optional<Entity> entity = snapshot.get().restore();
+            if (!entity.isPresent()) {
+                result.complete(ActionableResult.skipped(SkipReason.INVALID));
+                return;
+            }
 
-        // Don't let it burn to death (again?)
-        entity.get().get(IgniteableData.class).ifPresent(data -> entity.get().offer(data.fireTicks().set(0)));
+            // Don't let it burn to death (again?)
+            entity.get().get(IgniteableData.class).ifPresent(data -> entity.get().offer(data.fireTicks().set(0)));
 
-        // Heal, it was probably killed.
-        entity.get().get(HealthData.class).ifPresent(data -> entity.get().offer(data.health().set(data.maxHealth().get())));
+            // Heal, it was probably killed.
+            entity.get().get(HealthData.class).ifPresent(data -> entity.get().offer(data.health().set(data.maxHealth().get())));
 
-        return ActionableResult.success(new Transaction<>(new SerializableNonExistent(), entity.get()));
+            result.complete(ActionableResult.success(new Transaction<>(new SerializableNonExistent(), entity.get())));
+        });
+
+        return result;
     }
 
     @Override
-    public ActionableResult restore() throws Exception {
-        return ActionableResult.skipped(SkipReason.UNIMPLEMENTED);
+    public CompletableFuture<ActionableResult> restore() throws Exception {
+        CompletableFuture<ActionableResult> result = new CompletableFuture<>();
+        result.complete(ActionableResult.skipped(SkipReason.UNIMPLEMENTED));
+        return result;
     }
 
     private DataView formatEntityData() {

@@ -26,9 +26,16 @@ package com.helion3.prism.queues;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.helion3.prism.api.records.PrismRecord;
+import com.helion3.prism.api.records.PrismRecordPreSaveEvent;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 
 import com.helion3.prism.Prism;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.plugin.PluginContainer;
 
 public class RecordingQueueManager implements Runnable {
 
@@ -39,9 +46,22 @@ public class RecordingQueueManager implements Runnable {
         // Assume we're iterating everything in the queue
         while (!RecordingQueue.getQueue().isEmpty()) {
             // Poll the next event, append to list
-            DataContainer event = RecordingQueue.getQueue().poll();
-            if (event != null) {
-                eventsSaveBatch.add(event);
+            PrismRecord record = RecordingQueue.getQueue().poll();
+
+            if (record != null) {
+                // Prepare PrismRecord for sending to a PrismRecordEvent
+                PluginContainer plugin = Prism.getInstance().getPluginContainer();
+                EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
+
+                PrismRecordPreSaveEvent preSaveEvent = new PrismRecordPreSaveEvent(record,
+                    Cause.of(eventContext, plugin));
+
+                // Tell Sponge that this PrismRecordEvent has occurred
+                Sponge.getEventManager().post(preSaveEvent);
+
+                if (!preSaveEvent.isCancelled()) {
+                    eventsSaveBatch.add(record.getDataContainer());
+                }
             }
         }
 

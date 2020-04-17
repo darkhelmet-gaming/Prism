@@ -37,6 +37,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
@@ -93,25 +94,26 @@ public class ApplierCommand {
                 } else {
                     try {
                         // Iterate record results
-                        CompletableFuture.allOf(results.stream()
-                            .filter(result -> result instanceof Actionable)
-                            .map(result -> {
+                        Task.builder().execute(() -> {
+                            results.forEach(result -> {
                                 try {
-                                    Actionable actionable = (Actionable) result;
+                                    if (result instanceof Actionable) {
 
-                                    if (sort.equals(Sort.NEWEST_FIRST)) {
-                                        return actionable.rollback().thenAccept(actionResults::add);
-                                    } else {
-                                        return actionable.restore().thenAccept(actionResults::add);
+                                        Actionable actionable = (Actionable) result;
+
+                                        if (sort.equals(Sort.NEWEST_FIRST)) {
+                                            actionResults.add(actionable.rollback());
+                                        } else {
+                                            actionResults.add(actionable.restore());
+                                        }
                                     }
                                 } catch (Exception e) {
                                     source.sendMessage(Format.error(Text.of(e.getMessage())));
                                     e.printStackTrace();
-                                    return new CompletableFuture<Void>();
                                 }
-                            })
-                            .toArray(CompletableFuture[]::new))
-                            .thenRun(() -> sendResults(source, actionResults));
+                            });
+                            sendResults(source, actionResults);
+                        }).submit(Prism.getInstance());
                     } catch(Exception e) {
                         e.printStackTrace();
                     }

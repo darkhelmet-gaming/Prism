@@ -199,7 +199,7 @@ public class SQLQuery {
             // Where
             List<String> queryConditions = buildConditions(conditions);
             if (!queryConditions.isEmpty()) {
-                sql.append("WHERE ").append(String.join(" ", queryConditions).replaceFirst("AND ", "").replaceFirst("OR ", "")).append(" ");
+                sql.append("WHERE ").append(String.join(" ", queryConditions).replaceFirst("AND|OR ", "")).append(" ");
             }
 
             // Group By

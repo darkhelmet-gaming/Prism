@@ -25,10 +25,12 @@
 package com.helion3.prism.util;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.api.records.BlockResult;
 import com.helion3.prism.api.records.EntityResult;
 import com.helion3.prism.api.records.ResultComplete;
+import com.helion3.prism.api.records.SignResult;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 
 import javax.annotation.Nonnull;
@@ -50,6 +52,8 @@ public final class PrismEvents {
     public static final PrismEvent BLOCK_GROW = PrismEvent.of("grow", "Block Grow", "grew", BlockResult.class);
 
     public static final PrismEvent BLOCK_PLACE = PrismEvent.of("place", "Block Place", "placed", BlockResult.class);
+
+    public static final PrismEvent SIGN_CHANGE = PrismEvent.of("signchange", "Sign Change", "changed", SignResult.class);
 
     public static final PrismEvent ENTITY_DEATH = PrismEvent.of("death", "Entity Death", "killed", EntityResult.class);
 
@@ -78,6 +82,7 @@ public final class PrismEvents {
                 BLOCK_DECAY,
                 BLOCK_GROW,
                 BLOCK_PLACE,
+                SIGN_CHANGE,
                 ENTITY_DEATH,
                 COMMAND_EXECUTE,
                 INVENTORY_CLOSE,
@@ -89,9 +94,8 @@ public final class PrismEvents {
                 PLAYER_DISCONNECT,
                 PLAYER_JOIN
             );
-            private final Map<String, PrismEvent> prismEventMap = new HashMap<String, PrismEvent>() {{
-              prismEvents.forEach(prismEvent -> put(prismEvent.getId(), prismEvent));
-            }};
+            private final Map<String, PrismEvent> prismEventMap = Maps.newHashMap();
+            {prismEvents.forEach(prismEvent -> prismEventMap.put(prismEvent.getId(), prismEvent));}
 
             @Nonnull
             @Override

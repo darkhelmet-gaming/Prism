@@ -52,6 +52,7 @@ import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.configuration.Config;
 import com.helion3.prism.configuration.Configuration;
 import com.helion3.prism.listeners.ChangeBlockListener;
+import com.helion3.prism.listeners.ChangeSignListener;
 import com.helion3.prism.listeners.EntityListener;
 import com.helion3.prism.listeners.InventoryListener;
 import com.helion3.prism.listeners.RequiredInteractListener;
@@ -151,22 +152,6 @@ public final class Prism {
         registerParameterHandler(new ParameterRadius());
         registerParameterHandler(new ParameterTime());
 
-        // Register PrismEvents
-        registerPrismEvent(PrismEvents.BLOCK_BREAK);
-        registerPrismEvent(PrismEvents.BLOCK_DECAY);
-        registerPrismEvent(PrismEvents.BLOCK_GROW);
-        registerPrismEvent(PrismEvents.BLOCK_PLACE);
-        registerPrismEvent(PrismEvents.ENTITY_DEATH);
-        registerPrismEvent(PrismEvents.COMMAND_EXECUTE);
-        registerPrismEvent(PrismEvents.INVENTORY_CLOSE);
-        registerPrismEvent(PrismEvents.INVENTORY_OPEN);
-        registerPrismEvent(PrismEvents.ITEM_DROP);
-        registerPrismEvent(PrismEvents.ITEM_INSERT);
-        registerPrismEvent(PrismEvents.ITEM_PICKUP);
-        registerPrismEvent(PrismEvents.ITEM_REMOVE);
-        registerPrismEvent(PrismEvents.PLAYER_DISCONNECT);
-        registerPrismEvent(PrismEvents.PLAYER_JOIN);
-
         // Register Commands
         Sponge.getCommandManager().register(this, PrismCommands.getCommand(), Reference.ID, "pr");
 
@@ -174,6 +159,7 @@ public final class Prism {
         Sponge.getEventManager().registerListeners(getPluginContainer(), new ChangeBlockListener());
         Sponge.getEventManager().registerListeners(getPluginContainer(), new EntityListener());
         Sponge.getEventManager().registerListeners(getPluginContainer(), new InventoryListener());
+//        Sponge.getEventManager().registerListeners(getPluginContainer(), new ChangeSignListener());
 
         // Events required for internal operation
         Sponge.getEventManager().registerListeners(getPluginContainer(), new RequiredInteractListener());
@@ -358,32 +344,4 @@ public final class Prism {
         return getParameterHandlers().add(parameterHandler);
     }
 
-    /**
-     * Returns all currently registered prism events.
-     *
-     * @return List of {@link PrismEvent}
-     */
-    public Set<PrismEvent> getPrismEvents() {
-        return prismEvents;
-    }
-
-    public Optional<PrismEvent> getPrismEvent(String id) {
-        for (PrismEvent prismEvent : getPrismEvents()) {
-            if (StringUtils.equals(prismEvent.getId(), id)) {
-                return Optional.of(prismEvent);
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    /**
-     * Register a prism event.
-     *
-     * @param prismEvent
-     */
-    public boolean registerPrismEvent(PrismEvent prismEvent) {
-        Preconditions.checkNotNull(prismEvent);
-        return getPrismEvents().add(prismEvent);
-    }
 }

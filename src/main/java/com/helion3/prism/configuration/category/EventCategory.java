@@ -42,6 +42,9 @@ public class EventCategory {
     @Setting(value = "block-place", comment = "Log when blocks are placed")
     private boolean blockPlace = true;
 
+    @Setting(value = "sign-change", comment = "Log when a sign is changed")
+    private boolean signChange = true;
+
     @Setting(value = "command-execute", comment = "Log when commands are executed")
     private boolean commandExecute = false;
 
@@ -102,6 +105,14 @@ public class EventCategory {
 
     public void setBlockPlace(boolean blockPlace) {
         this.blockPlace = blockPlace;
+    }
+
+    public boolean isSignChange() {
+        return signChange;
+    }
+
+    public void setSignChange(boolean signChange) {
+        this.signChange = signChange;
     }
 
     public boolean isCommandExecute() {

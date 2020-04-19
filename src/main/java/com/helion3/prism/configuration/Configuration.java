@@ -24,12 +24,15 @@
 
 package com.helion3.prism.configuration;
 
+import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
 import com.helion3.prism.Prism;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMapper;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
@@ -157,6 +160,15 @@ public class Configuration {
         if (!query.isVirtual()) {
             getConfig().getLimitCategory().setMaximumActionable(query.getNode("actionable", "limit").getInt(10000));
             getConfig().getLimitCategory().setMaximumLookup(query.getNode("lookup", "limit").getInt(1000));
+        }
+
+        ConfigurationNode blacklist = configurationNode.getNode("blacklist");
+        if (!blacklist.isVirtual()) {
+            try {
+                getConfig().getGeneralCategory().setBlacklist(blacklist.getList(TypeToken.of(String.class), Lists.newArrayList()));
+            } catch (ObjectMappingException e) {
+                e.printStackTrace();
+            }
         }
     }
 

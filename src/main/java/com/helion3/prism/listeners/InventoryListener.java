@@ -59,6 +59,7 @@ public class InventoryListener {
      */
     @Listener(order = Order.POST)
     public void onClickInventory(ClickInventoryEvent event, @Root Player player) {
+
         if (event.getTransactions().isEmpty()
                 || (!Prism.getInstance().getConfig().getEventCategory().isItemInsert()
                 && !Prism.getInstance().getConfig().getEventCategory().isItemRemove())) {

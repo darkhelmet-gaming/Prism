@@ -24,8 +24,11 @@
 
 package com.helion3.prism.configuration.category;
 
+import com.google.common.collect.Lists;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+
+import java.util.List;
 
 @ConfigSerializable
 public class GeneralCategory {
@@ -38,6 +41,9 @@ public class GeneralCategory {
 
     @Setting(value = "schema-version")
     private int schemaVersion = 2;
+
+    @Setting(value = "blacklist")
+    private List<String> blacklist = Lists.newArrayList();
 
     public String getDateFormat() {
         return dateFormat;
@@ -61,5 +67,13 @@ public class GeneralCategory {
 
     public void setSchemaVersion(int schemaVersion) {
         this.schemaVersion = schemaVersion;
+    }
+
+    public List<String> getBlacklist() {
+        return blacklist;
+    }
+
+    public void setBlacklist(List<String> blacklist) {
+        this.blacklist = blacklist;
     }
 }

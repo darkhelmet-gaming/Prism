@@ -7,6 +7,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
+import org.spongepowered.api.plugin.PluginContainer;
 
 public class ChangeSignListener {
 
@@ -17,6 +18,12 @@ public class ChangeSignListener {
    */
   @Listener(order = Order.POST)
   public void onChangeSign(ChangeSignEvent event) {
+    if (event.getCause().allOf(PluginContainer.class).stream().map(PluginContainer::getId).anyMatch(id ->
+            Prism.getInstance().getConfig().getGeneralCategory().getBlacklist().contains(id))) {
+      // Don't do anything
+      return;
+    }
+
     if (event.getCause().first(Player.class).map(Player::getUniqueId).map(Prism.getInstance().getActiveWands()::contains).orElse(false)) {
       // Cancel and exit event here, not supposed to place/track a block with an active wand.
       event.setCancelled(true);

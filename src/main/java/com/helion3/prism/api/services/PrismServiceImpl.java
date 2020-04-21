@@ -40,7 +40,7 @@ public class PrismServiceImpl implements PrismService {
     com.helion3.prism.api.query.Query query = session.newQuery();
 
     ConditionGroup eventConditionGroup = new ConditionGroup(ConditionGroup.Operator.OR);
-    conditions.getEventId().forEach(event ->
+    conditions.getEvents().forEach(event ->
         eventConditionGroup.add(FieldCondition.of(
             DataQueries.EventName,
             MatchRule.EQUALS,
@@ -72,7 +72,7 @@ public class PrismServiceImpl implements PrismService {
     ConditionGroup worldConditionGroup = new ConditionGroup(ConditionGroup.Operator.OR);
     conditions.getWorldUuids().forEach(uuid ->
         worldConditionGroup.add(FieldCondition.of(
-            DataQueries.WorldUuid,
+            DataQueries.Location.then(DataQueries.WorldUuid),
             MatchRule.EQUALS,
             uuid.toString())));
     if (!worldConditionGroup.getConditions().isEmpty()) {

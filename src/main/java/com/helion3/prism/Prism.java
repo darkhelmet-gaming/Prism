@@ -149,22 +149,6 @@ public final class Prism {
         registerParameterHandler(new ParameterRadius());
         registerParameterHandler(new ParameterTime());
 
-        // Register PrismEvents
-        registerPrismEvent(PrismEvents.BLOCK_BREAK);
-        registerPrismEvent(PrismEvents.BLOCK_DECAY);
-        registerPrismEvent(PrismEvents.BLOCK_GROW);
-        registerPrismEvent(PrismEvents.BLOCK_PLACE);
-        registerPrismEvent(PrismEvents.ENTITY_DEATH);
-        registerPrismEvent(PrismEvents.COMMAND_EXECUTE);
-        registerPrismEvent(PrismEvents.INVENTORY_CLOSE);
-        registerPrismEvent(PrismEvents.INVENTORY_OPEN);
-        registerPrismEvent(PrismEvents.ITEM_DROP);
-        registerPrismEvent(PrismEvents.ITEM_INSERT);
-        registerPrismEvent(PrismEvents.ITEM_PICKUP);
-        registerPrismEvent(PrismEvents.ITEM_REMOVE);
-        registerPrismEvent(PrismEvents.PLAYER_DISCONNECT);
-        registerPrismEvent(PrismEvents.PLAYER_JOIN);
-
         // Register Commands
         Sponge.getCommandManager().register(this, PrismCommands.getCommand(), Reference.ID, "pr");
 

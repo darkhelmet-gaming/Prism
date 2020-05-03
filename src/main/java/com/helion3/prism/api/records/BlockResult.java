@@ -24,10 +24,8 @@
 package com.helion3.prism.api.records;
 
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import com.google.common.base.Preconditions;
-import com.helion3.prism.Prism;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.DataView;
@@ -37,7 +35,6 @@ import org.spongepowered.api.block.BlockSnapshot.Builder;
 
 import com.helion3.prism.util.BlockUtil;
 import com.helion3.prism.util.DataQueries;
-import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -49,14 +46,12 @@ import javax.annotation.Nonnull;
  */
 public class BlockResult extends ResultComplete implements Actionable {
     @Override
-    public CompletableFuture<ActionableResult> rollback() throws Exception {
-        CompletableFuture<ActionableResult> result = new CompletableFuture<>();
+    public ActionableResult rollback() {
 
         Optional<Object> optionalOriginal = data.get(DataQueries.OriginalBlock);
 
         if (!optionalOriginal.isPresent()) {
-            result.complete(ActionableResult.skipped(SkipReason.INVALID));
-            return result;
+            return ActionableResult.skipped(SkipReason.INVALID);
         }
 
         // Our data is stored with a different structure, so we'll need
@@ -66,8 +61,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         // Build World UUID / Vec3 data BlockSnapshot expects
         Optional<Object> optionalLocation = data.get(DataQueries.Location);
         if (!optionalLocation.isPresent()) {
-            result.complete(ActionableResult.skipped(SkipReason.INVALID_LOCATION));
-            return result;
+            return ActionableResult.skipped(SkipReason.INVALID_LOCATION);
         }
 
         // Format
@@ -75,42 +69,35 @@ public class BlockResult extends ResultComplete implements Actionable {
 
         Optional<BlockSnapshot> optionalSnapshot = Sponge.getRegistry().createBuilder(Builder.class).build(finalBlock);
         if (!optionalSnapshot.isPresent()) {
-            result.complete(ActionableResult.skipped(SkipReason.INVALID));
-            return result;
+            return ActionableResult.skipped(SkipReason.INVALID);
         }
 
         BlockSnapshot snapshot = optionalSnapshot.get();
 
         if (!snapshot.getLocation().isPresent()) {
-            result.complete(ActionableResult.skipped(SkipReason.INVALID_LOCATION));
-            return result;
+            return ActionableResult.skipped(SkipReason.INVALID_LOCATION);
         }
 
         Location<World> location = snapshot.getLocation().get();
 
         // Filter unsafe blocks
         if (BlockUtil.rejectIllegalApplierBlock(snapshot.getState().getType())) {
-            result.complete(ActionableResult.skipped(SkipReason.ILLEGAL_BLOCK));
-            return result;
+            return ActionableResult.skipped(SkipReason.ILLEGAL_BLOCK);
         }
 
-        Task.builder().execute(() -> {
-            // Current block in this space.
-            BlockSnapshot original = location.getBlock().snapshotFor(location);
+        // Current block in this space.
+        BlockSnapshot original = location.getBlock().snapshotFor(location);
 
-            // Actually restore!
-            if (!optionalSnapshot.get().restore(true, BlockChangeFlags.NONE)) {
-                result.complete(ActionableResult.skipped(SkipReason.UNKNOWN));
-                return;
-            }
+        // Actually restore!
+        if (!optionalSnapshot.get().restore(true, BlockChangeFlags.NONE)) {
+            return ActionableResult.skipped(SkipReason.UNKNOWN);
+        }
 
-            // Final block in this space.
-            BlockSnapshot resultingBlock = location.getBlock().snapshotFor(location);
+        // Final block in this space.
+        BlockSnapshot resultingBlock = location.getBlock().snapshotFor(location);
 
-            result.complete(ActionableResult.success(new Transaction<>(original, resultingBlock)));
-        }).submit(Prism.getInstance());
+        return ActionableResult.success(new Transaction<>(original, resultingBlock));
 
-        return result;
     }
 
     public DataView formatBlockData(DataView finalBlock, @Nonnull Object optionalLocation) {
@@ -140,14 +127,11 @@ public class BlockResult extends ResultComplete implements Actionable {
     }
 
     @Override
-    public CompletableFuture<ActionableResult> restore() throws Exception {
-
-        CompletableFuture<ActionableResult> result = new CompletableFuture<>();
+    public ActionableResult restore() {
 
         Optional<Object> optionalFinal = data.get(DataQueries.ReplacementBlock);
         if (!optionalFinal.isPresent()) {
-            result.complete(ActionableResult.skipped(SkipReason.INVALID));
-            return result;
+            return ActionableResult.skipped(SkipReason.INVALID);
         }
 
         // Our data is stored with a different structure, so we'll need
@@ -157,8 +141,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         // Build World UUID / Vec3 data BlockSnapshot expects
         Optional<Object> optionalLocation = data.get(DataQueries.Location);
         if (!optionalLocation.isPresent()) {
-            result.complete(ActionableResult.skipped(SkipReason.INVALID_LOCATION));
-            return result;
+            return ActionableResult.skipped(SkipReason.INVALID_LOCATION);
         }
 
         // Format
@@ -166,42 +149,33 @@ public class BlockResult extends ResultComplete implements Actionable {
 
         Optional<BlockSnapshot> optionalSnapshot = Sponge.getRegistry().createBuilder(Builder.class).build(finalBlock);
         if (!optionalSnapshot.isPresent()) {
-            result.complete(ActionableResult.skipped(SkipReason.INVALID));
-            return result;
+            return ActionableResult.skipped(SkipReason.INVALID);
         }
 
         BlockSnapshot snapshot = optionalSnapshot.get();
 
         if (!snapshot.getLocation().isPresent()) {
-            result.complete(ActionableResult.skipped(SkipReason.INVALID_LOCATION));
-            return result;
+            return ActionableResult.skipped(SkipReason.INVALID_LOCATION);
         }
 
         Location<World> location = snapshot.getLocation().get();
 
         // Filter unsafe blocks
         if (BlockUtil.rejectIllegalApplierBlock(snapshot.getState().getType())) {
-            result.complete(ActionableResult.skipped(SkipReason.ILLEGAL_BLOCK));
-            return result;
+            return ActionableResult.skipped(SkipReason.ILLEGAL_BLOCK);
         }
 
         // Current block in this space.
         BlockSnapshot original = location.getBlock().snapshotFor(location);
 
-        Task.builder().execute(() -> {
-            // Actually restore!
-            if (!optionalSnapshot.get().restore(true, BlockChangeFlags.NONE)) {
-                result.complete(ActionableResult.skipped(SkipReason.UNKNOWN));
-                return;
-            }
+        // Actually restore!
+        if (!optionalSnapshot.get().restore(true, BlockChangeFlags.NONE)) {
+            return ActionableResult.skipped(SkipReason.UNKNOWN);
+        }
 
-            // Final block in this space.
-            BlockSnapshot resultingBlock = location.getBlock().snapshotFor(location);
-            result.complete(ActionableResult.success(new Transaction<>(original, resultingBlock)));
-
-        }).submit(Prism.getInstance());
-
-        return result;
+        // Final block in this space.
+        BlockSnapshot resultingBlock = location.getBlock().snapshotFor(location);
+        return ActionableResult.success(new Transaction<>(original, resultingBlock));
 
     }
 }

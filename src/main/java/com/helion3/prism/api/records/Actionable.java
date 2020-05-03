@@ -37,7 +37,7 @@ public interface Actionable {
      *
      * @return ActionableResult Results of applier action
      */
-    CompletableFuture<ActionableResult> rollback() throws Exception;
+    ActionableResult rollback() throws Exception;
 
     /**
      * Re-applies the result of this event to a subject,
@@ -46,5 +46,5 @@ public interface Actionable {
      *
      * @return ActionableResult Results of applier action
      */
-    CompletableFuture<ActionableResult> restore() throws Exception;
+    ActionableResult restore() throws Exception;
 }

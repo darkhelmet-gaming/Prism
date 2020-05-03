@@ -30,6 +30,7 @@ import com.helion3.prism.api.data.PrismEvent;
 import com.helion3.prism.queues.RecordingQueue;
 import com.helion3.prism.util.DataQueries;
 import com.helion3.prism.util.DataUtil;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
@@ -350,7 +351,7 @@ public class PrismRecord {
          * @return A new prism record
          */
         public PrismRecord build() {
-            Preconditions.checkState(Prism.getInstance().getPrismEvent(getEvent()).isPresent(), getEvent() + " is not registered");
+            Preconditions.checkState(Sponge.getRegistry().getType(PrismEvent.class, getEvent()).isPresent(), getEvent() + " is not registered");
             return new PrismRecord(getEvent(), getSource(), getDataContainer());
         }
 

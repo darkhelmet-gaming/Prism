@@ -355,32 +355,4 @@ public final class Prism {
         return getParameterHandlers().add(parameterHandler);
     }
 
-    /**
-     * Returns all currently registered prism events.
-     *
-     * @return List of {@link PrismEvent}
-     */
-    public Set<PrismEvent> getPrismEvents() {
-        return prismEvents;
-    }
-
-    public Optional<PrismEvent> getPrismEvent(String id) {
-        for (PrismEvent prismEvent : getPrismEvents()) {
-            if (StringUtils.equals(prismEvent.getId(), id)) {
-                return Optional.of(prismEvent);
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    /**
-     * Register a prism event.
-     *
-     * @param prismEvent
-     */
-    public boolean registerPrismEvent(PrismEvent prismEvent) {
-        Preconditions.checkNotNull(prismEvent);
-        return getPrismEvents().add(prismEvent);
-    }
 }

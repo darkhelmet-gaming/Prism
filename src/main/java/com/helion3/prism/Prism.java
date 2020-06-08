@@ -124,6 +124,7 @@ public final class Prism {
     public void onConstruction(GameConstructionEvent event) {
         instance = this;
         configuration = new Configuration(getPath());
+        Sponge.getRegistry().registerModule(PrismEvent.class, PrismEvents.REGISTRY_MODULE);
     }
 
     @Listener
@@ -147,22 +148,6 @@ public final class Prism {
         registerParameterHandler(new ParameterPlayer());
         registerParameterHandler(new ParameterRadius());
         registerParameterHandler(new ParameterTime());
-
-        // Register PrismEvents
-        registerPrismEvent(PrismEvents.BLOCK_BREAK);
-        registerPrismEvent(PrismEvents.BLOCK_DECAY);
-        registerPrismEvent(PrismEvents.BLOCK_GROW);
-        registerPrismEvent(PrismEvents.BLOCK_PLACE);
-        registerPrismEvent(PrismEvents.ENTITY_DEATH);
-        registerPrismEvent(PrismEvents.COMMAND_EXECUTE);
-        registerPrismEvent(PrismEvents.INVENTORY_CLOSE);
-        registerPrismEvent(PrismEvents.INVENTORY_OPEN);
-        registerPrismEvent(PrismEvents.ITEM_DROP);
-        registerPrismEvent(PrismEvents.ITEM_INSERT);
-        registerPrismEvent(PrismEvents.ITEM_PICKUP);
-        registerPrismEvent(PrismEvents.ITEM_REMOVE);
-        registerPrismEvent(PrismEvents.PLAYER_DISCONNECT);
-        registerPrismEvent(PrismEvents.PLAYER_JOIN);
 
         // Register Commands
         Sponge.getCommandManager().register(this, PrismCommands.getCommand(), Reference.ID, "pr");
@@ -354,32 +339,4 @@ public final class Prism {
         return getParameterHandlers().add(parameterHandler);
     }
 
-    /**
-     * Returns all currently registered prism events.
-     *
-     * @return List of {@link PrismEvent}
-     */
-    public Set<PrismEvent> getPrismEvents() {
-        return prismEvents;
-    }
-
-    public Optional<PrismEvent> getPrismEvent(String id) {
-        for (PrismEvent prismEvent : getPrismEvents()) {
-            if (StringUtils.equals(prismEvent.getId(), id)) {
-                return Optional.of(prismEvent);
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    /**
-     * Register a prism event.
-     *
-     * @param prismEvent
-     */
-    public boolean registerPrismEvent(PrismEvent prismEvent) {
-        Preconditions.checkNotNull(prismEvent);
-        return getPrismEvents().add(prismEvent);
-    }
 }

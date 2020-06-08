@@ -37,6 +37,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
@@ -93,17 +94,26 @@ public class ApplierCommand {
                 } else {
                     try {
                         // Iterate record results
-                        for (Result result : results) {
-                            if (result instanceof Actionable) {
-                                Actionable actionable = (Actionable) result;
+                        Task.builder().execute(() -> {
+                            results.forEach(result -> {
+                                try {
+                                    if (result instanceof Actionable) {
 
-                                if (sort.equals(Sort.NEWEST_FIRST)) {
-                                    actionResults.add(actionable.rollback());
-                                } else {
-                                    actionResults.add(actionable.restore());
+                                        Actionable actionable = (Actionable) result;
+
+                                        if (sort.equals(Sort.NEWEST_FIRST)) {
+                                            actionResults.add(actionable.rollback());
+                                        } else {
+                                            actionResults.add(actionable.restore());
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    source.sendMessage(Format.error(Text.of(e.getMessage())));
+                                    e.printStackTrace();
                                 }
-                            }
-                        }
+                            });
+                            sendResults(source, actionResults);
+                        }).submit(Prism.getInstance());
                     } catch(Exception e) {
                         e.printStackTrace();
                     }
@@ -127,40 +137,43 @@ public class ApplierCommand {
                         }
                     }
 
-                    int appliedCount = 0;
-                    int skippedCount = 0;
-                    for (ActionableResult result : actionResults) {
-                        if (result.applied()) {
-                            appliedCount++;
-                        } else {
-                            skippedCount++;
-                        }
-                    }
-
-                    Map<String, String> tokens = new HashMap<>();
-                    tokens.put("appliedCount", ""+appliedCount);
-                    tokens.put("skippedCount", ""+skippedCount);
-
-                    final String messageTemplate;
-                    if (skippedCount > 0) {
-                        messageTemplate = Translation.from("rollback.success.withskipped");
-                    } else {
-                        messageTemplate = Translation.from("rollback.success");
-                    }
-
-                    source.sendMessage(Format.heading(
-                        Text.of(Template.parseTemplate(messageTemplate, tokens)),
-                        " ", Format.bonus(Translation.from("rollback.success.bonus"))
-                    ));
-
-                    if (source instanceof Player) {
-                        Prism.getInstance().getLastActionResults().put(((Player) source).getUniqueId(), actionResults);
-                    }
                 }
             });
         } catch (Exception e) {
             source.sendMessage(Format.error(Text.of(e.getMessage())));
             e.printStackTrace();
+        }
+    }
+
+    private static void sendResults(CommandSource source, List<ActionableResult> actionResults) {
+        int appliedCount = 0;
+        int skippedCount = 0;
+        for (ActionableResult result : actionResults) {
+            if (result.applied()) {
+                appliedCount++;
+            } else {
+                skippedCount++;
+            }
+        }
+
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("appliedCount", ""+appliedCount);
+        tokens.put("skippedCount", ""+skippedCount);
+
+        final String messageTemplate;
+        if (skippedCount > 0) {
+            messageTemplate = Translation.from("rollback.success.withskipped");
+        } else {
+            messageTemplate = Translation.from("rollback.success");
+        }
+
+        source.sendMessage(Format.heading(
+            Text.of(Template.parseTemplate(messageTemplate, tokens)),
+            " ", Format.bonus(Translation.from("rollback.success.bonus"))
+        ));
+
+        if (source instanceof Player) {
+            Prism.getInstance().getLastActionResults().put(((Player) source).getUniqueId(), actionResults);
         }
     }
 }

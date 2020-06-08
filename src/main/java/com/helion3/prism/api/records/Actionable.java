@@ -23,6 +23,8 @@
  */
 package com.helion3.prism.api.records;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface Actionable {
     /**
      * Reverses the result of this event on a subject
@@ -35,7 +37,7 @@ public interface Actionable {
      *
      * @return ActionableResult Results of applier action
      */
-    public ActionableResult rollback() throws Exception;
+    ActionableResult rollback() throws Exception;
 
     /**
      * Re-applies the result of this event to a subject,
@@ -44,5 +46,5 @@ public interface Actionable {
      *
      * @return ActionableResult Results of applier action
      */
-    public ActionableResult restore() throws Exception;
+    ActionableResult restore() throws Exception;
 }

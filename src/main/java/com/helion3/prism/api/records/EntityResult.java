@@ -40,7 +40,8 @@ import com.helion3.prism.util.DataQueries;
 
 public class EntityResult extends ResultComplete implements Actionable {
     @Override
-    public ActionableResult rollback() throws Exception {
+    public ActionableResult rollback() {
+
         DataView entityData = formatEntityData();
 
         Optional<EntitySnapshot> snapshot = Sponge.getRegistry().createBuilder(Builder.class).build(entityData);
@@ -63,7 +64,7 @@ public class EntityResult extends ResultComplete implements Actionable {
     }
 
     @Override
-    public ActionableResult restore() throws Exception {
+    public ActionableResult restore() {
         return ActionableResult.skipped(SkipReason.UNIMPLEMENTED);
     }
 

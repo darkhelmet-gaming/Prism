@@ -41,14 +41,11 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
-import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -122,20 +119,8 @@ public class PrismRecord {
             return;
         }
 
-        // Prepare PrismRecord for sending to a PrismRecordEvent
-        PluginContainer plugin = Prism.getInstance().getPluginContainer();
-        EventContext eventContext = EventContext.builder().add(EventContextKeys.PLUGIN, plugin).build();
-
-        PrismRecordPreSaveEvent preSaveEvent = new PrismRecordPreSaveEvent(this,
-            Cause.of(eventContext, plugin));
-
-        // Tell Sponge that this PrismRecordEvent has occurred
-        Sponge.getEventManager().post(preSaveEvent);
-
-        if (!preSaveEvent.isCancelled()) {
-            // Queue the finished record for saving
-            RecordingQueue.add(getDataContainer());
-        }
+        // Queue the finished record for saving
+        RecordingQueue.add(this);
     }
 
     /**
@@ -366,7 +351,7 @@ public class PrismRecord {
          * @return A new prism record
          */
         public PrismRecord build() {
-            Preconditions.checkState(Prism.getInstance().getPrismEvent(getEvent()).isPresent(), getEvent() + " is not registered");
+            Preconditions.checkState(Sponge.getRegistry().getType(PrismEvent.class, getEvent()).isPresent(), getEvent() + " is not registered");
             return new PrismRecord(getEvent(), getSource(), getDataContainer());
         }
 

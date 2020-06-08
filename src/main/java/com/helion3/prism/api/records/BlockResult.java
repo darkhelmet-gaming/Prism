@@ -46,7 +46,8 @@ import javax.annotation.Nonnull;
  */
 public class BlockResult extends ResultComplete implements Actionable {
     @Override
-    public ActionableResult rollback() throws Exception {
+    public ActionableResult rollback() {
+
         Optional<Object> optionalOriginal = data.get(DataQueries.OriginalBlock);
 
         if (!optionalOriginal.isPresent()) {
@@ -96,6 +97,7 @@ public class BlockResult extends ResultComplete implements Actionable {
         BlockSnapshot resultingBlock = location.getBlock().snapshotFor(location);
 
         return ActionableResult.success(new Transaction<>(original, resultingBlock));
+
     }
 
     public DataView formatBlockData(DataView finalBlock, @Nonnull Object optionalLocation) {
@@ -125,7 +127,8 @@ public class BlockResult extends ResultComplete implements Actionable {
     }
 
     @Override
-    public ActionableResult restore() throws Exception {
+    public ActionableResult restore() {
+
         Optional<Object> optionalFinal = data.get(DataQueries.ReplacementBlock);
         if (!optionalFinal.isPresent()) {
             return ActionableResult.skipped(SkipReason.INVALID);
@@ -172,7 +175,7 @@ public class BlockResult extends ResultComplete implements Actionable {
 
         // Final block in this space.
         BlockSnapshot resultingBlock = location.getBlock().snapshotFor(location);
-
         return ActionableResult.success(new Transaction<>(original, resultingBlock));
+
     }
 }

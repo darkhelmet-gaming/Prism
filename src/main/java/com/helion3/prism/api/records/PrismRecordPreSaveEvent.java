@@ -27,7 +27,8 @@ package com.helion3.prism.api.records;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import javax.annotation.Nonnull;
 
 /**
  * An event to be thrown when a PrismRecord is ready to be saved. Other
@@ -47,7 +48,7 @@ public class PrismRecordPreSaveEvent extends AbstractEvent implements Cancellabl
    * @param prismRecord The record sent through the event
    * @param cause       The cause of the event
    */
-  PrismRecordPreSaveEvent(PrismRecord prismRecord, Cause cause) {
+  public PrismRecordPreSaveEvent(PrismRecord prismRecord, Cause cause) {
     this.prismRecord = prismRecord;
     this.cause = cause;
   }
@@ -62,14 +63,14 @@ public class PrismRecordPreSaveEvent extends AbstractEvent implements Cancellabl
     this.cancelled = cancel;
   }
 
+  @Nonnull
   @Override
-  @NonnullByDefault
   public Cause getCause() {
     return this.cause;
   }
 
+  @Nonnull
   @Override
-  @NonnullByDefault
   public Object getSource() {
     return this.prismRecord.getSource();
   }

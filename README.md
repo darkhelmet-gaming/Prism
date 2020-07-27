@@ -12,7 +12,7 @@ Because of this, our feature set is growing. File an issue or let us know in IRC
 
 ## Downloads
 
-- [Builds](http://helion3.com:8080/job/Prism/)
+- [Releases](http://github.com/prism/Prism/releases)
 
 If using Mongo, download the `Prism-(version)-all.jar` file. Otherwise, download `Prism-(version).jar`.
 

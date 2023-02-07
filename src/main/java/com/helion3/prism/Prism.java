@@ -45,6 +45,8 @@ import com.helion3.prism.api.parameters.ParameterPlayer;
 import com.helion3.prism.api.parameters.ParameterRadius;
 import com.helion3.prism.api.parameters.ParameterTime;
 import com.helion3.prism.api.records.ActionableResult;
+import com.helion3.prism.api.services.PrismService;
+import com.helion3.prism.api.services.PrismServiceImpl;
 import com.helion3.prism.api.storage.StorageAdapter;
 import com.helion3.prism.commands.PrismCommands;
 import com.helion3.prism.configuration.Config;
@@ -164,6 +166,7 @@ public final class Prism {
     @Listener
     public void onPostInitialization(GamePostInitializationEvent event) {
         getConfiguration().saveConfiguration();
+        Sponge.getServiceManager().setProvider(this, PrismService.class, new PrismServiceImpl());
     }
 
     @Listener

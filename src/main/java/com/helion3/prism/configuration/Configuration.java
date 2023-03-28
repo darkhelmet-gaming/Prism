@@ -138,6 +138,7 @@ public class Configuration {
             getConfig().getEventCategory().setBlockDecay(events.getNode("decay").getBoolean(true));
             getConfig().getEventCategory().setBlockGrow(events.getNode("grow").getBoolean(true));
             getConfig().getEventCategory().setBlockPlace(events.getNode("place").getBoolean(true));
+            getConfig().getEventCategory().setSignChange(events.getNode("signchange").getBoolean(true));
             getConfig().getEventCategory().setCommandExecute(events.getNode("command").getBoolean(false));
             getConfig().getEventCategory().setEntityDeath(events.getNode("death").getBoolean(true));
             getConfig().getEventCategory().setInventoryClose(events.getNode("close").getBoolean(false));
